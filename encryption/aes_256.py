@@ -19,34 +19,34 @@ class AES256Cipher(object):
     def __init__(self, key):
         if len(key) != 32:  # allow only the most secure key length
             raise ValueError('AES Key must be 32 bytes long.')
-        AES.block_size = 16
+        self.block_size = AES.block_size
         self.key = key
 
     def encrypt(self, raw, iv):
-        raw = self._pad(raw)
+        raw = self.pad(raw, self.block_size)
         cipher = AES.new(self.key, AES.MODE_CBC, iv)
         return base64.b64encode(iv + cipher.encrypt(raw))
 
     def decrypt(self, enc):
         enc = base64.b64decode(enc)
-        iv = enc[:AES.block_size]
+        iv = enc[:self.block_size]
         cipher = AES.new(self.key, AES.MODE_CBC, iv)
-        return self._unpad(cipher.decrypt(enc[AES.block_size:])).decode('utf-8')
-
-    def _pad(self, s):  # using PKCS#7 style padding
-        return s + (AES.block_size - len(s) % AES.block_size) \
-                * chr(AES.block_size - len(s) % AES.block_size)
+        return self.unpad(cipher.decrypt(enc[self.block_size:])).decode('utf-8')
 
     @staticmethod
-    def _unpad(s):  # using PKCS#7 style padding
+    def pad(s, block_size):  # using PKCS#7 style padding
+        return s + (block_size - len(s) % block_size) \
+                * chr(block_size - len(s) % block_size)
+
+    @staticmethod
+    def unpad(s):  # using PKCS#7 style padding
         return s[:-ord(s[len(s)-1:])]
 
 if __name__ == "__main__":
 # This in an example. In production, you would want to read the key from an
-# external file or the command line.
+# external file or the command line. The key must be 32 bytes long.
 
 # DON'T DO THIS IN PRODUCTION!
-# key must be 32 bytes long
     key = b'Thirtytwo byte key, this is long'
 
 # In production, you would want to have a hardware random number generator
@@ -66,4 +66,7 @@ if __name__ == "__main__":
     print("decrypted: " + mydec)
 
 # make sure all memory is flushed after operations
+    del key
+    del message
+    del mydec
     gc.collect()
