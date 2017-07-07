@@ -19,14 +19,19 @@ def sha512_hash(salt, string):
     return hashlib.sha512(salt + string).hexdigest()
 
 if __name__ == "__main__":
-# In production the salt should come from a hardware random number generator and
-# be shared between parties.
+# In production the salt should come from a hardware random number generator
+# and will be shared between parties.
 
 # Salt must be 128 bytes in hex.
     salt = "a" * 128
+
     message = "This is a message. Hash me!"
+    print(message)
+
     hashed = sha512_hash(salt, message)
     print(hashed)
 
 # make sure all memory is flushed after operations
+    del salt
+    del message
     gc.collect()
