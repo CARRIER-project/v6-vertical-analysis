@@ -42,7 +42,7 @@ if __name__ == "__main__":
     print(verify_key.verify(signed, encoder=nacl.encoding.HexEncoder))
     print()
     print("verification negative:")
-    print(verify_key.verify(message, encoder=nacl.encoding.HexEncoder))
+    print(verify_key.verify("0"*len(signed), encoder=nacl.encoding.HexEncoder))
 
 # make sure all memory is flushed after operations
     del signing_key
