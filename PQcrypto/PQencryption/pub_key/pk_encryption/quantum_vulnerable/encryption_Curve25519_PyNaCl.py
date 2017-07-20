@@ -13,12 +13,12 @@ import nacl.utils
 import nacl.public
 import nacl.encoding
 
-def encrypt(secret_key, public_key, message):
+def encrypt(message, secret_key, public_key):
     encryption_box = nacl.public.Box(secret_key, public_key)
     nonce = nacl.utils.random(nacl.public.Box.NONCE_SIZE)
     return encryption_box.encrypt(message, nonce)
 
-def decrypt(secret_key, public_key, encrypted_message):
+def decrypt(encrypted_message, secret_key, public_key):
     decryption_box = nacl.public.Box(secret_key, public_key)
     return decryption_box.decrypt(encrypted_message)
 

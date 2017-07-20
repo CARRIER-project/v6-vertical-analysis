@@ -30,6 +30,13 @@ class Salsa20Cipher(object):
         return self.box.decrypt(encrypted,
                 encoder=nacl.encoding.HexEncoder)
 
+def encrypt(message, key):
+    my_cipher = Salsa20Cipher(key)
+    return my_cipher.encrypt(message)
+
+def decrypt(message, key):
+    my_cipher = Salsa20Cipher(key)
+    return my_cipher.decrypt(message)
 
 if __name__ == "__main__":
 # This in an example. In production, you would want to read the key from an

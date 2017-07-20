@@ -42,6 +42,17 @@ class AES256Cipher(object):
     def unpad(s):  # using PKCS#7 style padding
         return s[:-ord(s[len(s)-1:])]
 
+def encrypt(message, key):
+    # In production, you would want to have a hardware random number generator
+    # for initialization_vector-generation.
+    initialization_vector = Random.new().read(AES.block_size)
+    my_cipher = AES256Cipher(key)
+    return my_cipher.encrypt(message, initialization_vector)
+
+def decrypt(encrypted_message, key):
+    my_cipher = AES256Cipher(key)
+    return my_cipher.decrypt(encrypted_message)
+
 if __name__ == "__main__":
 # This in an example. In production, you would want to read the key from an
 # external file or the command line. The key must be 32 bytes long.
@@ -49,20 +60,15 @@ if __name__ == "__main__":
 # DON'T DO THIS IN PRODUCTION!
     key = b'Thirtytwo byte key, this is long'
 
-# In production, you would want to have a hardware random number generator
-# for this.
-    initialization_vector = Random.new().read(AES.block_size)
-
     message = 'This is my message.'
     print("message  : " + message)
-    my_cipher = AES256Cipher(key)
 
 # encryption
-    my_encrypted_message = my_cipher.encrypt(message, initialization_vector)
+    my_encrypted_message = encrypt(message, key)
     print("encrypted: " + my_encrypted_message)
 
 # decryption
-    mydec = my_cipher.decrypt(my_encrypted_message)
+    mydec = decrypt(my_encrypted_message, key)
     print("decrypted: " + mydec)
 
 # make sure all memory is flushed after operations

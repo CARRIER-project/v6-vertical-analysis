@@ -59,8 +59,10 @@ def get_password(validate):
 
 	return password
 
-def export_key(key, path, name, header, private):
-    if private:
+def export_key(key, path, name, header, key_type):
+    if ((key_type == "PrivateKey")
+            or (key_type == "SigningKey")
+            or (key_type == "SymmetricKey")):
         user_password = get_password(validate=True)
 
         # turn user_password into 32 char storag_password for Salsa20:
@@ -84,7 +86,9 @@ def import_key(path, name, key_type):
         for line in file:
             if not line.strip().startswith('#'):
                 raw_key = line
-    if (key_type == "SigningKey") or (key_type == "PrivateKey"):
+    if ((key_type == "SigningKey")
+        or (key_type == "PrivateKey")
+        or (key_type == "SymmetricKey")):
         user_password = get_password(validate=False)
 
         # turn user_password into 32 char storage_password for Salsa20:
@@ -92,7 +96,9 @@ def import_key(path, name, key_type):
                 encoder=nacl.encoding.HexEncoder)[:32]
         my_cipher = salsa20_256_PyNaCl.Salsa20Cipher(storage_password)
         decrypted_key = my_cipher.decrypt(raw_key)
-        if key_type == "PrivateKey":
+        if key_type == "SymmetricKey":
+            key = decrypted_key.decode("hex")
+        elif key_type == "PrivateKey":
             key = nacl.public.PrivateKey(decrypted_key,
                     encoder=nacl.encoding.HexEncoder)
         else:
@@ -109,12 +115,17 @@ def import_key(path, name, key_type):
     return key
 
 def generate_symmetric_key(size=32):
-    byte_key = nacl.utils.random(size)
-    return nacl.encoding.HexEncoder.encode(byte_key)
+    return nacl.utils.random(size)
 
-def generate_signing_keys():
+def generate_signing_verify_keys():
     signing_key = nacl.signing.SigningKey.generate()
     verify_key = signing_key.verify_key
-    verify_key_hex = verify_key.encode(encoder=nacl.encoding.HexEncoder)
-    signing_key_hex = signing_key.encode(encoder=nacl.encoding.HexEncoder)
-    return signing_key_hex, verify_key_hex
+    return signing_key, verify_key
+
+def generate_public_private_keys():
+    private_key = nacl.public.PrivateKey.generate()
+    public_key = private_key.public_key
+    return public_key, private_key
+
+def to_hex(string):
+    return nacl.encoding.HexEncoder.encode(string)

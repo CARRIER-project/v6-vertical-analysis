@@ -13,10 +13,9 @@ import nacl.signing
 import nacl.encoding
 
 def sign(signing_key, message):
-    signed = signing_key.sign(message, encoder=nacl.encoding.HexEncoder)
+    signed = signing_key.sign(message)
     verify_key = signing_key.verify_key
-    verify_key_hex = verify_key.encode(encoder=nacl.encoding.HexEncoder)
-    return signed, verify_key_hex
+    return signed, verify_key
 
 
 if __name__ == "__main__":
