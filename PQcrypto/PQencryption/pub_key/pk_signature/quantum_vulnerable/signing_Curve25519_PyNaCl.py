@@ -13,9 +13,7 @@ import nacl.signing
 import nacl.encoding
 
 def sign(signing_key, message):
-    signed = signing_key.sign(message)
-    verify_key = signing_key.verify_key
-    return signed, verify_key
+    return signing_key.sign(message)
 
 
 if __name__ == "__main__":
@@ -24,12 +22,14 @@ if __name__ == "__main__":
 
 # DON'T DO THIS IN PRODUCTION!
     signing_key = nacl.signing.SigningKey.generate()
+    verify_key = signing_key.verify_key
 
     message = 'This is my message.'
     print("message  : " + message)
 
 # signing
-    signed, verify_key_hex = sign(signing_key, message)
+    signed = sign(signing_key, message)
+    verify_key_hex = verify_key.encode(encoder=nacl.encoding.HexEncoder)
     print("signed: " + signed)
     print("verify_key_hex: " + verify_key_hex)
 
@@ -38,10 +38,10 @@ if __name__ == "__main__":
             encoder=nacl.encoding.HexEncoder)
     print()
     print("verification positive:")
-    print(verify_key.verify(signed, encoder=nacl.encoding.HexEncoder))
+    print(verify_key.verify(signed))
     print()
     print("verification negative:")
-    print(verify_key.verify("0"*len(signed), encoder=nacl.encoding.HexEncoder))
+    print(verify_key.verify("0"*len(signed)))
 
 # make sure all memory is flushed after operations
     del signing_key

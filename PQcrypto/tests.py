@@ -186,20 +186,50 @@ class TestFunctions(unittest.TestCase):
         self.assertNotEqual(message, my_encrypted_message)
         self.assertEqual(message, my_decrypted_message)
 
+    def test_sign_encrypt_sign(self):
+        from PQencryption.pub_key.pk_signature.quantum_vulnerable import signing_Curve25519_PyNaCl
+        from PQencryption.pub_key.pk_encryption.quantum_vulnerable import encryption_Curve25519_PyNaCl
+        from PQencryption import utilities
+        import nacl.encoding
+
+        signing_key, verify_key = utilities.generate_signing_verify_keys()
+        encryption_key = utilities.generate_symmetric_key()
+
+        message = 'This is my message.'
+
+        signed_encrypted_signed_message = utilities.sign_encrypt_sign(message,
+                signing_key, encryption_key)
+
+        # verify positive
+        verified_decrypted_verified_message = utilities.verify_decrypt_verify(
+                signed_encrypted_signed_message, verify_key, encryption_key)
+        self.assertEqual(message, verified_decrypted_verified_message)
+
+        # verify negative
+        # we should test all layers of the onion, not only the outer one. TODO
+        with self.assertRaises(Exception) as bad_signature:
+            spoof = "0"*len(nacl.encoding.RawEncoder.encode(
+                verified_decrypted_verified_message))
+            verified_decrypted_verified_message = \
+                    utilities.verify_decrypt_verify(spoof, verify_key,
+                            encryption_key)
+        self.assertTrue("Signature was forged or corrupt"
+                in bad_signature.exception)
+
+
     def test_quantum_vulnerable_signing(self):
         from PQencryption.pub_key.pk_signature.quantum_vulnerable import signing_Curve25519_PyNaCl
         from PQencryption import utilities
 
         signing_key, verify_key = utilities.generate_signing_verify_keys()
+
         message = 'This is my message.'
 
         # signing
-        signed, verified = signing_Curve25519_PyNaCl.sign(signing_key,
-                message)
+        signed = signing_Curve25519_PyNaCl.sign(signing_key, message)
 
         # verify positive
         out = verify_key.verify(signed)
-        self.assertEqual(verify_key, verified)
         self.assertEqual(message, out)
 
         # verify negative
@@ -208,6 +238,10 @@ class TestFunctions(unittest.TestCase):
             out = verify_key.verify(spoof)
         self.assertTrue("Signature was forged or corrupt"
                 in bad_signature.exception)
+
+        # test derived key
+        derived_verify_key = signing_key.verify_key
+        self.assertEqual(verify_key, derived_verify_key)
 
     def test_quantum_vulnerable_encryption(self):
         from PQencryption.pub_key.pk_encryption.quantum_vulnerable import encryption_Curve25519_PyNaCl

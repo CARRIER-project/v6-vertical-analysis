@@ -16,6 +16,7 @@ import nacl.signing
 import nacl.encoding
 import nacl.public
 from symmetric_encryption import salsa20_256_PyNaCl
+from pub_key.pk_signature.quantum_vulnerable import signing_Curve25519_PyNaCl
 
 def check_password(password):
 	length = 20
@@ -129,3 +130,19 @@ def generate_public_private_keys():
 
 def to_hex(string):
     return nacl.encoding.HexEncoder.encode(string)
+
+def sign_encrypt_sign(message, signing_key, encryption_key):
+    signed_message = signing_Curve25519_PyNaCl.sign(signing_key, message)
+    encrypted_signed_message = salsa20_256_PyNaCl.encrypt(signed_message,
+            encryption_key)
+    signed_encrypted_signed_message = signing_Curve25519_PyNaCl.sign(
+            signing_key, encrypted_signed_message)
+    return signed_encrypted_signed_message
+
+def verify_decrypt_verify(message, verify_key, encryption_key):
+    signed_encrypted_signed = message
+    verified_encrypted_signed = verify_key.verify(message)
+    signed = salsa20_256_PyNaCl.decrypt(verified_encrypted_signed,
+            encryption_key)
+    verified = verify_key.verify(signed)
+    return verified
