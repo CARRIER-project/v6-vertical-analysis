@@ -10,7 +10,12 @@ from __future__ import print_function  # make print python3 compatible
 import gc  # garbage collection
 import unittest
 import mock
+import os
 
+try:
+    os.mkdir("./tmp")
+except:
+    pass
 
 class TestFunctions(unittest.TestCase):
     def test_generate_signing_verify_key(self):
@@ -85,7 +90,7 @@ class TestFunctions(unittest.TestCase):
         s_raw, v_raw = utilities.generate_signing_verify_keys()
         signing_key_for_export_hex = utilities.to_hex(str(s_raw))
         verify_key_for_export_hex = utilities.to_hex(str(v_raw))
-        path = "/tmp"
+        path = "tmp"
         s_header = ("# This is an encrypted private signing key."
                 "KEEP IT PRIVATE!\n")
         v_header = ("# This is a public verification key."
@@ -118,7 +123,7 @@ class TestFunctions(unittest.TestCase):
         from PQencryption import utilities
         s_raw = utilities.generate_symmetric_key()
         symmetric_key_for_export_hex = utilities.to_hex(s_raw)
-        path = "/tmp"
+        path = "tmp"
         s_header = ("# This is an encrypted symmetric key."
                 "KEEP IT PRIVATE!\n")
         s_name = "_PRIVATE_symmetric_key_CBS"
