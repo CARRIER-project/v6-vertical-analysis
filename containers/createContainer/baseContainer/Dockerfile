@@ -8,6 +8,6 @@ COPY run.py run.py
 
 RUN pip install mock pynacl crypto pycrypto
 
-ADD PQcrypto/ /usr/lib/pyton2.7/dist-packages/PQcrypto/
+ADD PQcrypto/PQencryption/ /usr/local/lib/python2.7/site-packages/PQencryption/
 
 CMD ["python", "run.py"]
