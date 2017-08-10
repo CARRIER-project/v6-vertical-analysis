@@ -1,1 +1,0 @@
-pip install mock pynacl crypto pycrypto

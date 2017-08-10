@@ -7,6 +7,8 @@ RUN mkdir /data
 COPY prepare.sh prepare.sh
 COPY run.py run.py
 
-RUN sh prepare.sh
+RUN pip install mock pynacl crypto pycrypto
+
+ADD ../../PQcrypto /usr/lib/pyton2.7/dist-packages/PQcrypto
 
 CMD ["python", "run.py"]
