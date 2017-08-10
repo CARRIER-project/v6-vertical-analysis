@@ -1,6 +1,6 @@
 xcopy ..\..\PQcrypto baseContainer\PQcrypto /e /i /h
 docker rmi datasharing/base
-docker build -t datasharing/pqcrypto baseContainer/
+docker build -t datasharing/base baseContainer/
 rmdir /Q /S baseContainer\PQcrypto
 
 rem if you want to run the container in a command line, and mount the PQcrypto to a local folder, use this line
