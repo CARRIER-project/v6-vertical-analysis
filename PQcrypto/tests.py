@@ -186,7 +186,7 @@ class TestFunctions(unittest.TestCase):
         self.assertNotEqual(message, my_encrypted_message)
         self.assertEqual(message, my_decrypted_message)
 
-    def test_sign_encrypt_sign(self):
+    def test_sign_encrypt_sign_and_verify_decrypt_verify(self):
         from PQencryption.pub_key.pk_signature.quantum_vulnerable import signing_Curve25519_PyNaCl
         from PQencryption.pub_key.pk_encryption.quantum_vulnerable import encryption_Curve25519_PyNaCl
         from PQencryption import utilities
