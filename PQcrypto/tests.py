@@ -13,9 +13,12 @@ import mock
 import os
 
 try:
-    os.mkdir("./tmp")
+    os.mkdir("./.tmp")
 except:
     pass
+
+with open("./.tmp/README.md", 'w') as f:
+    f.write("This directory stores temporary keys for testing.")
 
 class TestFunctions(unittest.TestCase):
     def test_generate_signing_verify_key(self):
@@ -94,7 +97,7 @@ class TestFunctions(unittest.TestCase):
         s_raw, v_raw = signing_Curve25519_PyNaCl.key_gen()
         signing_key_for_export_hex = utilities.to_hex(str(s_raw))
         verify_key_for_export_hex = utilities.to_hex(str(v_raw))
-        path = "tmp"
+        path = ".tmp"
         s_header = ("# This is an encrypted private signing key."
                 "KEEP IT PRIVATE!\n")
         v_header = ("# This is a public verification key."
@@ -128,7 +131,7 @@ class TestFunctions(unittest.TestCase):
         from PQencryption.symmetric_encryption import salsa20_256_PyNaCl
         s_raw = salsa20_256_PyNaCl.key_gen()
         symmetric_key_for_export_hex = utilities.to_hex(s_raw)
-        path = "tmp"
+        path = ".tmp"
         s_header = ("# This is an encrypted symmetric key."
                 "KEEP IT PRIVATE!\n")
         s_name = "_PRIVATE_symmetric_key_CBS"
