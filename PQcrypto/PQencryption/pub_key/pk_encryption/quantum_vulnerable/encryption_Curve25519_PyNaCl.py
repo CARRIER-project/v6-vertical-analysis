@@ -22,6 +22,11 @@ def decrypt(encrypted_message, secret_key, public_key):
     decryption_box = nacl.public.Box(secret_key, public_key)
     return decryption_box.decrypt(encrypted_message)
 
+def key_gen():
+    private_key = nacl.public.PrivateKey.generate()
+    public_key = private_key.public_key
+    return public_key, private_key
+
 if __name__ == "__main__":
 # This in an example. In production, you would want to read the key from an
 # external file or the command line. The key must be 32 bytes long.

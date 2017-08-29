@@ -115,11 +115,6 @@ def import_key(path, name, key_type):
         raise KeyError("Invalid key type: " + key_type)
     return key
 
-def generate_public_private_keys():
-    private_key = nacl.public.PrivateKey.generate()
-    public_key = private_key.public_key
-    return public_key, private_key
-
 def to_hex(string):
     return nacl.encoding.HexEncoder.encode(string)
 

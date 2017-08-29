@@ -18,7 +18,7 @@ except:
     pass
 
 with open("./.tmp/README.md", 'w') as f:
-    f.write("This directory stores temporary keys for testing.")
+    f.write("This directory stores temporary keys for testing.\n")
 
 class TestFunctions(unittest.TestCase):
     def test_generate_signing_verify_key(self):
@@ -48,7 +48,8 @@ class TestFunctions(unittest.TestCase):
     def test_generate_public_private_key(self):
         import nacl.public
         from PQencryption import utilities
-        pub_raw, priv_raw = utilities.generate_public_private_keys()
+        from PQencryption.pub_key.pk_encryption.quantum_vulnerable import encryption_Curve25519_PyNaCl
+        pub_raw, priv_raw = encryption_Curve25519_PyNaCl.key_gen()
         public_key_hex = utilities.to_hex(str(pub_raw))
         private_key_hex = utilities.to_hex(str(priv_raw))
 
@@ -261,10 +262,10 @@ class TestFunctions(unittest.TestCase):
         from PQencryption import utilities
 
         public_key_Alice, secret_key_Alice = \
-                utilities.generate_public_private_keys()
+                encryption_Curve25519_PyNaCl.key_gen()
 
         public_key_Bob, secret_key_Bob = \
-                utilities.generate_public_private_keys()
+                encryption_Curve25519_PyNaCl.key_gen()
 
         message = 'This is my message.'
 
