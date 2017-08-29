@@ -21,7 +21,8 @@ class TestFunctions(unittest.TestCase):
     def test_generate_signing_verify_key(self):
         import nacl.signing
         from PQencryption import utilities
-        s_raw, v_raw = utilities.generate_signing_verify_keys()
+        from PQencryption.pub_key.pk_signature.quantum_vulnerable import signing_Curve25519_PyNaCl
+        s_raw, v_raw = signing_Curve25519_PyNaCl.key_gen()
         signing_key_hex = utilities.to_hex(str(s_raw))
         verify_key_hex = utilities.to_hex(str(v_raw))
 
@@ -89,7 +90,8 @@ class TestFunctions(unittest.TestCase):
     def test_public_key_import_export(self, input):
         import os
         from PQencryption import utilities
-        s_raw, v_raw = utilities.generate_signing_verify_keys()
+        from PQencryption.pub_key.pk_signature.quantum_vulnerable import signing_Curve25519_PyNaCl
+        s_raw, v_raw = signing_Curve25519_PyNaCl.key_gen()
         signing_key_for_export_hex = utilities.to_hex(str(s_raw))
         verify_key_for_export_hex = utilities.to_hex(str(v_raw))
         path = "tmp"
@@ -123,7 +125,8 @@ class TestFunctions(unittest.TestCase):
     def test_symmetric_key_import_export(self, input):
         import os
         from PQencryption import utilities
-        s_raw = utilities.generate_symmetric_key()
+        from PQencryption.symmetric_encryption import salsa20_256_PyNaCl
+        s_raw = salsa20_256_PyNaCl.key_gen()
         symmetric_key_for_export_hex = utilities.to_hex(s_raw)
         path = "tmp"
         s_header = ("# This is an encrypted symmetric key."
@@ -163,7 +166,7 @@ class TestFunctions(unittest.TestCase):
         from PQencryption.symmetric_encryption import aes_256_Crypto
         from PQencryption import utilities
 
-        key = utilities.generate_symmetric_key()
+        key = aes_256_Crypto.key_gen()
         message = 'This is my message.'
 
         # encryption
@@ -180,7 +183,7 @@ class TestFunctions(unittest.TestCase):
         from PQencryption.symmetric_encryption import salsa20_256_PyNaCl
         from PQencryption import utilities
 
-        key = utilities.generate_symmetric_key()
+        key = salsa20_256_PyNaCl.key_gen()
         message = 'This is my message.'
 
         # encryption
@@ -196,11 +199,12 @@ class TestFunctions(unittest.TestCase):
     def test_sign_encrypt_sign_and_verify_decrypt_verify(self):
         from PQencryption.pub_key.pk_signature.quantum_vulnerable import signing_Curve25519_PyNaCl
         from PQencryption.pub_key.pk_encryption.quantum_vulnerable import encryption_Curve25519_PyNaCl
+        from PQencryption.symmetric_encryption import salsa20_256_PyNaCl
         from PQencryption import utilities
         import nacl.encoding
 
-        signing_key, verify_key = utilities.generate_signing_verify_keys()
-        encryption_key = utilities.generate_symmetric_key()
+        signing_key, verify_key = signing_Curve25519_PyNaCl.key_gen()
+        encryption_key = salsa20_256_PyNaCl.key_gen()
 
         message = 'This is my message.'
 
@@ -227,7 +231,7 @@ class TestFunctions(unittest.TestCase):
         from PQencryption.pub_key.pk_signature.quantum_vulnerable import signing_Curve25519_PyNaCl
         from PQencryption import utilities
 
-        signing_key, verify_key = utilities.generate_signing_verify_keys()
+        signing_key, verify_key = signing_Curve25519_PyNaCl.key_gen()
 
         message = 'This is my message.'
 

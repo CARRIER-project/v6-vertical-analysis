@@ -115,14 +115,6 @@ def import_key(path, name, key_type):
         raise KeyError("Invalid key type: " + key_type)
     return key
 
-def generate_symmetric_key(size=32):
-    return nacl.utils.random(size)
-
-def generate_signing_verify_keys():
-    signing_key = nacl.signing.SigningKey.generate()
-    verify_key = signing_key.verify_key
-    return signing_key, verify_key
-
 def generate_public_private_keys():
     private_key = nacl.public.PrivateKey.generate()
     public_key = private_key.public_key
