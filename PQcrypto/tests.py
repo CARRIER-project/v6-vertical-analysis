@@ -208,14 +208,13 @@ class TestFunctions(unittest.TestCase):
         # verify negative
         # we should test all layers of the onion, not only the outer one. TODO
         with self.assertRaises(Exception) as bad_signature:
-            spoof = "0"*len(nacl.encoding.RawEncoder.encode(
+            spoof = "0"*len(nacl.encoding.HexEncoder.encode(
                 verified_decrypted_verified_message))
             verified_decrypted_verified_message = \
                     utilities.verify_decrypt_verify(spoof, verify_key,
                             encryption_key)
         self.assertTrue("Signature was forged or corrupt"
                 in bad_signature.exception)
-
 
     def test_quantum_vulnerable_signing(self):
         from PQencryption.pub_key.pk_signature.quantum_vulnerable import signing_Curve25519_PyNaCl
@@ -275,6 +274,12 @@ class TestFunctions(unittest.TestCase):
         string = "Hex me."
         hexed = utilities.to_hex(string)
         self.assertEqual(hexed, "486578206d652e")
+
+    def test_from_hex(self):
+        from PQencryption import utilities
+        string = "486578206d652e"
+        de_hexed = utilities.from_hex(string)
+        self.assertEqual(de_hexed, "Hex me.")
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

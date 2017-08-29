@@ -7,20 +7,50 @@ Created on vr 25 aug 2017 17:44:50 CEST
 """
 
 from __future__ import print_function  # make print python3 compatible
+import ctypes
 
-import gc  # garbage collector
-import nacl.utils
-import nacl.public
-import nacl.encoding
+mcbits = ctypes.CDLL("./libmcbits.so")
 
-def encrypt(message, secret_key, public_key):
-    encryption_box = nacl.public.Box(secret_key, public_key)
-    nonce = nacl.utils.random(nacl.public.Box.NONCE_SIZE)
-    return encryption_box.encrypt(message, nonce)
+# general vars
+synd_bytes = 208
+len_pk = 1357824
+len_sk = 13008
 
-def decrypt(encrypted_message, secret_key, public_key):
-    decryption_box = nacl.public.Box(secret_key, public_key)
-    return decryption_box.decrypt(encrypted_message)
+def generate_keys():
+    secret_key = (ctypes.c_ubyte * len_sk)()
+    public_key = (ctypes.c_ubyte * len_pk)()
+    mcbits.crypto_encrypt_keypair(public_key, secret_key)
+    return bytearray(secret_key), bytearray(public_key)
+
+def encrypt(message, public_key_byte_array):
+    key_length = len(public_key_byte_array)
+    public_key = (ctypes.c_ubyte * key_length)(*public_key_byte_array)
+    message_length = len(message)
+    cypher_length = synd_bytes + message_length + 16
+    cypher = (ctypes.c_ubyte * cypher_length)()
+    clen = ctypes.c_longlong()
+
+    mcbits.crypto_encrypt(cypher, ctypes.byref(clen), message, message_length,
+            public_key)
+
+    return cypher
+
+def decrypt(encrypted_message, secret_key_byte_array):
+    key_length = len(secret_key_byte_array)
+    secret_key = (ctypes.c_ubyte * key_length)(*secret_key_byte_array)
+    cypher_length = len(encrypted_message)
+    message_length = len(encrypted_message) - synd_bytes - 16
+    decrypted = (ctypes.c_ubyte * message_length)()
+    mlen = ctypes.c_longlong()
+
+    status = mcbits.crypto_encrypt_open(decrypted, ctypes.byref(mlen),
+            encrypted_message, cypher_length, secret_key)
+
+    if status == 0:
+        return decrypted
+    else:
+        raise ValueError("Decryption failed, 'mcbits.crypto_encrypt_open "
+        "return value' is not zero")
 
 if __name__ == "__main__":
 # This in an example. In production, you would want to read the key from an

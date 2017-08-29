@@ -131,6 +131,9 @@ def generate_public_private_keys():
 def to_hex(string):
     return nacl.encoding.HexEncoder.encode(string)
 
+def from_hex(string):
+    return nacl.encoding.HexEncoder.decode(string)
+
 def sign_encrypt_sign(message, signing_key, encryption_key):
     signed_message = signing_Curve25519_PyNaCl.sign(signing_key, message)
     encrypted_signed_message = salsa20_256_PyNaCl.encrypt(signed_message,
