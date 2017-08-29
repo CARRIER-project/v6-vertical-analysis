@@ -66,7 +66,9 @@ class TestFunctions(unittest.TestCase):
 
     def test_generate_symmetric_key(self):
         from PQencryption import utilities
-        sym_raw = utilities.generate_symmetric_key()
+        from PQencryption.symmetric_encryption import salsa20_256_PyNaCl
+
+        sym_raw = salsa20_256_PyNaCl.key_gen()
         symmetric_key_hex = utilities.to_hex(sym_raw)
 
         # Is it of the correct type?
