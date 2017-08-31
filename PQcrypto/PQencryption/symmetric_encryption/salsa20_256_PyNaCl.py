@@ -17,7 +17,7 @@ class Salsa20Cipher(object):
 
     def __init__(self, key):
         if len(key) != 32:  # allow only the most secure key length
-            raise ValueError('AES Key must be 32 bytes long.')
+            raise ValueError('Salsa20 key must be 32 bytes long.')
         self.key = key
         self.box = nacl.secret.SecretBox(key)
 
@@ -29,6 +29,9 @@ class Salsa20Cipher(object):
     def decrypt(self, encrypted):
         return self.box.decrypt(encrypted,
                 encoder=nacl.encoding.HexEncoder)
+
+def key_gen(size=32):
+    return nacl.utils.random(size)
 
 def encrypt(message, key):
     my_cipher = Salsa20Cipher(key)
@@ -43,7 +46,7 @@ if __name__ == "__main__":
 # external file or the command line. The key must be 32 bytes long.
 
 # DON'T DO THIS IN PRODUCTION!
-    key = b'Thirtytwo byte key, this is long'
+    key = key_gen()
 
     message = 'This is my message.'
     print("message  : " + message)

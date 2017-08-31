@@ -260,7 +260,16 @@ def example_import_symmetric_key(path, symmetric_key, s_name):
         imported_symmetric_key))
     print("="*79)
 
-def example_generate_signing_key():
+def example_generate_public_private_keys():
+    import nacl.encoding
+    from PQencryption import utilities
+    pu_raw, pr_raw = utilities.generate_public_private_keys()
+    public_key = pu_raw.encode(encoder=nacl.encoding.HexEncoder)
+    private_key = pr_raw.encode(encoder=nacl.encoding.HexEncoder)
+    print(public_key)
+    print(private_key)
+
+def example_generate_signing_verify_keys():
     import nacl.encoding
     from PQencryption import utilities
     s_raw, v_raw = utilities.generate_signing_verify_keys()
@@ -285,7 +294,9 @@ if __name__ == "__main__":
 
     #example_salsa20_256_PyNaCl()
 
-    #example_generate_signing_key()
+    #example_generate_public_private_keys()
+
+    #example_generate_signing_verify_keys()
 
     #example_generate_symmetric_key()
 

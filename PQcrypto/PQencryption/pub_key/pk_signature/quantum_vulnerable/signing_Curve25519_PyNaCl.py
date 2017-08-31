@@ -15,14 +15,18 @@ import nacl.encoding
 def sign(signing_key, message):
     return signing_key.sign(message)
 
+def key_gen():
+    signing_key = nacl.signing.SigningKey.generate()
+    verify_key = signing_key.verify_key
+    return signing_key, verify_key
+
 
 if __name__ == "__main__":
 # This in an example. In production, you would want to read the key from an
 # external file or the command line. The key must be 32 bytes long.
 
 # DON'T DO THIS IN PRODUCTION!
-    signing_key = nacl.signing.SigningKey.generate()
-    verify_key = signing_key.verify_key
+    signing_key, verify_key = key_gen()
 
     message = 'This is my message.'
     print("message  : " + message)

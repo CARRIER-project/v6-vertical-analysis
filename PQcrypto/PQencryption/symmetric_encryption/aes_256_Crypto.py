@@ -42,6 +42,9 @@ class AES256Cipher(object):
     def unpad(s):  # using PKCS#7 style padding
         return s[:-ord(s[len(s)-1:])]
 
+def key_gen(size=32):
+    return Random.new().read(size)
+
 def encrypt(message, key):
     # In production, you would want to have a hardware random number generator
     # for initialization_vector-generation.
@@ -58,7 +61,7 @@ if __name__ == "__main__":
 # external file or the command line. The key must be 32 bytes long.
 
 # DON'T DO THIS IN PRODUCTION!
-    key = b'Thirtytwo byte key, this is long'
+    key = key_gen()
 
     message = 'This is my message.'
     print("message  : " + message)
