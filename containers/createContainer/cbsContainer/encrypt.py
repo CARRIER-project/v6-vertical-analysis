@@ -11,3 +11,6 @@ resultJson = json.loads(res.text.encode("utf-8"))
 #print output
 print("Stored encrypted file as %s" % (resultJson["status"].encode("utf-8")))
 print("UUID: %s" % resultJson["uuid"].encode("utf-8"))
+
+with open('result.txt', 'w') as fp:
+    json.dump(resultJson, fp)
