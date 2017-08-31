@@ -1,5 +1,5 @@
-cbsSet <- read.csv("/input/cbs.csv")
-dmsSet <- read.csv("/input/dms.csv")
+cbsSet <- read.csv("/data/cbsData.csv")
+dmsSet <- read.csv("/data/umData.csv")
 
 #DMS set is subset of CBS
 mergedSet <- sapply(dmsSet$id, function(x) {
