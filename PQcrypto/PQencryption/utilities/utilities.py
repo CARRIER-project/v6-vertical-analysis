@@ -16,8 +16,6 @@ import nacl.utils
 import nacl.signing
 import nacl.encoding
 import nacl.public
-#from .symmetric_encryption import salsa20_256_PyNaCl
-#from .pub_key.pk_signature.quantum_vulnerable import signing_Curve25519_PyNaCl
 
 def _check_password(password):
     length = 20
@@ -62,28 +60,6 @@ def _get_password(validate=False, print_requirements=True):
 
     return password
 
-#def export_key(key, path, name, header, key_type):
-#    if ((key_type == "PrivateKey")
-#            or (key_type == "SigningKey")
-#            or (key_type == "SymmetricKey")):
-#        user_password = get_password(validate=True)
-#
-#        # turn user_password into 32 char storag_password for Salsa20:
-#        storage_password = nacl.hash.sha512(user_password,
-#                encoder=nacl.encoding.HexEncoder)[:32]
-#        my_cipher = salsa20_256_PyNaCl.Salsa20Cipher(storage_password)
-#        key_for_file = my_cipher.encrypt(key)
-#        del user_password
-#        del storage_password
-#        del my_cipher
-#    else:
-#        key_for_file = key
-#    with open(path + "/" + name, 'w') as file:
-#        file.write(header)
-#        file.write(key_for_file)
-#    del key_for_file
-#    gc.collect()
-#
 def import_key(file_name_with_path, silent=False):
     file_name = os.path.basename(file_name_with_path)
     key = False
@@ -153,54 +129,3 @@ def import_key(file_name_with_path, silent=False):
         return key
     else:
         raise TypeError("Importing invalid key.")
-
-#    if ((key_type == "SigningKey")
-#        or (key_type == "PrivateKey")
-#        or (key_type == "SymmetricKey")):
-#        user_password = get_password(validate=False)
-#
-#        # turn user_password into 32 char storage_password for Salsa20:
-#        storage_password = nacl.hash.sha512(user_password,
-#                encoder=nacl.encoding.HexEncoder)[:32]
-#        my_cipher = salsa20_256_PyNaCl.Salsa20Cipher(storage_password)
-#        decrypted_key = my_cipher.decrypt(raw_key)
-#        if key_type == "SymmetricKey":
-#            key = decrypted_key.decode("hex")
-#        elif key_type == "PrivateKey":
-#            key = nacl.public.PrivateKey(decrypted_key,
-#                    encoder=nacl.encoding.HexEncoder)
-#        else:
-#            key = nacl.signing.SigningKey(decrypted_key,
-#                    encoder=nacl.encoding.HexEncoder)
-#    elif key_type == "PublicKey":
-#        key = nacl.public.PublicKey(raw_key,
-#                encoder=nacl.encoding.HexEncoder)
-#    elif key_type == "VerifyKey":
-#        key = nacl.signing.VerifyKey(raw_key,
-#                encoder=nacl.encoding.HexEncoder)
-#    else:
-#        raise KeyError("Invalid key type: " + key_type)
-#    return key
-
-#def _to_hex(string):
-#    #return nacl.encoding.HexEncoder.encode(string)
-#    return nacl.encoding.HexEncoder.encode(bytes(string.encode("utf-8"))).decode("utf-8")
-#
-#def _from_hex(string):
-#    return nacl.encoding.HexEncoder.decode(string).decode("utf-8")
-
-#def sign_encrypt_sign(message, signing_key, encryption_key):
-#    signed_message = signing_Curve25519_PyNaCl.sign(message, signing_key)
-#    encrypted_signed_message = salsa20_256_PyNaCl.encrypt(signed_message,
-#            encryption_key)
-#    signed_encrypted_signed_message = signing_Curve25519_PyNaCl.sign(
-#            encrypted_signed_message, signing_key)
-#    return signed_encrypted_signed_message
-#
-#def verify_decrypt_verify(signed_encrypted_signed, verify_key, encryption_key):
-#    verify_key_hex = verify_key.encode(encoder=nacl.encoding.HexEncoder).decode("utf-8")
-#    verified_encrypted_signed = signing_Curve25519_PyNaCl.verify(signed_encrypted_signed, verify_key_hex)
-#    signed = salsa20_256_PyNaCl.decrypt(verified_encrypted_signed,
-#            encryption_key)
-#    verified = signing_Curve25519_PyNaCl.verify(signed, verify_key_hex)
-#    return verified

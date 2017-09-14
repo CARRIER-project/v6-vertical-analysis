@@ -29,16 +29,16 @@ class EdDSA(object):
     def sign(self, message):
         if isinstance(self.key.key, nacl.signing.SigningKey):
             signed = self.key.key.sign(bytes(message.encode("utf-8")))
-            return nacl.encoding.HexEncoder.encode(signed).decode("utf-8")
+            return nacl.encoding.Base64Encoder.encode(signed).decode("utf-8")
         else:
             raise TypeError("Key is no EdDSA SigningKey")
 
-    def verify(self, signed_message_hex):
+    def verify(self, signed_message_base64):
         if isinstance(self.key.key, nacl.signing.VerifyKey):
-            signed_message = nacl.encoding.HexEncoder.decode(
-                    signed_message_hex)
+            signed_message = nacl.encoding.Base64Encoder.decode(
+                    signed_message_base64)
 #            verify_key = nacl.signing.VerifyKey(self.key,
-#                    encoder=nacl.encoding.HexEncoder)
+#                    encoder=nacl.encoding.Base64Encoder)
             return self.key.key.verify(signed_message).decode("utf-8")
         else:
             raise TypeError("Key is no EdDSA VerifyKey")
@@ -73,7 +73,7 @@ class EdDSASigningKey(EdDSAKey):
     def import_key(file_name_with_path, silent=False):
         with open(file_name_with_path) as f:
             header = f.readline().rstrip()
-            encrypted_key_hex = f.readline().rstrip()
+            encrypted_key_base64 = f.readline().rstrip()
             footer = f.readline().rstrip()
         if not secret_key_description in header:
             raise IOError("Key is not a EdDSA SECRET key.")
@@ -85,11 +85,11 @@ class EdDSASigningKey(EdDSAKey):
         else:
             user_password = _get_password(validate=False)
         storage_password = \
-                nacl.encoding.HexEncoder.decode(hash512(user_password))[:32]
+                nacl.encoding.Base64Encoder.decode(hash512(user_password))[:32]
         storage_key = Salsa20Key(storage_password)
         symmetric_cipher = Salsa20(storage_key)
-        decrypted_key_hex = symmetric_cipher.decrypt(encrypted_key_hex)
-        decrypted_key = nacl.encoding.HexEncoder.decode(decrypted_key_hex)
+        decrypted_key_base64 = symmetric_cipher.decrypt(encrypted_key_base64)
+        decrypted_key = nacl.encoding.Base64Encoder.decode(decrypted_key_base64)
         return EdDSASigningKey(nacl.signing.SigningKey(decrypted_key))
 
 class EdDSAVerifyKey(EdDSAKey):
@@ -102,23 +102,23 @@ class EdDSAVerifyKey(EdDSAKey):
     def import_key(file_name_with_path, silent=False):
         with open(file_name_with_path) as f:
             header = f.readline().rstrip()
-            key_hex = f.readline().rstrip()
+            key_base64 = f.readline().rstrip()
             footer = f.readline().rstrip()
         if not public_key_description in header:
             raise IOError("Key is not a EdDSA Public key.")
         if not footer == Key.footer:
             raise IOError("Key is not a valid key.")
-        key = nacl.encoding.HexEncoder.decode(key_hex)
+        key = nacl.encoding.Base64Encoder.decode(key_base64)
         return EdDSAVerifyKey(nacl.signing.VerifyKey(key))
 
 def sign(message, signing_key):
     signed = signing_key.sign(bytes(message.encode("utf-8")))
-    return nacl.encoding.HexEncoder.encode(signed).decode("utf-8")
+    return nacl.encoding.Base64Encoder.encode(signed).decode("utf-8")
 
-def verify(signed_message_hex, verify_key_hex):
-    signed_message = nacl.encoding.HexEncoder.decode(signed_message_hex)
-    verify_key = nacl.signing.VerifyKey(verify_key_hex,
-            encoder=nacl.encoding.HexEncoder)
+def verify(signed_message_base64, verify_key_base64):
+    signed_message = nacl.encoding.Base64Encoder.decode(signed_message_base64)
+    verify_key = nacl.signing.VerifyKey(verify_key_base64,
+            encoder=nacl.encoding.Base64Encoder)
     return verify_key.verify(signed_message).decode("utf-8")
 
 def key_gen():
@@ -138,26 +138,26 @@ if __name__ == "__main__":
     message = 'This is my message.'
     print("message  : " + message)
 
-    signed_hex = sign(message, signing_key)
-    verify_key_hex = verify_key.encode(encoder=nacl.encoding.HexEncoder).decode("utf-8")
-    print("signed: " + signed_hex)
-    print("verify_key_hex: " + verify_key_hex)
+    signed_base64 = sign(message, signing_key)
+    verify_key_base64 = verify_key.encode(encoder=nacl.encoding.Base64Encoder).decode("utf-8")
+    print("signed: " + signed_base64)
+    print("verify_key_base64: " + verify_key_base64)
 
     print()
     print("verification positive:")
-    print(verify(signed_hex, verify_key_hex))
+    print(verify(signed_base64, verify_key_base64))
     print()
     print("=====================================")
     print("THE NEXT STEP WILL FAIL, AS EXPECTED!")
     print("=====================================")
     print("verification negative:")
-    spoofed_message = "0"*len(signed_hex)
-    print(verify(spoofed_message, verify_key_hex))
+    spoofed_message = "0"*len(signed_base64)
+    print(verify(spoofed_message, verify_key_base64))
 
     # make sure all memory is flushed after operations
     del signing_key
     del verify_key
-    del verify_key_hex
-    del signed_hex
+    del verify_key_base64
+    del signed_base64
     del message
     gc.collect()

@@ -16,13 +16,13 @@ iterations = 1000000
 print("Time in [s] for " + str(iterations) + " iterations.")
 
 print("PyNaCl: "
-        + str(timeit.timeit("hash(salt, message)",
-            setup="from sha_512_PyNaCl import hash;"
+        + str(timeit.timeit("salthash(salt, message)",
+            setup="from PQencryption.crypto.sha_512_PyNaCl import salthash;"
             "from __main__ import salt, message",
             number=iterations)))
 
 print("hashlib: "
-        + str(timeit.timeit("hash(salt, message)",
-            setup="from sha_512_hashlib import hash;"
+        + str(timeit.timeit("salthash(salt, message)",
+            setup="from PQencryption.crypto.sha_512_hashlib import salthash;"
             "from __main__ import salt, message",
             number=iterations)))

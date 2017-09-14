@@ -47,11 +47,11 @@ class DiffieHellman(object):
         message = message_unencoded.encode("utf-8")
         nonce = nacl.utils.random(nacl.public.Box.NONCE_SIZE)
         encrypted = self.crypto_box.encrypt(message, nonce)
-        return nacl.encoding.HexEncoder.encode(encrypted).decode("utf-8")
+        return nacl.encoding.Base64Encoder.encode(encrypted).decode("utf-8")
 
-    def decrypt(self, encrypted_message_hex):
-        encrypted_message = nacl.encoding.HexEncoder.decode(
-                encrypted_message_hex)
+    def decrypt(self, encrypted_message_base64):
+        encrypted_message = nacl.encoding.Base64Encoder.decode(
+                encrypted_message_base64)
         return self.crypto_box.decrypt(encrypted_message).decode("utf-8")
 
 class DiffieHellmanKey(Key):
@@ -78,7 +78,7 @@ class DiffieHellmanSecretKey(DiffieHellmanKey):
     def import_key(file_name_with_path, silent=False):
         with open(file_name_with_path) as f:
             header = f.readline().rstrip()
-            encrypted_key_hex = f.readline().rstrip()
+            encrypted_key_base64 = f.readline().rstrip()
             footer = f.readline().rstrip()
         if not secret_key_description in header:
             raise IOError("Key is not a Diffie Hellman SECRET key.")
@@ -90,11 +90,11 @@ class DiffieHellmanSecretKey(DiffieHellmanKey):
         else:
             user_password = _get_password(validate=False)
         storage_password = \
-                nacl.encoding.HexEncoder.decode(hash512(user_password))[:32]
+                nacl.encoding.Base64Encoder.decode(hash512(user_password))[:32]
         storage_key = Salsa20Key(storage_password)
         symmetric_cipher = Salsa20(storage_key)
-        decrypted_key_hex = symmetric_cipher.decrypt(encrypted_key_hex)
-        decrypted_key = nacl.encoding.HexEncoder.decode(decrypted_key_hex)
+        decrypted_key_base64 = symmetric_cipher.decrypt(encrypted_key_base64)
+        decrypted_key = nacl.encoding.Base64Encoder.decode(decrypted_key_base64)
         return DiffieHellmanSecretKey(nacl.public.PrivateKey(decrypted_key))
 
 class DiffieHellmanPublicKey(DiffieHellmanKey):
@@ -107,13 +107,13 @@ class DiffieHellmanPublicKey(DiffieHellmanKey):
     def import_key(file_name_with_path, silent=False):
         with open(file_name_with_path) as f:
             header = f.readline().rstrip()
-            key_hex = f.readline().rstrip()
+            key_base64 = f.readline().rstrip()
             footer = f.readline().rstrip()
         if not public_key_description in header:
             raise IOError("Key is not a Diffie Hellman Public key.")
         if not footer == Key.footer:
             raise IOError("Key is not a valid key.")
-        key = nacl.encoding.HexEncoder.decode(key_hex)
+        key = nacl.encoding.Base64Encoder.decode(key_base64)
         return DiffieHellmanPublicKey(nacl.public.PublicKey(key))
 
 def encrypt(message_unencoded, secret_key, public_key):
@@ -124,24 +124,24 @@ def encrypt(message_unencoded, secret_key, public_key):
         secret_key: secret_key object
         public_key: public_key object
     Returns:
-        hex-encoded cypher in unicode
+        base64-encoded cypher in unicode
     """
     message = message_unencoded.encode("utf-8")
     encryption_box = nacl.public.Box(secret_key, public_key)
     nonce = nacl.utils.random(nacl.public.Box.NONCE_SIZE)
     encrypted = encryption_box.encrypt(message, nonce)
-    return nacl.encoding.HexEncoder.encode(encrypted).decode("utf-8")
+    return nacl.encoding.Base64Encoder.encode(encrypted).decode("utf-8")
 
-def decrypt(encrypted_message_hex, secret_key, public_key):
+def decrypt(encrypted_message_base64, secret_key, public_key):
     """Diffie-Hellman Curve25519 public key decryption.
     Args:
-        encrypted_message_hex: hex-encoded cyphertext
+        encrypted_message_base64: base64-encoded cyphertext
         secret_key: secret_key object
         public_key: public_key object
     Returns:
         Clear text message as unicode string
     """
-    encrypted_message = nacl.encoding.HexEncoder.decode(encrypted_message_hex)
+    encrypted_message = nacl.encoding.Base64Encoder.decode(encrypted_message_base64)
     decryption_box = nacl.public.Box(secret_key, public_key)
     return decryption_box.decrypt(encrypted_message).decode("utf-8")
 

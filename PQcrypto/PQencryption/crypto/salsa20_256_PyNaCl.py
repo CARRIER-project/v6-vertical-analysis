@@ -31,11 +31,11 @@ class Salsa20(object):
         message = message_unencoded.encode("utf-8")
         nonce = nacl.utils.random(nacl.secret.SecretBox.NONCE_SIZE)
         return self.box.encrypt(message, nonce,
-                encoder=nacl.encoding.HexEncoder)
+                encoder=nacl.encoding.Base64Encoder).decode("utf-8")
 
     def decrypt(self, encrypted):
         return self.box.decrypt(encrypted,
-                encoder=nacl.encoding.HexEncoder).decode("utf-8")
+                encoder=nacl.encoding.Base64Encoder).decode("utf-8")
 
     @staticmethod
     def key_gen(size=32):
@@ -68,7 +68,7 @@ class Salsa20Key(Key):
     def import_key(file_name_with_path, silent=False):
         with open(file_name_with_path) as f:
             header = f.readline().rstrip()
-            encrypted_key_hex = f.readline().rstrip()
+            encrypted_key_base64 = f.readline().rstrip()
             footer = f.readline().rstrip()
         if not key_description in header:
             raise IOError("Key is not a Salsa20 symmetric key.")
@@ -80,48 +80,12 @@ class Salsa20Key(Key):
         else:
             user_password = _get_password(validate=False)
         storage_password = \
-                nacl.encoding.HexEncoder.decode(hash512(user_password))[:32]
+                nacl.encoding.Base64Encoder.decode(hash512(user_password))[:32]
         storage_key = Salsa20Key(storage_password)
         symmetric_cipher = Salsa20(storage_key)
-        decrypted_key_hex = symmetric_cipher.decrypt(encrypted_key_hex)
-        decrypted_key = nacl.encoding.HexEncoder.decode(decrypted_key_hex)
+        decrypted_key_base64 = symmetric_cipher.decrypt(encrypted_key_base64)
+        decrypted_key = nacl.encoding.Base64Encoder.decode(decrypted_key_base64)
         return Salsa20Key(bytearray(decrypted_key))
-
-
-#def key_gen(size=32):
-#    """ Key generation for symmetric Salsa20 256 encryption.
-#
-#    Args:
-#        size (int): size/length of the key
-#    Returns:
-#        random bytes of length(size)
-#    """
-#    return nacl.utils.random(size)
-
-#def encrypt(message_str, key):
-#    """ Symmetric Salsa20 256 encryption.
-#
-#    Args:
-#        message (string): message to be encrypted
-#        key (string): symmetric key
-#    Returns:
-#        hex-encoded cypher in unicode
-#    """
-#    message_bytes = bytes(message_str.encode("utf-8"))
-#    my_cipher = Salsa20Cipher(key)
-#    return my_cipher.encrypt(message_bytes).decode("utf-8")
-
-#def decrypt(message, key):
-#    """ Symmetric Salsa20 256 decryption.
-#
-#    Args:
-#        encrypted_message (string): hex-encoded cypher text
-#        key (bytes): symmetric key
-#    Returns:
-#        hex-encoded clear text message
-#    """
-#    my_cipher = Salsa20Cipher(key)
-#    return my_cipher.decrypt(message).decode("utf-8")
 
 if __name__ == "__main__":
     # This in an example. In production, you would want to read the key from an

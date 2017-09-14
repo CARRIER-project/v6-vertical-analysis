@@ -32,11 +32,11 @@ class AES256(object):
         initialization_vector = Random.new().read(AES.block_size)
         raw = self.pad(raw, self.block_size)
         cipher = AES.new(self.key, AES.MODE_CBC, initialization_vector)
-        return nacl.encoding.HexEncoder.encode(
-                initialization_vector + cipher.encrypt(raw))
+        return nacl.encoding.Base64Encoder.encode(
+                initialization_vector + cipher.encrypt(raw)).decode("utf-8")
 
     def decrypt(self, enc):
-        enc = nacl.encoding.HexEncoder.decode(enc)
+        enc = nacl.encoding.Base64Encoder.decode(enc)
         initialization_vector = enc[:self.block_size]
         cipher = AES.new(self.key, AES.MODE_CBC, initialization_vector)
         return self.unpad(cipher.decrypt(enc[self.block_size:])).decode('utf-8')
@@ -82,7 +82,7 @@ class AES256Key(Key):
     def import_key(file_name_with_path, silent=False):
         with open(file_name_with_path) as f:
             header = f.readline().rstrip()
-            encrypted_key_hex = f.readline().rstrip()
+            encrypted_key_base64 = f.readline().rstrip()
             footer = f.readline().rstrip()
         if not key_description in header:
             raise IOError("Key is not a AES 256 symmetric key.")
@@ -94,40 +94,41 @@ class AES256Key(Key):
         else:
             user_password = _get_password(validate=False)
         storage_password = \
-                nacl.encoding.HexEncoder.decode(hash512(user_password))[:32]
+                nacl.encoding.Base64Encoder.decode(hash512(user_password))[:32]
         storage_key = Salsa20Key(storage_password)
         symmetric_cipher = Salsa20(storage_key)
-        decrypted_key_hex = symmetric_cipher.decrypt(encrypted_key_hex)
-        decrypted_key = nacl.encoding.HexEncoder.decode(decrypted_key_hex)
+        decrypted_key_base64 = symmetric_cipher.decrypt(encrypted_key_base64)
+        decrypted_key = nacl.encoding.Base64Encoder.decode(
+                decrypted_key_base64)
         return AES256Key(bytearray(decrypted_key))
 
 
-def encrypt(message, key):
-    """ Symmetric AES 256 encryption.
-
-    Args:
-        message (string): message to be encrypted
-        key (string): symmetric key
-    Returns:
-        hex-encoded cypher in unicode
-    """
-    # In production, you would want to have a hardware random number generator
-    # for initialization_vector-generation.
-    initialization_vector = Random.new().read(AES.block_size)
-    my_cipher = AES256Cipher(key)
-    return my_cipher.encrypt(message, initialization_vector).decode("utf-8")
-
-def decrypt(encrypted_message, key):
-    """ Symmetric AES 256 decryption.
-
-    Args:
-        encrypted_message (string): hex-encoded cypher text
-        key (bytes): symmetric key
-    Returns:
-        hex-encoded clear text message
-    """
-    my_cipher = AES256Cipher(key)
-    return my_cipher.decrypt(encrypted_message)
+#def encrypt(message, key):
+#    """ Symmetric AES 256 encryption.
+#
+#    Args:
+#        message (string): message to be encrypted
+#        key (string): symmetric key
+#    Returns:
+#        base64-encoded cipher in unicode
+#    """
+#    # In production, you would want to have a hardware random number generator
+#    # for initialization_vector-generation.
+#    initialization_vector = Random.new().read(AES.block_size)
+#    my_cipher = AES256Cipher(key)
+#    return my_cipher.encrypt(message, initialization_vector).decode("utf-8")
+#
+#def decrypt(encrypted_message, key):
+#    """ Symmetric AES 256 decryption.
+#
+#    Args:
+#        encrypted_message (string): base64-encoded cypher text
+#        key (bytes): symmetric key
+#    Returns:
+#        base64-encoded clear text message
+#    """
+#    my_cipher = AES256Cipher(key)
+#    return my_cipher.decrypt(encrypted_message)
 
 if __name__ == "__main__":
     # This in an example. In production, you would want to read the key from an

@@ -45,7 +45,7 @@ class McBits(object):
         Args:
             message_unencoded (str): message to be encrypted
         Returns:
-            hex-encoded cipher in unicode
+            base64-encoded cipher in unicode
         """
         if not self.key.key_length == len_pk:
             raise ValueError("Can't encrypt with a secret key.")
@@ -58,13 +58,13 @@ class McBits(object):
 
         mcbits.crypto_encrypt(cipher, ctypes.byref(clen), message, message_length,
                 public_key)
-        return nacl.encoding.HexEncoder.encode(cipher).decode("utf-8")
+        return nacl.encoding.Base64Encoder.encode(cipher).decode("utf-8")
 
-    def decrypt(self, encrypted_message_hex):
+    def decrypt(self, encrypted_message_base64):
         """McBits public key decryption.
 
         Args:
-            encrypted_message_hex (string): hex-encoded cipher text
+            encrypted_message_base64 (string): base64-encoded cipher text
         Returns:
             Clear text message as unicode string
         Raises:
@@ -73,7 +73,7 @@ class McBits(object):
         if not self.key.key_length == len_sk:
             raise ValueError("Can't decrypt with a private key.")
         encrypted_message = \
-                nacl.encoding.HexEncoder.decode(encrypted_message_hex)
+                nacl.encoding.Base64Encoder.decode(encrypted_message_base64)
         secret_key = (ctypes.c_ubyte * len_sk)(*self.key.key)
         cipher_length = len(encrypted_message)
         message_length = cipher_length - synd_bytes - 16
@@ -108,55 +108,6 @@ class McBitsKey(Key):
     def __init__(self, key, key_name, key_description):
         super(McBitsKey, self).__init__(key, key_name, key_description)
 
-#    def encrypt(self, message_unencoded):
-#        """McBits public key encryption.
-#
-#        Args:
-#            message_unencoded (str): message to be encrypted
-#        Returns:
-#            hex-encoded cipher in unicode
-#        """
-#        if not self.key_length == len_pk:
-#            raise ValueError("Can't encrypt with a secret key.")
-#        message = message_unencoded.encode("utf-8")
-#        public_key = (ctypes.c_ubyte * len_pk)(*self.key)
-#        message_length = len(message)
-#        cipher_length = synd_bytes + message_length + 16
-#        cipher = (ctypes.c_ubyte * cipher_length)()
-#        clen = ctypes.c_longlong()
-#
-#        mcbits.crypto_encrypt(cipher, ctypes.byref(clen), message, message_length,
-#                public_key)
-#        return nacl.encoding.HexEncoder.encode(cipher).decode("utf-8")
-#
-#    def decrypt(self, encrypted_message_hex):
-#        """McBits public key decryption.
-#
-#        Args:
-#            encrypted_message_hex (string): hex-encoded cipher text
-#        Returns:
-#            Clear text message as unicode string
-#        Raises:
-#            ValueError: if decryption fails
-#        """
-#        if not self.key_length == len_sk:
-#            raise ValueError("Can't decrypt with a private key.")
-#        encrypted_message = nacl.encoding.HexEncoder.decode(encrypted_message_hex)
-#        secret_key = (ctypes.c_ubyte * len_sk)(*self.key)
-#        cipher_length = len(encrypted_message)
-#        message_length = cipher_length - synd_bytes - 16
-#        decrypted = (ctypes.c_ubyte * message_length)()
-#        mlen = ctypes.c_longlong()
-#
-#        status = mcbits.crypto_encrypt_open(decrypted, ctypes.byref(mlen),
-#                encrypted_message, cipher_length, secret_key)
-#
-#        if status == 0:
-#            return bytearray(decrypted).decode("utf-8")
-#        else:
-#            raise ValueError("Decryption failed, 'mcbits.crypto_encrypt_open "
-#            "return value' is not zero")
-
     def _is_valid(self):
         if type(self.key) != bytearray:
             return False
@@ -177,7 +128,7 @@ class McBitsSecretKey(McBitsKey):
     def import_key(file_name_with_path, silent=False):
         with open(file_name_with_path) as f:
             header = f.readline().rstrip()
-            encrypted_key_hex = f.readline().rstrip()
+            encrypted_key_base64 = f.readline().rstrip()
             footer = f.readline().rstrip()
         if not secret_key_description in header:
             raise IOError("Key is not a McBits SECRET key.")
@@ -189,11 +140,11 @@ class McBitsSecretKey(McBitsKey):
         else:
             user_password = _get_password(validate=False)
         storage_password = \
-                nacl.encoding.HexEncoder.decode(hash512(user_password))[:32]
+                nacl.encoding.Base64Encoder.decode(hash512(user_password))[:32]
         storage_key = Salsa20Key(storage_password)
         symmetric_cipher = Salsa20(storage_key)
-        decrypted_key_hex = symmetric_cipher.decrypt(encrypted_key_hex)
-        decrypted_key = nacl.encoding.HexEncoder.decode(decrypted_key_hex)
+        decrypted_key_base64 = symmetric_cipher.decrypt(encrypted_key_base64)
+        decrypted_key = nacl.encoding.Base64Encoder.decode(decrypted_key_base64)
         return McBitsSecretKey(bytearray(decrypted_key))
 
 class McBitsPublicKey(McBitsKey):
@@ -208,13 +159,13 @@ class McBitsPublicKey(McBitsKey):
     def import_key(file_name_with_path, silent=False):
         with open(file_name_with_path) as f:
             header = f.readline().rstrip()
-            key_hex = f.readline().rstrip()
+            key_base64 = f.readline().rstrip()
             footer = f.readline().rstrip()
         if not public_key_description in header:
             raise IOError("Key is not a McBits Public key.")
         if not footer == Key.footer:
             raise IOError("Key is not a valid key.")
-        key = nacl.encoding.HexEncoder.decode(key_hex)
+        key = nacl.encoding.Base64Encoder.decode(key_base64)
         return McBitsPublicKey(bytearray(key))
 
 

@@ -1,0 +1,1 @@
+This packet is not optimized for speed. Hashing and encrypting can be faster if version compatibilities (python2/python3) are thrown out and utf-8 encoding is omitted. All data then should be prepared as byte strings (b'foo') that need no encoding.

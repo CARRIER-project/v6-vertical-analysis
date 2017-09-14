@@ -9,9 +9,11 @@ Created on 4 jul 2017 16:24:30 CEST
 from __future__ import print_function  # make print python3 compatible
 
 import hashlib
+import nacl.encoding
 
 def hash512(string):
-    return hashlib.sha512(string.encode("utf-8")).hexdigest()
+    return nacl.encoding.Base64Encoder.encode(
+            hashlib.sha512(string.encode("utf-8")).digest()).decode("utf-8")
 
 def salthash(salt, string):
     """SHA 512 hashing with salt, using hashlib.
@@ -33,7 +35,7 @@ if __name__ == "__main__":
     import gc  # garbage collector
 
     # In production the salt should come from a hardware random number generator
-    # and will be shared between parties. Salt must be 128 bytes in hex.
+    # and will be shared between parties. Salt must be 128 bytes in base64.
     salt = "a" * 128
 
     message = "This is a message. Hash me!"

@@ -27,17 +27,6 @@ ciphers = [cr.AES256, cr.McBits, cr.Salsa20, cr.EdDSA, cr.DiffieHellman]
 
 
 class TestFunctions(unittest.TestCase):
-
-#    def test_to_hex(self):
-#        string = "Hex me."
-#        hexed = cr._to_hex(string)
-#        self.assertEqual(hexed, "486578206d652e")
-#
-#    def test_from_hex(self):
-#        string = "486578206d652e"
-#        de_hexed = cr._from_hex(string)
-#        self.assertEqual(de_hexed, "Hex me.")
-
     def test_check_password(self):
         cr._check_password("Aa0!asdfasdfasdfasdf")
 
@@ -84,6 +73,17 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(type(e.exception), ValueError)
         self.assertTrue("Passwords differ." in str(e.exception))
 
+    def test_hashing(self):
+        message = "This is a message. Hash me!"
+        hashed = cr.hash512(message)
+        self.assertEqual(hashed, "ekHXd/YDKU112ETowqFV9GbxGo3I8UMwcDaHk+XVHsPIuXUWy3Jsv6JrCry+Yu8ugjRL+4DAha2IM4+B/HkXIQ==")
+
+    def test_salthashing(self):
+        salt = "a" * 128
+        message = "This is a message. Hash me!"
+        hashed = cr.salthash(salt, message)
+        self.assertEqual(hashed, "q5Cx2pzTqGJadaDgqqpcehSrnd6QBtI8rKxmXMDtvJMJ2MxxWq9xXLytYendsy6seFiB6IC/8ywiEIy1jPaovw==")
+
     def test_generate_keys(self):
         for cipher in ciphers:
             key_objects = cipher.key_gen()
@@ -92,59 +92,10 @@ class TestFunctions(unittest.TestCase):
             for key_object in key_objects:
                 self.assertEqual(key_object._is_valid(), True)
 
-    def test_salthashing(self):
-        message = "This is a message. Hash me!"
-        hashed = cr.hash512(message)
-        self.assertEqual(hashed, "7a41d777f603294d75d844e8c2a155f466f11a8dc8f1433070368793e5d51ec3c8b97516cb726cbfa26b0abcbe62ef2e82344bfb80c085ad88338f81fc791721")
-
-    def test_hashing(self):
-        salt = "a" * 128
-        message = "This is a message. Hash me!"
-        hashed = cr.salthash(salt, message)
-        self.assertEqual(hashed, "ab90b1da9cd3a8625a75a0e0aaaa5c7a14ab9dde9006d23cacac665cc0edbc9309d8cc715aaf715cbcad61e9ddb32eac785881e880bff32c22108cb58cf6a8bf")
-
-    def test_asymmetric_encryption_McBits(self):
+    def test_symmetric_encryption_AES256(self):
         message = "This is my message."
-        pub_key, secret_key = cr.McBits.key_gen()
-        alice_asymmetric = cr.McBits(secret_key)
-        bob_asymmetric = cr.McBits(pub_key)
-
-        ciphertext = alice_asymmetric.encrypt(message)
-
-        cleartext = bob_asymmetric.decrypt(ciphertext)
-
-        self.assertNotEqual(message, ciphertext)
-        self.assertEqual(message, cleartext)
-
-    @mock.patch('getpass.getpass',
-            return_value="Aa0!asdfasdfasdfasdf")
-    def test_key_import_export(self, input):
-        owner = "CBS"
-        for cipher in ciphers:
-            key_objects = cipher.key_gen()
-            if type(key_objects) is not tuple:  # is it just a single key?
-                key_objects = [key_objects]
-            for key_object in key_objects:
-                key_object.export_key(temp_path, owner, force=True,
-                        silent=True)
-                file_name = key_object.name + "_" + owner + ".key"
-                imported_key = cr.import_key(temp_path + file_name,
-                        silent=True)
-                self.assertEqual(bytes(key_object.key),
-                        bytes(imported_key.key))
-                self.assertEqual(key_object.key_length,
-                        imported_key.key_length)
-                self.assertEqual(key_object.name, imported_key.name)
-                self.assertEqual(key_object.description,
-                        imported_key.description)
-                self.assertEqual(key_object.footer, imported_key.footer)
-                self.assertEqual(key_object.security_level,
-                        imported_key.security_level)
-
-    def test_symmetric_encryption_Salsa20(self):
-        message = "This is my message."
-        key = cr.Salsa20.key_gen()
-        symmetric = cr.Salsa20(key)
+        key = cr.AES256.key_gen()
+        symmetric = cr.AES256(key)
 
         ciphertext = symmetric.encrypt(message)
 
@@ -153,10 +104,10 @@ class TestFunctions(unittest.TestCase):
         self.assertNotEqual(message, ciphertext)
         self.assertEqual(message, cleartext)
 
-    def test_symmetric_encryption_AES256(self):
+    def test_symmetric_encryption_Salsa20(self):
         message = "This is my message."
-        key = cr.AES256.key_gen()
-        symmetric = cr.AES256(key)
+        key = cr.Salsa20.key_gen()
+        symmetric = cr.Salsa20(key)
 
         ciphertext = symmetric.encrypt(message)
 
@@ -202,6 +153,44 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(pub_key_alice.footer, derived_public_key.footer)
         self.assertEqual(pub_key_alice.security_level,
                 derived_public_key.security_level)
+
+    def test_asymmetric_encryption_McBits(self):
+        message = "This is my message."
+        secret_key, pub_key = cr.McBits.key_gen()
+        bob_asymmetric = cr.McBits(pub_key)
+        alice_asymmetric = cr.McBits(secret_key)
+
+        ciphertext = bob_asymmetric.encrypt(message)
+
+        cleartext = alice_asymmetric.decrypt(ciphertext)
+
+        self.assertNotEqual(message, ciphertext)
+        self.assertEqual(message, cleartext)
+
+    @mock.patch('getpass.getpass',
+            return_value="Aa0!asdfasdfasdfasdf")
+    def test_key_import_export(self, input):
+        owner = "CBS"
+        for cipher in ciphers:
+            key_objects = cipher.key_gen()
+            if type(key_objects) is not tuple:  # is it just a single key?
+                key_objects = [key_objects]
+            for key_object in key_objects:
+                key_object.export_key(temp_path, owner, force=True,
+                        silent=True)
+                file_name = key_object.name + "_" + owner + ".key"
+                imported_key = cr.import_key(temp_path + file_name,
+                        silent=True)
+                self.assertEqual(bytes(key_object.key),
+                        bytes(imported_key.key))
+                self.assertEqual(key_object.key_length,
+                        imported_key.key_length)
+                self.assertEqual(key_object.name, imported_key.name)
+                self.assertEqual(key_object.description,
+                        imported_key.description)
+                self.assertEqual(key_object.footer, imported_key.footer)
+                self.assertEqual(key_object.security_level,
+                        imported_key.security_level)
 
     def test_signing_EdDSA_Curve25519(self):
         message = 'This is my message.'

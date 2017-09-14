@@ -34,22 +34,22 @@ class Key(object):
                 user_password = _get_password(validate=True)
 
             # turn user_password into 32 char storag_password for Salsa20:
-            storage_password = nacl.encoding.HexEncoder.decode(
+            storage_password = nacl.encoding.Base64Encoder.decode(
                             hash512(user_password))[:32]
             storage_key = Salsa20Key(storage_password)
             symmetric_cipher = Salsa20(storage_key)
-            hex_key = nacl.encoding.HexEncoder.encode(
+            base64_key = nacl.encoding.Base64Encoder.encode(
                     bytes(self.key)).decode("utf-8")
-            key_for_file = symmetric_cipher.encrypt(hex_key).decode("utf-8")
+            key_for_file = symmetric_cipher.encrypt(base64_key)
             del user_password
             del storage_password
             del symmetric_cipher
-            del hex_key
+            del base64_key
             gc.collect()
 
         else:
-            hex_key = nacl.encoding.HexEncoder.encode(bytes(self.key))
-            key_for_file = hex_key.decode("utf-8")
+            base64_key = nacl.encoding.Base64Encoder.encode(bytes(self.key))
+            key_for_file = base64_key.decode("utf-8")
 
         with open(path + file_name, 'w') as f:
             f.write(self.header + "\n")

@@ -26,12 +26,12 @@ def salthash(salt, string):
     if len(salt) != 128:
         raise ValueError('Salt must be 128 bytes long.')
 
-    return nacl.hash.sha512(salt.encode("utf-8") + string.encode("utf-8"), encoder=nacl.encoding.HexEncoder).decode("utf-8")
+    return nacl.hash.sha512(salt.encode("utf-8") + string.encode("utf-8"), encoder=nacl.encoding.Base64Encoder).decode("utf-8")
 
 if __name__ == "__main__":
     import gc  # garbage collector
     # In production the salt should come from a hardware random number generator
-    # and will be shared between parties. Salt must be 128 bytes in hex.
+    # and will be shared between parties. Salt must be 128 bytes in base64.
     salt = "a" * 128
 
     message = "This is a message. Hash me!"
