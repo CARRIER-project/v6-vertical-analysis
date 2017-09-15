@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+"""
+Created on vr 15 sep 2017  9:25:15 CEST
+@author: BMMN
+
+signing Curve 25519 PyNaCl
+"""
+
 import os
 import gc
 import nacl.encoding

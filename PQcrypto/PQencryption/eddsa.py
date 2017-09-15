@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Created on Mon Jul 10 16:26:41 CEST 2017
@@ -112,54 +111,3 @@ class EdDSAVerifyKey(EdDSAKey):
             raise IOError("Key is not a valid key.")
         key = nacl.encoding.Base64Encoder.decode(key_base64)
         return EdDSAVerifyKey(nacl.signing.VerifyKey(key))
-
-def sign(message, signing_key):
-    signed = signing_key.sign(bytes(message.encode("utf-8")))
-    return nacl.encoding.Base64Encoder.encode(signed).decode("utf-8")
-
-def verify(signed_message_base64, verify_key_base64):
-    signed_message = nacl.encoding.Base64Encoder.decode(signed_message_base64)
-    verify_key = nacl.signing.VerifyKey(verify_key_base64,
-            encoder=nacl.encoding.Base64Encoder)
-    return verify_key.verify(signed_message).decode("utf-8")
-
-def key_gen():
-    signing_key = nacl.signing.SigningKey.generate()
-    verify_key = signing_key.verify_key
-    return signing_key, verify_key
-
-
-if __name__ == "__main__":
-    import gc  # garbage collector
-    # This in an example. In production, you would want to read the key from an
-    # external file or the command line. The key must be 32 bytes long.
-
-    # DON'T DO THIS IN PRODUCTION!
-    signing_key, verify_key = key_gen()
-
-    message = 'This is my message.'
-    print("message  : " + message)
-
-    signed_base64 = sign(message, signing_key)
-    verify_key_base64 = verify_key.encode(encoder=nacl.encoding.Base64Encoder).decode("utf-8")
-    print("signed: " + signed_base64)
-    print("verify_key_base64: " + verify_key_base64)
-
-    print()
-    print("verification positive:")
-    print(verify(signed_base64, verify_key_base64))
-    print()
-    print("=====================================")
-    print("THE NEXT STEP WILL FAIL, AS EXPECTED!")
-    print("=====================================")
-    print("verification negative:")
-    spoofed_message = "0"*len(signed_base64)
-    print(verify(spoofed_message, verify_key_base64))
-
-    # make sure all memory is flushed after operations
-    del signing_key
-    del verify_key
-    del verify_key_base64
-    del signed_base64
-    del message
-    gc.collect()

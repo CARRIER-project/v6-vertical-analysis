@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Created on 4 jul 2017 12:31:39 CEST
@@ -88,25 +87,3 @@ class Salsa20Key(Key):
         decrypted_key_base64 = symmetric_cipher.decrypt(encrypted_key_base64)
         decrypted_key = nacl.encoding.Base64Encoder.decode(decrypted_key_base64)
         return Salsa20Key(bytearray(decrypted_key))
-
-if __name__ == "__main__":
-    # This in an example. In production, you would want to read the key from an
-    # external file or the command line. The key must be 32 bytes long.
-
-    # DON'T DO THIS IN PRODUCTION!
-    key = key_gen()
-
-    message = 'This is my message.'
-    print("message:  " + message)
-
-    my_encrypted_message = encrypt(message, key)
-    print("encrypted: " + my_encrypted_message)
-
-    my_decrypted_message = decrypt(my_encrypted_message, key)
-    print("decrypted: " + my_decrypted_message)
-
-    # make sure all memory is flushed after operations
-    del key
-    #del message
-    del my_decrypted_message
-    gc.collect()

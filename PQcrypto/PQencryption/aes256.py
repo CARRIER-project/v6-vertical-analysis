@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Created on 4 jul 2017 12:31:39 CEST
@@ -8,7 +7,6 @@ Created on 4 jul 2017 12:31:39 CEST
 
 from __future__ import print_function  # make print python3 compatible
 
-#import base64
 import nacl.encoding
 import gc  # garbage collector
 from Crypto import Random
@@ -101,53 +99,3 @@ class AES256Key(Key):
         decrypted_key = nacl.encoding.Base64Encoder.decode(
                 decrypted_key_base64)
         return AES256Key(bytearray(decrypted_key))
-
-
-#def encrypt(message, key):
-#    """ Symmetric AES 256 encryption.
-#
-#    Args:
-#        message (string): message to be encrypted
-#        key (string): symmetric key
-#    Returns:
-#        base64-encoded cipher in unicode
-#    """
-#    # In production, you would want to have a hardware random number generator
-#    # for initialization_vector-generation.
-#    initialization_vector = Random.new().read(AES.block_size)
-#    my_cipher = AES256Cipher(key)
-#    return my_cipher.encrypt(message, initialization_vector).decode("utf-8")
-#
-#def decrypt(encrypted_message, key):
-#    """ Symmetric AES 256 decryption.
-#
-#    Args:
-#        encrypted_message (string): base64-encoded cypher text
-#        key (bytes): symmetric key
-#    Returns:
-#        base64-encoded clear text message
-#    """
-#    my_cipher = AES256Cipher(key)
-#    return my_cipher.decrypt(encrypted_message)
-
-if __name__ == "__main__":
-    # This in an example. In production, you would want to read the key from an
-    # external file or the command line. The key must be 32 bytes long.
-
-    # DON'T DO THIS IN PRODUCTION!
-    key = key_gen()
-
-    message = 'This is my message.'
-    print("message  : " + message)
-
-    my_encrypted_message = encrypt(message, key)
-    print("encrypted: " + my_encrypted_message)
-
-    mydec = decrypt(my_encrypted_message, key)
-    print("decrypted: " + mydec)
-
-    # make sure all memory is flushed after operations
-    del key
-    del message
-    del mydec
-    gc.collect()

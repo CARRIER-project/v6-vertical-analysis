@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Created on Thu Jul 13 07:12:15 CEST 2017
@@ -11,11 +10,6 @@ import getpass
 import gc  # garbage collector
 import re
 import os
-#import nacl.hash
-#import nacl.utils
-#import nacl.signing
-#import nacl.encoding
-#import nacl.public
 
 def _check_password(password):
     length = 20
@@ -132,18 +126,62 @@ def import_key(file_name_with_path, silent=False):
     else:
         raise TypeError("Importing invalid key.")
 
-#def sign_encrypt_sign_asymmetric(signing_key, q_safe_encryption_key,
-#        classic_encryption_key, message):
-#    from ..crypto.signing_Curve25519_PyNaCl import EdDSA
-#    from ..crypto.encryption_mcbits import McBits
-#    from ..crypto.encryption_Curve25519_PyNaCl import DiffieHellman
-#    signing = EdDSA(signing_key)
-#    q_safe_encryption = McBits(q_safe_encryption_key)
-#    classic_encryption = DiffieHellman(classic_encryption_key)
-#
-#def sign_encrypt_sign_symmetric(signing_key, encryption_key, message):
-#    from ..crypto.signing_Curve25519_PyNaCl import EdDSA
-#    signing = EdDSA(signing_key)
+def sign_encrypt_sign_pubkey(signing_key, quantum_safe_public_key,
+        classic_secret_key, classic_public_key, message):
+    from .diffiehellman import DiffieHellman
+    from .eddsa import EdDSA
+    from .mcbits import McBits
+    signing_cipher = EdDSA(signing_key)
+    classic_cipher = DiffieHellman(classic_secret_key, classic_public_key)
+    q_safe_cipher = McBits(quantum_safe_public_key)
 
-#def verify_decrypt_verify():
-#    pass
+    signed = signing_cipher.sign(message)
+    signed_classicenc = classic_cipher.encrypt(signed)
+    signed_classicenc_qsafeenc = q_safe_cipher.encrypt(signed_classicenc)
+    signed_classicenc_qsafeenc_signed = signing_cipher.sign(
+            signed_classicenc_qsafeenc)
+    return signed_classicenc_qsafeenc_signed
+
+def sign_encrypt_sign_symmetric(signing_key, symmetric_encryption_key,
+        message):
+    from .eddsa import EdDSA
+    from .salsa20 import Salsa20
+    signing_cipher = EdDSA(signing_key)
+    symmetric_cipher = Salsa20(symmetric_encryption_key)
+
+    signed = signing_cipher.sign(message)
+    signed_symencrypted = symmetric_cipher.encrypt(signed)
+    signed_symencrypted_signed = signing_cipher.sign(signed_symencrypted)
+    return signed_symencrypted_signed
+
+def verify_decrypt_verify_pubkey(verifying_key, quantum_safe_secret_key,
+        classic_secret_key, classic_public_key, ciphertext):
+    from .diffiehellman import DiffieHellman
+    from .eddsa import EdDSA
+    from .mcbits import McBits
+    verifying_cipher = EdDSA(verifying_key)
+    classic_cipher = DiffieHellman(classic_secret_key, classic_public_key)
+    q_safe_cipher = McBits(quantum_safe_secret_key)
+
+    signed_classicenc_qsafeenc_signed = ciphertext
+
+    signed_classicenc_qsafeenc = verifying_cipher.verify(
+            signed_classicenc_qsafeenc_signed)
+    signed_classicenc = q_safe_cipher.decrypt(signed_classicenc_qsafeenc)
+    signed = classic_cipher.decrypt(signed_classicenc)
+    cleartext = verifying_cipher.verify(signed)
+    return cleartext
+
+def verify_decrypt_verify_symmetric(verifying_key, symmetric_encryption_key,
+        ciphertext):
+    from .eddsa import EdDSA
+    from .salsa20 import Salsa20
+    verifying_cipher = EdDSA(verifying_key)
+    symmetric_cipher = Salsa20(symmetric_encryption_key)
+
+    signed_symencrypted_signed = ciphertext
+
+    signed_symencrypted = verifying_cipher.verify(signed_symencrypted_signed)
+    signed = symmetric_cipher.decrypt(signed_symencrypted)
+    cleartext = verifying_cipher.verify(signed)
+    return cleartext

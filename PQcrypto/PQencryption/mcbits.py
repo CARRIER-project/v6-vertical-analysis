@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Created on vr 25 aug 2017 17:44:50 CEST
@@ -167,36 +166,3 @@ class McBitsPublicKey(McBitsKey):
             raise IOError("Key is not a valid key.")
         key = nacl.encoding.Base64Encoder.decode(key_base64)
         return McBitsPublicKey(bytearray(key))
-
-
-if __name__ == "__main__":
-    import gc  #garbage collector
-    # This in an example. In production, you would want to read the key from an
-    # external file or the command line. The key must be 32 bytes long.
-
-    # DON'T DO THIS IN PRODUCTION!
-
-    s, p = McBits.key_gen()
-    p.export_key(".", "mine")
-
-    sender = McBits(p)
-    receiver = McBits(s)
-
-    message = "This is my message."
-    print("message  : " + message)
-
-    enc = sender.encrypt(message)
-    print("encrypted: " + enc)
-
-    dec = receiver.decrypt(enc)
-    print("decrypted: " + dec)
-    exit()
-
-    # make sure all memory is flushed after operations
-    del s
-    del p
-    del sender
-    del receiver
-    del enc
-    del dec
-    gc.collect()

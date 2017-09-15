@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Created on 4 jul 2017 16:24:30 CEST
@@ -32,21 +31,3 @@ def salthash(salt, string):
         raise ValueError('Salt must be 128 bytes long.')
 
     return hash512(salt + string)
-
-if __name__ == "__main__":
-    import gc  # garbage collector
-
-    # In production the salt should come from a hardware random number generator
-    # and will be shared between parties. Salt must be 128 bytes in base64.
-    salt = "a" * 128
-
-    message = "This is a message. Hash me!"
-    print(message)
-
-    hashed = hash(salt, message)
-    print(hashed)
-
-    # make sure all memory is flushed after operations
-    del salt
-    del message
-    gc.collect()

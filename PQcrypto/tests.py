@@ -55,14 +55,14 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(type(e.exception), ValueError)
         self.assertTrue("does not contain any special" in str(e.exception))
 
-    @mock.patch('getpass.getpass',
+    @mock.patch("getpass.getpass",
             return_value="Aa0!asdfasdfasdfasdf")
     def test_get_password(self, input):
         password = cr._get_password(validate=True,
                 print_requirements=False)
         self.assertEqual(password, "Aa0!asdfasdfasdfasdf")
 
-    @mock.patch('getpass.getpass',
+    @mock.patch("getpass.getpass",
             side_effect=["Aa0!asdfasdfasdfasdf", "Aa0!ASDFASDFASDFASDF"])
     def test_get_password_fail(self, input):
         with self.assertRaises(Exception) as e:
@@ -165,7 +165,7 @@ class TestFunctions(unittest.TestCase):
         self.assertNotEqual(message, ciphertext)
         self.assertEqual(message, cleartext)
 
-    @mock.patch('getpass.getpass',
+    @mock.patch("getpass.getpass",
             return_value="Aa0!asdfasdfasdfasdf")
     def test_key_import_export(self, input):
         owner = "CBS"
@@ -191,7 +191,7 @@ class TestFunctions(unittest.TestCase):
                         imported_key.security_level)
 
     def test_signing_EdDSA_Curve25519(self):
-        message = 'This is my message.'
+        message = "This is my message."
         sign_key, verify_key = cr.EdDSA.key_gen()
 
         signing = cr.EdDSA(sign_key)
@@ -231,6 +231,52 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(verify_key.footer, derived_verify_key.footer)
         self.assertEqual(verify_key.security_level,
                 derived_verify_key.security_level)
+
+    def test_sign_encrypt_sign_pubkey_and_reverse(self):
+        message = "This is my message."
+
+        signing_key, verifying_key = cr.EdDSA.key_gen()
+        quantum_safe_secret_key, quantum_safe_public_key = cr.McBits.key_gen()
+        classic_secret_key_Alice, classic_public_key_Alice = \
+                cr.DiffieHellman.key_gen()
+        classic_secret_key_Bob, classic_public_key_Bob = \
+                cr.DiffieHellman.key_gen()
+
+        ciphertext_AB = cr.sign_encrypt_sign_pubkey(signing_key,
+                quantum_safe_public_key, classic_secret_key_Alice,
+                classic_public_key_Bob, message)
+        ciphertext_BA = cr.sign_encrypt_sign_pubkey(signing_key,
+                quantum_safe_public_key, classic_secret_key_Bob,
+                classic_public_key_Alice, message)
+        cleartext_AB = cr.verify_decrypt_verify_pubkey(verifying_key,
+                quantum_safe_secret_key, classic_secret_key_Bob,
+                classic_public_key_Alice, ciphertext_AB)
+        cleartext_BA = cr.verify_decrypt_verify_pubkey(verifying_key,
+                quantum_safe_secret_key, classic_secret_key_Alice,
+                classic_public_key_Bob, ciphertext_BA)
+
+        self.assertEqual(message, cleartext_AB)
+        self.assertEqual(cleartext_AB, cleartext_BA)
+        self.assertNotEqual(message, ciphertext_AB)
+        self.assertNotEqual(message, ciphertext_BA)
+        self.assertNotEqual(ciphertext_AB, ciphertext_BA)
+        self.assertNotEqual(cleartext_AB, ciphertext_AB)
+        self.assertNotEqual(cleartext_BA, ciphertext_BA)
+
+    def test_sign_encrypt_sign_symmetric_and_reverse(self):
+        message = "This is my message."
+
+        symmetric_encryption_key = cr.Salsa20.key_gen()
+        signing_key, verifying_key = cr.EdDSA.key_gen()
+
+        ciphertext = cr.sign_encrypt_sign_symmetric(signing_key,
+                symmetric_encryption_key, message)
+        cleartext = cr.verify_decrypt_verify_symmetric(verifying_key,
+                symmetric_encryption_key, ciphertext)
+
+        self.assertEqual(message, cleartext)
+        self.assertNotEqual(message, ciphertext)
+        self.assertNotEqual(cleartext, ciphertext)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
