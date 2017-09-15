@@ -11,9 +11,9 @@ import os
 import ctypes
 import nacl.encoding
 #import nacl.hash
-from .salsa20_256_PyNaCl import Salsa20, Salsa20Key
-from ..utilities.utilities import _get_password
-from .sha_512_hashlib import hash512
+from .salsa20 import Salsa20, Salsa20Key
+from .utilities import _get_password
+from .sha512 import hash512
 from .Key import Key
 
 

@@ -4,6 +4,8 @@
 Created on 4 jul 2017 12:31:39 CEST
 
 @author: BMMN
+
+Salsa20 256 PyNaCl
 """
 
 from __future__ import print_function  # make print python3 compatible
@@ -13,8 +15,8 @@ import nacl.secret
 import nacl.utils
 import nacl.encoding
 from .Key import Key
-from .sha_512_hashlib import hash512
-from ..utilities.utilities import _get_password
+from .sha512 import hash512
+from .utilities import _get_password
 
 
 key_length = 32

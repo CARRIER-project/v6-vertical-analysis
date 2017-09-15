@@ -1,8 +1,8 @@
 import os
 import gc
 import nacl.encoding
-from ..utilities.utilities import _get_password
-from .sha_512_hashlib import hash512
+from .utilities import _get_password
+from .sha512 import hash512
 
 class Key(object):
     footer = "#" * 79
@@ -21,7 +21,7 @@ class Key(object):
                     + str(key_length) + ' bits.')
 
     def export_key(self, path, owner, force=False, silent=False):
-        from .salsa20_256_PyNaCl import Salsa20, Salsa20Key
+        from .salsa20 import Salsa20, Salsa20Key
         file_name = self.name + "_" + owner + ".key"
         if os.path.isfile(path + "/" + file_name) and (force==False):
             raise FileExistsError("Key file exists, use 'force=True' or "

@@ -17,12 +17,12 @@ print("Time in [s] for " + str(iterations) + " iterations.")
 
 print("PyNaCl: "
         + str(timeit.timeit("salthash(salt, message)",
-            setup="from PQencryption.crypto.sha_512_PyNaCl import salthash;"
+            setup="from PQencryption.sha512 import salthash;"
             "from __main__ import salt, message",
             number=iterations)))
 
 print("hashlib: "
         + str(timeit.timeit("salthash(salt, message)",
-            setup="from PQencryption.crypto.sha_512_hashlib import salthash;"
+            setup="from PQencryption.sha512 import salthash;"
             "from __main__ import salt, message",
             number=iterations)))

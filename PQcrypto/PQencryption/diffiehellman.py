@@ -4,6 +4,8 @@
 Created on Mon Jul 10 16:26:41 CEST 2017
 
 @author: BMMN
+
+Curve25519 PyNaCl
 """
 
 from __future__ import print_function  # make print python3 compatible
@@ -11,9 +13,9 @@ from __future__ import print_function  # make print python3 compatible
 import nacl.utils
 import nacl.public
 import nacl.encoding
-from .salsa20_256_PyNaCl import Salsa20, Salsa20Key
-from ..utilities.utilities import _get_password
-from .sha_512_hashlib import hash512
+from .salsa20 import Salsa20, Salsa20Key
+from .utilities import _get_password
+from .sha512 import hash512
 from .Key import Key
 
 secret_key_name = "SECRET_Diffie_Hellman_Key"

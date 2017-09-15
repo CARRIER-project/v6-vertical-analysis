@@ -58,17 +58,15 @@ class TestFunctions(unittest.TestCase):
     @mock.patch('getpass.getpass',
             return_value="Aa0!asdfasdfasdfasdf")
     def test_get_password(self, input):
-        from PQencryption.utilities import utilities
-        password = utilities._get_password(validate=True,
+        password = cr._get_password(validate=True,
                 print_requirements=False)
         self.assertEqual(password, "Aa0!asdfasdfasdfasdf")
 
     @mock.patch('getpass.getpass',
             side_effect=["Aa0!asdfasdfasdfasdf", "Aa0!ASDFASDFASDFASDF"])
     def test_get_password_fail(self, input):
-        from PQencryption.utilities import utilities
         with self.assertRaises(Exception) as e:
-            password = utilities._get_password(validate=True,
+            password = cr._get_password(validate=True,
                     print_requirements=False)
         self.assertEqual(type(e.exception), ValueError)
         self.assertTrue("Passwords differ." in str(e.exception))

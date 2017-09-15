@@ -4,6 +4,8 @@
 Created on 4 jul 2017 16:24:30 CEST
 
 @author: BMMN
+
+SHA 512 hashlib
 """
 
 from __future__ import print_function  # make print python3 compatible

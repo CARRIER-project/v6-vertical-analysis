@@ -212,7 +212,7 @@ def example_export_import_keys():
     print("=== example_export_import_keys() ===")
     print()
 
-    path = "."
+    path = ".tmp/"
     owner = "CBS"
     key_objects = cr.EdDSA.key_gen()
     for key_object in key_objects:

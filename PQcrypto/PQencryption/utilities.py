@@ -11,11 +11,11 @@ import getpass
 import gc  # garbage collector
 import re
 import os
-import nacl.hash
-import nacl.utils
-import nacl.signing
-import nacl.encoding
-import nacl.public
+#import nacl.hash
+#import nacl.utils
+#import nacl.signing
+#import nacl.encoding
+#import nacl.public
 
 def _check_password(password):
     length = 20
@@ -41,6 +41,8 @@ def _check_password(password):
     if symbol_error:
         errors += "Password does not contain any special characters.\n"
     if not password_ok:
+        del password
+        gc.collect()
         raise ValueError(errors)
 
 def _get_password(validate=False, print_requirements=True):
@@ -66,28 +68,28 @@ def import_key(file_name_with_path, silent=False):
 
     if "McBits" in file_name:
         if "SECRET" in file_name:
-            from ..crypto.encryption_mcbits import McBitsSecretKey
+            from .mcbits import McBitsSecretKey
             try:
                 key = McBitsSecretKey.import_key(file_name_with_path, silent)
             except IOError:
                 print("Could not import key file: " + str(file_name))
 
         if "Public" in file_name:
-            from ..crypto.encryption_mcbits import McBitsPublicKey
+            from .mcbits import McBitsPublicKey
             try:
                 key = McBitsPublicKey.import_key(file_name_with_path, silent)
             except IOError:
                 print("Could not import key file: " + str(file_name))
 
     if "AES_256" in file_name:
-        from ..crypto.aes_256_Crypto import AES256Key
+        from .aes256 import AES256Key
         try:
             key = AES256Key.import_key(file_name_with_path, silent)
         except IOError:
             print("Could not import key file: " + str(file_name))
 
     if "Salsa20" in file_name:
-        from ..crypto.salsa20_256_PyNaCl import Salsa20Key
+        from .salsa20 import Salsa20Key
         try:
             key = Salsa20Key.import_key(file_name_with_path, silent)
         except IOError:
@@ -95,14 +97,14 @@ def import_key(file_name_with_path, silent=False):
 
     if "EdDSA" in file_name:
         if "SECRET" in file_name:
-            from ..crypto.signing_Curve25519_PyNaCl import EdDSASigningKey
+            from .eddsa import EdDSASigningKey
             try:
                 key = EdDSASigningKey.import_key(file_name_with_path, silent)
             except IOError:
                 print("Could not import key file: " + str(file_name))
 
         if "Public" in file_name:
-            from ..crypto.signing_Curve25519_PyNaCl import EdDSAVerifyKey
+            from .eddsa import EdDSAVerifyKey
             try:
                 key = EdDSAVerifyKey.import_key(file_name_with_path, silent)
             except IOError:
@@ -110,7 +112,7 @@ def import_key(file_name_with_path, silent=False):
 
     if "Diffie_Hellman" in file_name:
         if "SECRET" in file_name:
-            from ..crypto.encryption_Curve25519_PyNaCl import DiffieHellmanSecretKey
+            from .diffiehellman import DiffieHellmanSecretKey
             try:
                 key = DiffieHellmanSecretKey.import_key(
                         file_name_with_path, silent)
@@ -118,7 +120,7 @@ def import_key(file_name_with_path, silent=False):
                 print("Could not import key file: " + str(file_name))
 
         if "Public" in file_name:
-            from ..crypto.encryption_Curve25519_PyNaCl import DiffieHellmanPublicKey
+            from .diffiehellman import DiffieHellmanPublicKey
             try:
                 key = DiffieHellmanPublicKey.import_key(
                         file_name_with_path, silent)
@@ -129,3 +131,19 @@ def import_key(file_name_with_path, silent=False):
         return key
     else:
         raise TypeError("Importing invalid key.")
+
+#def sign_encrypt_sign_asymmetric(signing_key, q_safe_encryption_key,
+#        classic_encryption_key, message):
+#    from ..crypto.signing_Curve25519_PyNaCl import EdDSA
+#    from ..crypto.encryption_mcbits import McBits
+#    from ..crypto.encryption_Curve25519_PyNaCl import DiffieHellman
+#    signing = EdDSA(signing_key)
+#    q_safe_encryption = McBits(q_safe_encryption_key)
+#    classic_encryption = DiffieHellman(classic_encryption_key)
+#
+#def sign_encrypt_sign_symmetric(signing_key, encryption_key, message):
+#    from ..crypto.signing_Curve25519_PyNaCl import EdDSA
+#    signing = EdDSA(signing_key)
+
+#def verify_decrypt_verify():
+#    pass
