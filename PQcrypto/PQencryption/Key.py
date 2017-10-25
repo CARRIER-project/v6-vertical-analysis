@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-"""
-Created on vr 15 sep 2017  9:25:15 CEST
-@author: BMMN
+""" Template for crypto keys.
 
-signing Curve 25519 PyNaCl
+Not to be used on its own.
 """
 
 import os
@@ -12,7 +10,21 @@ import nacl.encoding
 from .utilities import _get_password
 from .sha512 import hash512
 
-class Key(object):
+class _Key(object):
+    """ Generic key object.
+
+    Attributes:
+        key: The raw key.
+        name: The key name.
+        description: Verbose description of key type.
+        header: Header for exporting to a file, also contains the description.
+        footer: Footer for exporting to a file
+
+    Methods:
+        export_key: Export the raw key to a file.
+        _check_length: Verify the length of the raw key.
+    """
+
     footer = "#" * 79
 
     def __init__(self, key, key_name, key_description):
@@ -21,7 +33,7 @@ class Key(object):
         self.description = key_description
         self.header = "## " + self.description + " "\
                 + "#" * (79-4-len(self.description))
-        self.footer = Key.footer
+        self.footer = _Key.footer
 
     def _check_length(self, key_length):
         if len(self.key) != key_length:

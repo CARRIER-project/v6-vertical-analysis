@@ -1,8 +1,18 @@
 # -*- coding: utf-8 -*-
-"""
-Created on vr 25 aug 2017 17:44:50 CEST
+""" McBits pubkey code-based encryption cipher.
 
-@author: BMMN
+Safe against quantum computing attacks. Wrapper around the McBits C library
+from Daniel J. Bernstein, Tung Chou and Peter Schwabe.
+
+https://tungchou.github.io/mcbits/
+https://eprint.iacr.org/2015/610.pdf
+
+class McBits provides a cipher object for en- and decryption. Without
+instantiation you can use key_gen() to generate keys.
+
+classes McBitsSecretKey and McBitsPublicKey provide key objects. The raw keys
+can be found in KEYNAME.key. Without instantiation, calling import_key() reads
+a keyfile and returns a key object.
 """
 
 from __future__ import print_function  # make print python3 compatible
@@ -13,7 +23,7 @@ import nacl.encoding
 from .salsa20 import Salsa20, Salsa20Key
 from .utilities import _get_password
 from .sha512 import hash512
-from .Key import Key
+from .Key import _Key
 
 
 secret_key_name = "SECRET_McBits_Key"
@@ -35,6 +45,17 @@ len_pk = 1357824
 len_sk = 13008
 
 class McBits(object):
+    """ Cipher object for en- and decryption.
+
+    Attributes:
+        key: The raw key.
+
+    Methods:
+        encrypt: Encrypt plaintext with a McBits pubkey cipher.
+        decrypt: Encrypt ciphertext with a McBits pubkey cipher.
+        key_gen: Generate a tuple of key objects, containing a McBits secret
+                 key and public key. Can be called without instantiation.
+    """
     def __init__(self, key):
         self.key = key
 
@@ -43,6 +64,7 @@ class McBits(object):
 
         Args:
             message_unencoded (str): message to be encrypted
+
         Returns:
             base64-encoded cipher in unicode
         """
@@ -90,7 +112,7 @@ class McBits(object):
 
     @staticmethod
     def key_gen():
-        """Key-pair generation for McBits encrytion.
+        """Key-pair generation for McBits public key encrytion.
 
         Args:
             --
@@ -103,9 +125,9 @@ class McBits(object):
         return McBitsSecretKey(bytearray(secret_key)), \
                 McBitsPublicKey(bytearray(public_key))
 
-class McBitsKey(Key):
+class _McBitsKey(_Key):
     def __init__(self, key, key_name, key_description):
-        super(McBitsKey, self).__init__(key, key_name, key_description)
+        super(_McBitsKey, self).__init__(key, key_name, key_description)
 
     def _is_valid(self):
         if type(self.key) != bytearray:
@@ -115,7 +137,26 @@ class McBitsKey(Key):
         else:
             return True
 
-class McBitsSecretKey(McBitsKey):
+class McBitsSecretKey(_McBitsKey):
+    """ Secret key object for decryption.
+
+    Attributes:
+        key: The raw secret key.
+        name: The key name.
+        description: Verbose description of key type.
+        header: Header for exporting to a file, also contains the description.
+        footer: Footer for exporting to a file.
+        key_length: Key length, used for checking key validity.
+        security_level: String, "SECRET" if encrypted storage is needed,
+                        "Private" if not.
+
+    Methods:
+        export_key: Export the raw key to a key file.
+        import _key: Creates a key object from the content of a key file. Can
+                     be called without instantiation.
+        _check_length: Verify the length of the raw key.
+        _is_valid: Self check for validity.
+    """
     def __init__(self, key):
         super(McBitsSecretKey, self).__init__(key, secret_key_name,
                 secret_key_description)
@@ -125,14 +166,29 @@ class McBitsSecretKey(McBitsKey):
 
     @staticmethod
     def import_key(file_name_with_path, silent=False):
+        """ Creates a private key object from a key file.
+
+        Attributes:
+            file_name_with_path: Key_file.
+            silent: Don't print password requirements if set True.
+
+        Returns:
+            McBitsSecretKey object.
+
+        Raises:
+            IOError: When opening a wrong file.
+            TypeError: When key in file is invalid.
+            ValueError: When decryption passwords do not match requirements.
+            nacl.exceptions.CryptoError: When key decryption fails.
+        """
         with open(file_name_with_path) as f:
             header = f.readline().rstrip()
             encrypted_key_base64 = f.readline().rstrip()
             footer = f.readline().rstrip()
         if not secret_key_description in header:
-            raise IOError("Key is not a McBits SECRET key.")
-        if not footer == Key.footer:
-            raise IOError("Key is not a valid key.")
+            raise TypeError("Key is not a McBits SECRET key.")
+        if not footer == _Key.footer:
+            raise TypeError("Key is not a valid key.")
         if silent:
             user_password = _get_password(validate=False,
                     print_requirements=False)
@@ -146,7 +202,26 @@ class McBitsSecretKey(McBitsKey):
         decrypted_key = nacl.encoding.Base64Encoder.decode(decrypted_key_base64)
         return McBitsSecretKey(bytearray(decrypted_key))
 
-class McBitsPublicKey(McBitsKey):
+class McBitsPublicKey(_McBitsKey):
+    """ Public key object for encryption.
+
+    Attributes:
+        key: The raw secret key.
+        name: The key name.
+        description: Verbose description of key type.
+        header: Header for exporting to a file, also contains the description.
+        footer: Footer for exporting to a file.
+        key_length: Key length, used for checking key validity.
+        security_level: String, "SECRET" if encrypted storage is needed,
+                        "Private" if not.
+
+    Methods:
+        export_key: Export the raw key to a key file.
+        import _key: Creates a key object from the content of a key file. Can
+                     be called without instantiation.
+        _check_length: Verify the length of the raw key.
+        _is_valid: Self check for validity.
+    """
     def __init__(self, key):
         super(McBitsPublicKey, self).__init__(key, public_key_name,
                 public_key_description)
@@ -156,13 +231,26 @@ class McBitsPublicKey(McBitsKey):
 
     @staticmethod
     def import_key(file_name_with_path, silent=False):
+        """ Creates a public key object from a key file.
+
+        Attributes:
+            file_name_with_path: Key_file.
+            silent: Don't print password requirements if set True.
+
+        Returns:
+            McBitsPublicKey object.
+
+        Raises:
+            IOError: When opening a wrong file.
+            TypeError: When key in file is invalid.
+        """
         with open(file_name_with_path) as f:
             header = f.readline().rstrip()
             key_base64 = f.readline().rstrip()
             footer = f.readline().rstrip()
         if not public_key_description in header:
-            raise IOError("Key is not a McBits Public key.")
-        if not footer == Key.footer:
-            raise IOError("Key is not a valid key.")
+            raise TypeError("Key is not a McBits Public key.")
+        if not footer == _Key.footer:
+            raise TypeError("Key is not a valid key.")
         key = nacl.encoding.Base64Encoder.decode(key_base64)
         return McBitsPublicKey(bytearray(key))

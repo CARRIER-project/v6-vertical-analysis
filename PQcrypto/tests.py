@@ -1,9 +1,9 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Jul 13 08:46:20 CEST 2017
+""" Run tests of the PQcrypto functions and utilities.
 
-@author: BMMN
+If all tests pass, your system is set up properly to use the PQcrypto package.
+The tests can also be seen as implementation examples.
 """
 
 from __future__ import print_function  # make print python3 compatible

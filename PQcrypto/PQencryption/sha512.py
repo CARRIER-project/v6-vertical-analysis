@@ -13,6 +13,13 @@ import hashlib
 import nacl.encoding
 
 def hash512(string):
+    """SHA 512 hashing, using hashlib.
+
+    Args:
+        string (str): arbitrary length string
+    Returns:
+        hashed string
+    """
     return nacl.encoding.Base64Encoder.encode(
             hashlib.sha512(string.encode("utf-8")).digest()).decode("utf-8")
 

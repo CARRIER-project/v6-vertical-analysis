@@ -1,9 +1,11 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Jul 13 08:46:20 CEST 2017
+""" Implementation examples for using the PQcrypto package.
 
-@author: BMMN
+Uncomment a function name under 'if __name__ == "__main__":' and run this
+script.
+
+See also test.py
 """
 
 from __future__ import print_function  # make print python3 compatible
@@ -58,10 +60,12 @@ def example_generate_keys():
 
     ciphers = [cr.AES256, cr.McBits, cr.Salsa20, cr.EdDSA, cr.DiffieHellman]
     for cipher in ciphers:
-        cipher_name = str(cipher).split('.')[-1].split("'")[0]
+        cipher_name = str(cipher).split(".")[-1].split("'")[0]
         print(cipher_name)
         print(cipher.key_gen())
         print()
+        del cipher
+    gc.collect()
 
 def example_symmetric_block_encryption_AES256():
     import PQencryption as cr
@@ -75,7 +79,7 @@ def example_symmetric_block_encryption_AES256():
     # DON'T DO THIS IN PRODUCTION!
     key = cr.AES256.key_gen()
 
-    message = 'This is my message.'
+    message = "This is my message."
     print("message  : " + message)
 
     symmetric_cipher = cr.AES256(key)
@@ -110,7 +114,7 @@ def example_symmetric_streaming_encryption_salsa20():
     # DON'T DO THIS IN PRODUCTION!
     key = cr.Salsa20.key_gen()
 
-    message = 'This is my message.'
+    message = "This is my message."
     print("message  : " + message)
 
     symmetric_cipher = cr.Salsa20(key)
@@ -144,7 +148,7 @@ def example_classic_pubkey_encryption():
     secret_key_Alice, public_key_Alice = cr.DiffieHellman.key_gen()
     secret_key_Bob, public_key_Bob = cr.DiffieHellman.key_gen()
 
-    message = 'This is my message.'
+    message = "This is my message."
     print("message  :    " + message)
 
     q_vuln_pubkey_cipher_Alice = cr.DiffieHellman(secret_key_Alice,
@@ -185,7 +189,7 @@ def example_quantum_safe_pubkey_encryption():
     # DON'T DO THIS IN PRODUCTION!
     secret_key_Alice, public_key_Alice = cr.McBits.key_gen()
 
-    message = 'This is my message.'
+    message = "This is my message."
     print("message  : " + message)
 
     q_safe_pubkey_cipher_Bob = cr.McBits(public_key_Alice)
@@ -211,10 +215,19 @@ def example_export_import_keys():
     print()
     print("=== example_export_import_keys() ===")
     print()
+    print("====================================")
+    print("Sample password for copy&pasting:")
+    print("Aa0!asdfasdfasdfasdf")
+    print("====================================")
 
     path = ".tmp/"
     owner = "CBS"
+
+    # As an example, we use EdDSA signing keys. The syntax is the same for
+    # all other ciphers. Note that symmetric ciphers have only one key instead
+    # of two, the iteration through the key_objects is then not necessary.
     key_objects = cr.EdDSA.key_gen()
+
     for key_object in key_objects:
         print()
         print("Exporting key " + str(key_object))
@@ -229,6 +242,8 @@ def example_export_import_keys():
         print()
         print("Key: " + str(imported_key))
         print()
+        del imported_key
+    gc.collect()
 
 def example_quantum_vulnerable_signing():
     import PQencryption as cr
@@ -243,7 +258,7 @@ def example_quantum_vulnerable_signing():
     # DON'T DO THIS IN PRODUCTION!
     signing_key, verify_key = cr.EdDSA.key_gen()
 
-    message = 'This is my message.'
+    message = "This is my message."
     print()
     print("message           : " + message)
 
@@ -287,21 +302,143 @@ def example_quantum_vulnerable_signing():
         print("... end cleanup.")
         print("="*79)
 
+def example_sign_encrypt_sign_pubkey():
+    import PQencryption as cr
+    print()
+    print()
+    print("=== example_sign_encrypt_sign_pubkey() ===")
+    print()
+
+    # This in an example. In production, you would want to read the key from an
+    # external file or the command line. The key must be 32 bytes long.
+
+    # DON'T DO THIS IN PRODUCTION!
+    signing_key, verifying_key = cr.EdDSA.key_gen()
+    quantum_safe_secret_key, quantum_safe_public_key = cr.McBits.key_gen()
+    classic_secret_key_Alice, classic_public_key_Alice = \
+            cr.DiffieHellman.key_gen()
+    classic_secret_key_Bob, classic_public_key_Bob = \
+            cr.DiffieHellman.key_gen()
+
+    message = "This is my message."
+    print()
+    print("message                  : " + message)
+
+    ciphertext = cr.sign_encrypt_sign_pubkey(signing_key,
+            quantum_safe_public_key, classic_secret_key_Alice,
+            classic_public_key_Bob, message)
+
+    print()
+    print("signed, encrypted, signed: " + ciphertext)
+
+    try:
+        print()
+        print("decryption, verification positive: " \
+                + cr.verify_decrypt_verify_pubkey(verifying_key,
+            quantum_safe_secret_key, classic_secret_key_Bob,
+            classic_public_key_Alice, ciphertext))
+        print()
+        print("decryption, verification negative:")
+        print("="*79)
+        print("THIS WILL FAIL WITH AN ERROR, AS EXPECTED.")
+        print("="*79)
+        print(cr.verify_decrypt_verify_pubkey(verifying_key,
+            quantum_safe_secret_key, classic_secret_key_Bob,
+            classic_public_key_Alice, "0"*len(ciphertext)))
+    except:
+        raise
+
+    finally:
+        print("="*79)
+        print("Yes, clean-up is still executed, even after raising errors:")
+        print("begin cleanup ...")
+        # make sure all memory is flushed after operations
+        del message
+        del signing_key
+        del quantum_safe_secret_key
+        del classic_secret_key_Alice
+        del classic_secret_key_Bob
+        del verifying_key
+        del ciphertext
+        gc.collect()
+        print("... end cleanup.")
+        print("="*79)
+
+def example_sign_encrypt_sign_symmetric():
+    import PQencryption as cr
+    print()
+    print()
+    print("=== example_sign_encrypt_sign_pubkey() ===")
+    print()
+
+    # This in an example. In production, you would want to read the key from an
+    # external file or the command line. The key must be 32 bytes long.
+
+    # DON'T DO THIS IN PRODUCTION!
+    symmetric_encryption_key = cr.Salsa20.key_gen()
+    signing_key, verifying_key = cr.EdDSA.key_gen()
+
+    message = "This is my message."
+
+
+    print()
+    print("message                  : " + message)
+
+    ciphertext = cr.sign_encrypt_sign_symmetric(signing_key,
+            symmetric_encryption_key, message)
+
+    print()
+    print("signed, encrypted, signed: " + ciphertext)
+
+    try:
+        print()
+        print("decryption, verification positive: " \
+                + cr.verify_decrypt_verify_symmetric(verifying_key,
+                symmetric_encryption_key, ciphertext))
+
+        print()
+        print("decryption, verification negative:")
+        print("="*79)
+        print("THIS WILL FAIL WITH AN ERROR, AS EXPECTED.")
+        print("="*79)
+        print(cr.verify_decrypt_verify_symmetric(verifying_key,
+                symmetric_encryption_key, "0"*len(ciphertext)))
+    except:
+        raise
+
+    finally:
+        print("="*79)
+        print("Yes, clean-up is still executed, even after raising errors:")
+        print("begin cleanup ...")
+        # make sure all memory is flushed after operations
+        del message
+        del symmetric_encryption_key
+        del signing_key
+        del verifying_key
+        del ciphertext
+        gc.collect()
+        print("... end cleanup.")
+        print("="*79)
+
 if __name__ == "__main__":
-    example_hashing()
+#    example_hashing()
 
-    example_salthashing()
+#    example_salthashing()
 
-    example_symmetric_block_encryption_AES256()
+#    example_symmetric_block_encryption_AES256()
 
-    example_symmetric_streaming_encryption_salsa20()
+#    example_symmetric_streaming_encryption_salsa20()
 
-    example_classic_pubkey_encryption()
+#    example_classic_pubkey_encryption()
 
-    example_quantum_safe_pubkey_encryption()
+#    example_quantum_safe_pubkey_encryption()
 
-    example_generate_keys()
+#    example_generate_keys()
 
-    example_export_import_keys()
+#    example_export_import_keys()
 
-    example_quantum_vulnerable_signing()
+#    example_quantum_vulnerable_signing()
+
+#    example_sign_encrypt_sign_pubkey()
+
+#    example_sign_encrypt_sign_symmetric()

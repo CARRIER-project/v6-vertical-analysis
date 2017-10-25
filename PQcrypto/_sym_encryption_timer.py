@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-Created on Fri Jul  7 16:44:29 CEST 2017
-@author: BMMN
+""" Benchmarking Salsa20 and AES symmetric encryption ciphers.
+
+Currently Salsa20 is faster.
+Note that generating the initialization vector from AES takes quite a while.
 """
 
 from __future__ import print_function  # make print python3 compatible
@@ -56,8 +57,3 @@ print("Crypto AES: "
             "key=AES256Key(bytes_key);"
             "my_cipher=AES256(key);",
             number=iterations)))
-
-print()
-print("Comments:")
-print("• Generating the initialization vector from AES takes quite a while.")
-print("• Salsa20 is faster.")

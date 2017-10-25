@@ -12,6 +12,19 @@ import re
 import os
 
 def _check_password(password):
+    """ Checks if the password meets the required criteria.
+    Criteria:
+        - length >= 20
+        - contains at least one digit
+        - contains at least one lower case character
+        - contains at least one upper case character
+        - contains at least one special character
+
+    Args:
+        password: The password to be checked.
+    Raises:
+        ValueError: If password does not meet the above mentioned criteria.
+    """
     length = 20
     length_error = len(password) < length
     digit_error = re.search(r"\d", password) is None
@@ -40,6 +53,18 @@ def _check_password(password):
         raise ValueError(errors)
 
 def _get_password(validate=False, print_requirements=True):
+    """ Gets a password from user input.
+
+    Args:
+        validate: Does the password need to by typed twice? This is usually
+            used for encryption to prevent typos.
+        print_requirements: Print the password requirements? Set to False for
+            tests.
+    Returns:
+        The password input by the user.
+    Raises:
+        ValueError: If validation fails.
+    """
     requirements = ("Password must have at least 20 characters, including:\n"
             "upper-case    ABC...\n"
             "lower-case    abc...\n"
@@ -52,11 +77,24 @@ def _get_password(validate=False, print_requirements=True):
     if validate:
         password_2 = getpass.getpass("Repeat password:")
         if password != password_2:
+            del password_2
             raise ValueError("Passwords differ.")
+        else:
+            del password_2
 
     return password
 
 def import_key(file_name_with_path, silent=False):
+    """ Imports a key from a file.
+
+    Args:
+        file_name_with_path: File name with path of the key file.
+        silent: Don't print password requirements if set True.
+    Returns:
+        The imported key.
+    Raises:
+        IOError: If key import fails.
+    """
     file_name = os.path.basename(file_name_with_path)
     key = False
 
@@ -124,10 +162,32 @@ def import_key(file_name_with_path, silent=False):
     if key:
         return key
     else:
-        raise TypeError("Importing invalid key.")
+        raise IOError("Could not import key.")
 
 def sign_encrypt_sign_pubkey(signing_key, quantum_safe_public_key,
         classic_secret_key, classic_public_key, message):
+    """ Sign, double public-key-encrypt and sign again a cleartext message.
+
+    The two signing processes prevent chosen-cyphertext-attacks (the
+    decryption algorithm only operates on authenticated code) and ensure the
+    integrity of the data.
+
+    The message is encrypted with the tested and trusted Diffie Hellman cypher,
+    as well as the experimental McBits cypher. The latter is thought to be
+    safe against quantum computer attacks.
+
+    Args:
+        signing_key: EdDSA Key object for signing.
+        quantum_safe_public_key: McBits Key object for encryption.
+        classic_secret_key: The sender's secret Diffie Hellman Key object for
+            encryption.
+        classic_public_key: The receiver's public Diffie Hellman Key object for
+            encryption.
+        message: Plain text string.
+    Returns:
+        Signed, twice encrypted and signed Base64 encoded ciphertext.
+    """
+
     from .diffiehellman import DiffieHellman
     from .eddsa import EdDSA
     from .mcbits import McBits
@@ -144,6 +204,19 @@ def sign_encrypt_sign_pubkey(signing_key, quantum_safe_public_key,
 
 def sign_encrypt_sign_symmetric(signing_key, symmetric_encryption_key,
         message):
+    """ Sign, double symmetric-encrypt and sign again a cleartext message.
+
+    The two signing processes prevent chosen-cyphertext-attacks (the
+    decryption algorithm only operates on authenticated code) and ensure the
+    integrity of the data.
+
+    Args:
+        signing_key: EdDSA Key object for signing.
+        symmetric_encryption_key: Secret Salsa20 key object.
+        message: Plain text string.
+    Returns:
+        Signed, symmetric encrypted and signed Base64 encoded ciphertext.
+    """
     from .eddsa import EdDSA
     from .salsa20 import Salsa20
     signing_cipher = EdDSA(signing_key)
@@ -156,6 +229,27 @@ def sign_encrypt_sign_symmetric(signing_key, symmetric_encryption_key,
 
 def verify_decrypt_verify_pubkey(verifying_key, quantum_safe_secret_key,
         classic_secret_key, classic_public_key, ciphertext):
+    """ Verify, double public-key-decrypt and verify again a cleartext message.
+
+    The two verification processes prevent chosen-cyphertext-attacks (the
+    decryption algorithm only operates on authenticated code) and ensure the
+    integrity of the data.
+
+    The message is decrypted with the tested and trusted Diffie Hellman cypher,
+    as well as the experimental McBits cypher. The latter is thought to be
+    safe against quantum computer attacks.
+
+    Args:
+        verifying: EdDSA Key object for verifying.
+        quantum_safe_secret_key: McBits Key object for decryption.
+        classic_secret_key: The receiver's secret Diffie Hellman Key object for
+            decryption.
+        classic_public_key: The sender's public Diffie Hellman Key object for
+            decryption.
+        ciphertext: Base64 encoded ciphertext.
+    Returns:
+        Cleartext message.
+    """
     from .diffiehellman import DiffieHellman
     from .eddsa import EdDSA
     from .mcbits import McBits
@@ -174,6 +268,19 @@ def verify_decrypt_verify_pubkey(verifying_key, quantum_safe_secret_key,
 
 def verify_decrypt_verify_symmetric(verifying_key, symmetric_encryption_key,
         ciphertext):
+    """ Verify, double symmetric-decrypt and verify again a ciphertext.
+
+    The two verification processes prevent chosen-cyphertext-attacks (the
+    decryption algorithm only operates on authenticated code) and ensure the
+    integrity of the data.
+
+    Args:
+        verifying_key: EdDSA Key object for verifying.
+        symmetric_encryption_key: Secret Salsa20 key object.
+        ciphertext: Base64 encoded ciphertext.
+    Returns:
+        Cleartext message.
+    """
     from .eddsa import EdDSA
     from .salsa20 import Salsa20
     verifying_cipher = EdDSA(verifying_key)
