@@ -1,8 +1,10 @@
+curFolder=$(pwd)
+
 cd containers/createContainer/cbsContainer
-docker run --rm --add-host dockerhost:10.0.75.1 -v ./output.txt:/output.txt datasharing/cbs
+docker run --rm --add-host dockerhost:10.0.75.1 -v $curFolder/containers/createContainer/cbsContainer/output.txt:/output.txt datasharing/cbs
 
 cd ../umContainer
-docker run --rm --add-host dockerhost:10.0.75.1 -v ./output.txt:/output.txt datasharing/um
+docker run --rm --add-host dockerhost:10.0.75.1 -v $curFolder/containers/createContainer/umContainer/output.txt:/output.txt datasharing/um
 
 cd ../../ttpImage
 rm -R output/
