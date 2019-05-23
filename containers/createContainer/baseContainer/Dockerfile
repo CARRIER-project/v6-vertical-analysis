@@ -1,6 +1,6 @@
 FROM python:2-stretch
 
-RUN apt-get update && apt-get install -y r-base r-base-dev python-pip
+RUN apt-get update && apt-get install -y r-base r-base-dev python-pip dos2unix
 
 RUN mkdir /data
 
