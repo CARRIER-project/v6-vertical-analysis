@@ -1,5 +1,5 @@
-docker rmi datasharing/ttp
-docker build -t datasharing/ttp .\
+docker rmi datasharing/tse
+docker build -t datasharing/tse .\
 
 # Uncomment lines below if you want to test execution    
 #rm -R ./output/
