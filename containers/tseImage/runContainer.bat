@@ -7,4 +7,4 @@ docker build -t datasharing/tse .\
 
 docker run --rm --add-host dockerhost:10.0.75.1 -v %~dp0\output:/temp -v %~dp0\input.json:/input.txt datasharing/tse
 
-rem docker push datasharing/tse
+docker push datasharing/tse
