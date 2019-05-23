@@ -11,6 +11,6 @@ mergedSet <- sapply(dmsSet$id, function(x) {
 })
 
 mergedSet <- as.data.frame(t(mergedSet))
-png(filename = "/temp/myImage.png")
+png(filename = "/output/myImage.png")
 plot(mergedSet$age, mergedSet$income)
 dev.off()
