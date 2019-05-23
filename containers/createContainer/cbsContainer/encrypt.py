@@ -1,5 +1,7 @@
 import requests
 import json
+import uuid
+import os
 
 ####################################
 # encryption part
@@ -35,21 +37,31 @@ text_file.close()
 # data sending
 #########################################################
 
-#send file to TTP service
-res = requests.post(url='http://dockerhost:5001/addFile',
-    files={"fileObj": open('/data/cbs.enc', 'rb')})
+# #send file to TTP service
+# res = requests.post(url='http://dockerhost:5001/addFile',
+#     files={"fileObj": open('/data/cbs.enc', 'rb')})
 
-#get the uuid of the stored file at TTP
-resultJson = json.loads(res.text.encode("utf-8"))
+# #get the uuid of the stored file at TTP
+# resultJson = json.loads(res.text.encode("utf-8"))
 
-#print output
-print("Stored encrypted file as %s" % (resultJson["status"].encode("utf-8")))
-print("UUID: %s" % resultJson["uuid"].encode("utf-8"))
+# #print output
+# print("Stored encrypted file as %s" % (resultJson["status"].encode("utf-8")))
+# print("UUID: %s" % resultJson["uuid"].encode("utf-8"))
+
+if not os.path.exists("/temp/"):
+    print("Temp folder does not exist, creating now")
+    os.mkdir("/temp")
+
+#### copy file to /temp/ folder
+fileName = str(uuid.uuid4())
+with open(os.path.join('/temp', fileName), 'w') as f: 
+    f.write(signed_encrypted_signed_message) 
+###############################
 
 result = {
     "verifyKey": verifyBase64,
     "encryptKey": encryptionKeyBase64,
-    "fileUUID": resultJson["uuid"].encode("utf-8")
+    "fileUUID": fileName
 }
 
 with open('output.txt', 'w') as fp:
