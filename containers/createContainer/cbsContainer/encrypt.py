@@ -48,13 +48,13 @@ text_file.close()
 # print("Stored encrypted file as %s" % (resultJson["status"].encode("utf-8")))
 # print("UUID: %s" % resultJson["uuid"].encode("utf-8"))
 
-if not os.path.exists("/temp/"):
-    print("Temp folder does not exist, creating now")
-    os.mkdir("/temp")
+if not os.path.exists("/output/"):
+    print("Output folder does not exist, creating now")
+    os.mkdir("/output")
 
 #### copy file to /temp/ folder
 fileName = str(uuid.uuid4())
-with open(os.path.join('/temp', fileName), 'w') as f: 
+with open(os.path.join('/output', fileName), 'w') as f: 
     f.write(signed_encrypted_signed_message) 
 ###############################
 
