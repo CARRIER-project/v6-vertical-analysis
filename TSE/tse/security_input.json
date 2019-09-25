@@ -1,0 +1,8 @@
+
+{   "parties": ["dms","cbs"],
+    "dmsfileUUID": "63a604e9-5d06-4c06-824b-3e4340951b72", 
+        "dmsencryptKey": "m9xsSxWVK5UYUvFxccAMXIhA6FwMYWM7tOmJ2d8SXZA=", 
+        "dmsverifyKey": "JC8yYxEzIkoXB1lmG+UhohcaI4EHILNwcW60gQnZvlQ=",
+        "cbsfileUUID": "35b3d28c-c348-47ae-8a6e-e016ccdc9ad6", 
+        "cbsencryptKey": "AvBcN5OpCFIEu0oKfzNJ6wjzzW4Bb5IkYZ9wMSHQqWk=", 
+        "cbsverifyKey": "T85I87NktcFtqpE7DV+Sc8EQ+Lk/c2BqHmaar2N1XcU="}

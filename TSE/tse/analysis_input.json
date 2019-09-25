@@ -1,0 +1,32 @@
+
+{   
+    "taskName": ["basic", "regression", "classification"],
+
+    "check_missing": [true,false,false],
+
+    "correlation_matrix": [true,false,false],
+
+    "Box_plot": [true,false,false],
+    "Box_plot_feature":[[["Employment_status","weights","N_Diabetes_WHO_2"]]],
+
+    "Cat_Num_plot": [true,false,false],
+    "Cat_Num_feature":[[["Employment_status","KOSTEN_FARMACIE_2011","N_Diabetes_WHO_2"]]],
+
+    "Num_Num_Plot": [true,false,false],
+    "Num_Num_feature":[[["height","KOSTEN_FARMACIE_2011","N_Diabetes_WHO_2"]]],
+
+    "task": [false, "regression","classification"],
+
+    "model": [false, "linear regression","logistic regression"], 
+    "parameters": [false, {"fit_intercept":true, "normalize":false, "copy_X":true}, 
+        {"class_weight":"balanced", "solver":"liblinear", "max_iter":500}],
+
+    "training_features":[false, ["height", "weight", "bmi"], ["height", "weight", "bmi"]], 
+
+    "target_feature":[false, "KOSTEN_FARMACIE_2011", "N_DIABETES_2"], 
+
+    "evaluation_methods": [false, ["neg_mean_absolute_error","neg_mean_squared_error","neg_mean_squared_log_error","r2"],
+    ["precision","recall","f1","roc_auc"]], 
+
+    "k_fold": [false, 10,10]
+}

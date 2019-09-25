@@ -1,8 +1,12 @@
 *.pyc
 *.swp
+*.sav
+.DS_Store
 _PRIVATE_signing_key_CBS
 _PRIVATE_symmetric_key_CBS
 verify_key_CBS
 containers/runContainer/output
 containers/createContainer/umContainer/output.txt
 containers/createContainer/cbsContainer/output.txt
+new_dms_test_enc.csv
+new_dms_test.csv
