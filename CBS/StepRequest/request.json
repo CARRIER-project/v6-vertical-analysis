@@ -1,0 +1,31 @@
+{
+    "data_file": "new_cbs_test.csv",
+
+    "year": "2011",
+
+    "selected_features": ["KOSTEN_MEDISCH_SPECIALISTISCHE_ZORG","KOSTEN_HUISARTS_INSCHRIJFTARIEF", 
+       "KOSTEN_HUISARTS_CONSULT","KOSTEN_HUISARTS_OVERIG", "KOSTEN_FARMACIE", "KOSTEN_MONDZORG", 
+       "KOSTEN_ZIEKENVERVOER_ZITTEND", "KOSTEN_ZIEKENVERVOER_LIGGEND", "KOSTEN_GRENSOVERSCHRIJDENDE_ZORG",
+       "KOSTEN_PARAMEDISCHE_ZORG_FYSIOTHERAPIE", "KOSTEN_PARAMEDISCHE_ZORG_OVERIG","KOSTEN_OVERIG",
+       "KOSTEN_GERIATRISCHE_REVALIDATIEZORG","KOSTEN_VERPLEGING_EN_VERZORGING",
+       "KOSTEN_EERSTELIJNS_PSYCHOLOGISCHE_ZORG","KOSTEN_GENERALISTISCHE_BASIS_GGZ","KOSTEN_LANGDURIGE_GGZ"],
+
+    "name_features": ["medical_specialist", "GP_registration","GP_consult","GP_others","pharmacy","dental","transport_seat", 
+        "transport_land","abroad","paramedical_phy","paramedical_others", "others","rehabilitation","nursing",
+        "firstLinePsy","basicGGZ","longGGZ"],
+
+    "age_range": [[0,4],[5,12],[13,18],[19,29],[30,39],[40,49],[50,59],[60,69],[70,79],[80,90]],
+
+    "check_missing": true,
+
+    "data_description": true,
+
+    "correlation_matrix": true,
+
+    "pie_chart": true,
+
+    "distribution_plot": true,
+
+    "stacked_area": true
+
+}

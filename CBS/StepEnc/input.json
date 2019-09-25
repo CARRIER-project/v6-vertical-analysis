@@ -1,0 +1,4 @@
+{   "party_name": "cbs",
+    "data_file": "new_cbs_test_enc.csv", 
+    "salt_text": "banana", 
+    "id_feature": ["GBAGeboorteJaar","GBAGeboorteMaand","GBAGeboorteDag","GBAGeslacht","GBAPostcode","GBAHuisnummer","GBAToev"]}
