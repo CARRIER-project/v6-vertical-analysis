@@ -1,5 +1,6 @@
-
 {   
+    "receiver_url": "http://dockerhost:5001",
+    
     "taskName": ["basic", "regression", "classification"],
 
     "check_missing": [true,false,false],
