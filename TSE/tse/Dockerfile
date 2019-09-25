@@ -1,4 +1,4 @@
-FROM datasharing/base
+FROM datasharing/base:2019-09-25
 
 COPY verDec.py verDec.py
 COPY matching.py matching.py
