@@ -10,8 +10,9 @@ with open('security_input.json') as data_file:
     inputJson = json.load(data_file)
 parties = inputJson['parties']
 
+receiver_url = inputJson['receiver_url']
 for p in parties:
-    url = 'http://dockerhost:5001/file/%s' % inputJson["%sfileUUID" %(p)]
+    url = receiver_url+'/file/%s' % inputJson["%sfileUUID" %(p)]
     response = requests.get(url, stream=True)
     with open('/data/%sData.enc' %(p), 'wb') as out_file:
         shutil.copyfileobj(response.raw, out_file)

@@ -43,7 +43,8 @@ text_file.close()
 #########################################################
 
 #send file to TTP service
-res = requests.post(url='http://dockerhost:5001/addFile',
+input_url = input['receiver_url']
+res = requests.post(url=input_url+'/addFile',
     files={"fileObj": open('/data/%s.enc' %(fileStr), 'rb')})
 
 #get the uuid of the stored file at TTP
