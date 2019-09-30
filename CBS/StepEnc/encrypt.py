@@ -3,6 +3,7 @@ start_time = time.time()
 
 import requests
 import json
+import uuid
 
 ####################################
 # encryption part
@@ -42,20 +43,33 @@ text_file.close()
 # data sending
 #########################################################
 
-#send file to TTP service
-input_url = input['receiver_url']
-res = requests.post(url=input_url+'/addFile',
-    files={"fileObj": open('/data/%s.enc' %(fileStr), 'rb')})
+# Send file to TTP service
+input_address = input['receiver_address']
+if input_address != False:
+    res = requests.post(url=input_address+'/addFile',
+        files={"fileObj": open('/data/%s.enc' %(fileStr), 'rb')})
 
-#get the uuid of the stored file at TTP
-resultJson = json.loads(res.text.encode("utf-8"))
+    #get the uuid of the stored file at TTP
+    resultJson = json.loads(res.text.encode("utf-8"))
+    saved_status = resultJson["status"]
+    saved_uuid = resultJson["uuid"]
+elif input_address == False:
+    saved_status = "Succeed (locally saved)"
+    saved_uuid = str(uuid.uuid4())
+
+# Save file locally (optional)
+local_save = input['local_save']
+if local_save == True:
+    output_file = open("/output/%s.enc" %(saved_uuid), "wb")
+    output_file.write(signed_encrypted_signed_message)
+    output_file.close()
 
 #print output
-print("Stored encrypted file as %s" % (resultJson["status"]))
-print("UUID: %s" % resultJson["uuid"])
+print("Stored encrypted file as %s" % (saved_status))
+print("UUID: %s" % saved_uuid)
 
 result = {
-    "%sfileUUID" %(fileStr): resultJson["uuid"],
+    "%sfileUUID" %(fileStr): saved_uuid,
     "%sencryptKey" %(fileStr): encryptionKeyBase64.decode('ascii'),
     "%sverifyKey" %(fileStr): verifyBase64.decode('ascii')
 }

@@ -11,12 +11,22 @@ with open('security_input.json') as data_file:
 parties = inputJson['parties']
 
 receiver_url = inputJson['receiver_url']
-for p in parties:
-    url = receiver_url+'/file/%s' % inputJson["%sfileUUID" %(p)]
-    response = requests.get(url, stream=True)
-    with open('/data/%sData.enc' %(p), 'wb') as out_file:
-        shutil.copyfileobj(response.raw, out_file)
-    del response
+if receiver_url != False:
+    for p in parties:
+        url = receiver_url+'/file/%s' % inputJson["%sfileUUID" %(p)]
+        response = requests.get(url, stream=True)
+        with open('/data/%sData.enc' %(p), 'wb') as out_file:
+            shutil.copyfileobj(response.raw, out_file)
+        del response
+elif receiver_url == False:
+    for p in parties:
+        fileUUID = inputJson["%sfileUUID" %(p)]
+        with open("/input/"+fileUUID+".enc", 'rb') as f:
+            contents = f.read()
+        contents_file = open("/data/%sData.enc" %(p), "wb")
+        contents_file.write(contents)
+        contents_file.close()
+
 
 ####################################
 # decryption part
