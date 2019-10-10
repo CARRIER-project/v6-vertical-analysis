@@ -2,6 +2,7 @@ import time, json
 start_time = time.time()
 
 import pandas as pd
+imort checkFormat
 from PQencryption.hashing import sha_512_PyNaCl
 
 with open('input.json', 'r') as f:
@@ -26,10 +27,14 @@ salt = salt_text.encode('UTF-8')
 # Input names of PI columns
 PI = input['id_feature'] 
 act_data = df.drop(PI, axis=1)
-# ["housenum", "zipcode", "date_of_birth", "sex"]
 
 # act_data = act_data.drop(input['internal_id'], axis=1)
 # 2.3 PI columns (personal identifier)
+
+########################################
+### Check formats of linking features###
+########################################
+checkFormat.checking(df, PI)
 
 hashedPI = []
 if df[PI].isnull().sum().sum() == 0:
