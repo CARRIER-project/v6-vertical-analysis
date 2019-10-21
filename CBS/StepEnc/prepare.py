@@ -2,7 +2,7 @@ import time, json
 start_time = time.time()
 
 import pandas as pd
-imort checkFormat
+import checkFormat
 from PQencryption.hashing import sha_512_PyNaCl
 
 with open('input.json', 'r') as f:

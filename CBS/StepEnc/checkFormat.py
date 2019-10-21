@@ -27,7 +27,7 @@ def checking(df, PI):
                     value = df.iloc[i][var]
                     if type(value) != str:
                         print("%s type has to be string" %var)
-                        if len(value) != 4:
+                        if len(value) != 2:
                             print("%s length has to be 2" %var)
                 print("%s checking is done" %var)
                             
@@ -38,7 +38,7 @@ def checking(df, PI):
                     value = df.iloc[i][var]
                     if type(value) != str:
                         print("%s type has to be string" %var)
-                        if len(value) != 4:
+                        if len(value) != 2:
                             print("%s length has to be 2" %var)
                 print("%s checking is done" %var)
             
@@ -60,7 +60,7 @@ def checking(df, PI):
                     value = df.iloc[i][var]
                     if type(value) != str:
                         print("%s type has to be string" %var)
-                        if len(value) != 4:
+                        if len(value) != 6:
                             print("%s length has to be 6" %var)
                 print("%s checking is done" %var)
             
