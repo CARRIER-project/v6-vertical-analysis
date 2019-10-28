@@ -61,6 +61,16 @@ def check_missing(df, col, file):
 
 
 ###########################################
+# Function for variable basic information #
+###########################################
+def data_describe(df, col, file):
+    outputFile = 'output/%s_describe.csv' %file
+    os.makedirs(os.path.dirname(outputFile), exist_ok=True)
+    df.describe().to_csv(outputFile)
+    print('There is %d rows and %d columns' %(len(df), len(col)))
+    print('Data description is done!')
+
+###########################################
 ### Function for plot Correlation Matrix ##
 ###########################################
 def corr_Matrix(df, file):

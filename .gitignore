@@ -1,6 +1,8 @@
 *.pyc
 *.swp
 *.sav
+*.csv
+*.enc
 .DS_Store
 _PRIVATE_signing_key_CBS
 _PRIVATE_symmetric_key_CBS
@@ -11,3 +13,8 @@ containers/createContainer/cbsContainer/output.txt
 new_dms_test_enc.csv
 new_dms_test.csv
 Images
+internal
+TSE/tse/OnlyMatching
+__pycache__
+encryption
+

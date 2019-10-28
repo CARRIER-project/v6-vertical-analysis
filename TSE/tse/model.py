@@ -30,10 +30,17 @@ for i in range(0, len(input['taskName'])):
     ###############################
     # 1.Overview on combined data #
     ###############################
-    ### For getting some basic info ###
+
+    ### For checking missings ###
     checkMissing = input['check_missing'][i]
     if checkMissing == True:
         func.check_missing(combined_df, col, file)
+
+    ### For getting some basic info ###
+    basicInfo = input['basic_Information'][i]
+    if basicInfo == True:
+        func.data_describe(combined_df, col, file)
+
 
     ### Function for correlation matrix ###
     CorrMatrix = input['correlation_matrix'][i]
@@ -81,6 +88,7 @@ for i in range(0, len(input['taskName'])):
         scoring = input['evaluation_methods'][i]
         kFold = input['k_fold'][i]
         params = input['parameters'][i]
+        customize_target = input['customize_target'][i]
 
         ### set up restrictions for inputs ###
         scoring_reg = ["neg_mean_absolute_error","neg_mean_squared_error","neg_mean_squared_log_error","r2"]
@@ -107,7 +115,10 @@ for i in range(0, len(input['taskName'])):
         print("The number of instances(rows): ", len(combined_df_selected))
         print('*************************************************')
 
-        target = combined_df_selected[target_feature]
+        if customize_target == False:
+            target = combined_df_selected[target_feature]
+        elif customize_target == True:
+            target = combined_df_selected[target_feature].sum(axis=1)
         features = combined_df_selected[training_features]
 
 

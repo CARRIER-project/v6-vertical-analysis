@@ -1,33 +1,34 @@
 {   
     "receiver_url": false,
     
-    "taskName": ["basic", "regression", "classification"],
+    "taskName": ["basic", "None"],
 
-    "check_missing": [true,false,false],
+    "check_missing": [true,false],
 
-    "correlation_matrix": [true,false,false],
+    "basic_Information": [true,false],
 
-    "Box_plot": [true,false,false],
+    "correlation_matrix": [true,false],
+
+    "Box_plot": [true,false],
     "Box_plot_feature":[[["Employment_status","weights","N_Diabetes_WHO_2"]]],
 
-    "Cat_Num_plot": [true,false,false],
+    "Cat_Num_plot": [true,false],
     "Cat_Num_feature":[[["Employment_status","KOSTEN_FARMACIE_2011","N_Diabetes_WHO_2"]]],
 
-    "Num_Num_Plot": [true,false,false],
+    "Num_Num_Plot": [true,false],
     "Num_Num_feature":[[["height","KOSTEN_FARMACIE_2011","N_Diabetes_WHO_2"]]],
 
-    "task": [false, "regression","classification"],
+    "task": [false, false],
 
-    "model": [false, "linear regression","logistic regression"], 
-    "parameters": [false, {"fit_intercept":true, "normalize":false, "copy_X":true}, 
-        {"class_weight":"balanced", "solver":"liblinear", "max_iter":500}],
+    "model": [false, false], 
+    "parameters": [false, false],
 
-    "training_features":[false, ["height", "weight", "bmi"], ["height", "weight", "bmi"]], 
+    "training_features":[false, false], 
 
-    "target_feature":[false, "KOSTEN_FARMACIE_2011", "N_DIABETES_2"], 
+    "customize_target":[false,false],
+    "target_feature":[false, "KOSTEN_FARMACIE_2011"], 
 
-    "evaluation_methods": [false, ["neg_mean_absolute_error","neg_mean_squared_error","neg_mean_squared_log_error","r2"],
-    ["precision","recall","f1","roc_auc"]], 
+    "evaluation_methods": [false, false], 
 
-    "k_fold": [false, 10,10]
+    "k_fold": [false, false]
 }

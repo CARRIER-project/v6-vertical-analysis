@@ -46,9 +46,11 @@ for item in range(0, len(order)):
         print('************************************************')
         print('*** Match result between %s and %s ***' %(parties[item-1], parties[item]))
         print('************************************************')
-        print('Exact match: ', len(exact_match))
-        print('Multiple matchs: ', len(multi_match))
-        print('No matchs: ', len(no_match))
+        with open('/output/printOut.txt', 'w') as f:
+                f.write("Exact match: %s \n Multiple matchs: %s \n No matches: %s" %(str(len(exact_match)), str(len(multi_match)),str(len(no_match))))
+
+        print('Exact match: %s \n Multiple matchs: %s \n No matches: %s' \
+                %(str(len(exact_match)), str(len(multi_match)),str(len(no_match))))
 
         # Link and combine actual data with person identifiers #
         combined_df = pd.concat([combined_df.loc[exact_match], dataset_list[order[item]].loc[exact_match]], axis=1, join='inner')
@@ -56,7 +58,11 @@ for item in range(0, len(order)):
 
 print('************************************************')
 print('Features in combined dataset')
-print(combined_df.columns)
+cmb_col = list(combined_df.columns)
+with open('/output/CombinedFeatures.txt', 'w') as f:
+    for item in cmb_col:
+        f.write("%s\n" % item)
+        print("%s" % item)
 print('************************************************')
 
 # Save file #
