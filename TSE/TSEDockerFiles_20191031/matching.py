@@ -26,6 +26,7 @@ order = np.argsort(sizes)
 
 for item in range(0, len(order)): 
     multi_match = []
+    multi_match_number = []
     exact_match = []
     no_match = []
 
@@ -37,6 +38,7 @@ for item in range(0, len(order)):
                 pair = dataset_list[order[item]].loc[i]
                 if type(pair) == pd.DataFrame:
                     multi_match.append(i)
+                    multi_match_number.append(len(pair))
                 elif type(pair) == pd.Series:
                     exact_match.append(i)
             except:
@@ -51,6 +53,10 @@ for item in range(0, len(order)):
 
         print('Exact match: %s \n Multiple matchs: %s \n No matches: %s' \
                 %(str(len(exact_match)), str(len(multi_match)),str(len(no_match))))
+
+        with open('/output/printOut.txt', 'a') as f:
+            f.write("Multi match number array: %s "%(str(multi_match_number)))
+        print("Multi match number array: %s "%(str(multi_match_number)))
 
         # Link and combine actual data with person identifiers #
         combined_df = pd.concat([combined_df.loc[exact_match], dataset_list[order[item]].loc[exact_match]], axis=1, join='inner')

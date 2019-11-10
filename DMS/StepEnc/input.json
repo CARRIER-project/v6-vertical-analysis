@@ -1,5 +1,5 @@
 {   "party_name": "dms",
-    "data_file": "new_dms_test_enc.csv", 
+    "data_file": "DMSTestingData.csv", 
     "salt_text": "banana", 
     "id_feature": ["GBAGeboorteJaar","GBAGeboorteMaand","GBAGeboorteDag","GBAGeslacht","GBAPostcode","GBAHuisnummer","GBAToev"],
     "local_save": true,

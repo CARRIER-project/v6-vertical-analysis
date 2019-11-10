@@ -46,15 +46,16 @@ def verify_and_decrypt(verifyBase64, decryptKey, encFile, newFile):
     encryption_key= base64.b64decode(decryptKey)
 
     #read encrypted data
-    myStr = open(encFile, 'rb').read()
+    with open(encFile, 'rb') as encrypted_file:
+        myStr =encrypted_file.read()
 
     #verify-decrypt-verify
     verified_decrypted_verified_message = utilities.verify_decrypt_verify(myStr, verify_key, encryption_key)
 
     #save encrypted file temporarily
-    text_file = open(newFile, "wb")
-    text_file.write(verified_decrypted_verified_message)
-    text_file.close()
+    with open(newFile, "wb") as text_file:
+        text_file.write(verified_decrypted_verified_message)
+
 
 #run decryption and verify
 

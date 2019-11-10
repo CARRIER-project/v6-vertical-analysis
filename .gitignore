@@ -17,4 +17,6 @@ internal
 TSE/tse/OnlyMatching
 __pycache__
 encryption
-
+TSE/LocalUse
+TSE/TSEDockerFiles_test
+output
