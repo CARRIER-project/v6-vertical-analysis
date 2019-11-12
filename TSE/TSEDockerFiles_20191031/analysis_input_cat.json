@@ -3,7 +3,7 @@
     
     "taskName": ["basic","adjusted_T2D"],
     "variables": "all",
-    "exclude_variables":["RandomID","VISIT1_DATE"],
+    "exclude_variables":["VISIT1_DATE"],
 
     "feature_sum": [
                     ["ZVWKHUISARTS_2011", "ZVWKHUISARTS_2012", "ZVWKHUISARTS_2013", 
@@ -43,7 +43,7 @@
                 "Sum_ZVWKZIEKENVERVOER", "Sum_ZVWKBUITENLAND", "Sum_ZVWKOVERIG", "Sum_ZVWKEERSTELIJNSPSYCHO",
                 "Sum_ZVWKGGZ", "Sum_ZVWKWYKVERPLEGING", "Sum_ZVWKMULTIDISC"],
 
-    "replace?": false,
+    "replace?": true,
 
     "check_missing": [true, true],
 
@@ -54,7 +54,7 @@
 
     "correlation_matrix": [true, true],
 
-    "Distribution_Plot": [true,true],
+    "Distribution_Plot": [true,false],
 
     "task": ["regression",false],
 

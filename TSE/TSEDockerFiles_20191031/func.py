@@ -1,6 +1,7 @@
 import os
 import errno
 import numpy as np
+import os
 from math import pi
 import pandas as pd
 import seaborn as sns
@@ -20,7 +21,7 @@ from sklearn.metrics import classification_report, f1_score, precision_score, re
 ###########################################
 ### Function for checking missing values ##
 ###########################################
-def check_missing(df, col, file):
+def check_missing(df, col, file_name):
     
     ##### Replace customized missing valve #####
     mis_value_code = None  # Input #
@@ -45,18 +46,18 @@ def check_missing(df, col, file):
         sort_table = df_misVariables.sort_values(by=['Percentage (%)'], ascending=False)
         # display(sort_table.style.bar(subset=['Percentage (%)'], color='#d65f5f'))
         
-        outputFile = 'output/%s_missings.csv' %file
+        outputFile = 'output/%s_missings.csv'%file_name
         os.makedirs(os.path.dirname(outputFile), exist_ok=True)
         sort_table.to_csv(outputFile)
         print('************************************************')
-        print('Check missing outcome is saved to output/%s_missings.csv' %file)
+        print('Check missing outcome is saved to output/%s_missings.csv' %file_name)
 
 
 ###########################################
 # Function for variable basic information #
 ###########################################
-def data_describe(df, col, file):
-    outputFile = 'output/%s_describe.csv' %file
+def data_describe(df, col, file_name):
+    outputFile = 'output/%s_describe.csv' %file_name
     os.makedirs(os.path.dirname(outputFile), exist_ok=True)
     df.describe().to_csv(outputFile)
     print('There is %d rows and %d columns' %(len(df), len(col)))
@@ -65,11 +66,11 @@ def data_describe(df, col, file):
 ###########################################
 ### Function for plot Correlation Matrix ##
 ###########################################
-def corr_Matrix(df, file):
+def corr_Matrix(df, file_name):
 
     corr = df.corr() 
 
-    outputFile = 'output/Output_CM/%s.csv' %file
+    outputFile = 'output/Output_CM/%s.csv' %file_name
     os.makedirs(os.path.dirname(outputFile), exist_ok=True)
     corr.to_csv(outputFile)
     print('************************************************')
@@ -80,7 +81,7 @@ def corr_Matrix(df, file):
 ### Function for plotting Distribution ###
 ##########################################
 
-def dist_Plot (df,featureName,age_range,file):
+def dist_Plot (df,featureName,age_range,file_name):
     F = featureName
     fea = df[F].dropna()
     mu = fea.mean()
@@ -90,20 +91,30 @@ def dist_Plot (df,featureName,age_range,file):
     x = np.linspace(fea.min(), fea.max(), len(df))
     pdf = 1/(sigma * np.sqrt(2*np.pi)) * np.exp(-(x-mu)**2 / (2*sigma**2))
     df_dist = pd.DataFrame.from_records([hist, edges, x, pdf]).transpose()
-    df_dist.columns = ['hist', 'edges', 'x', 'pdf']
+    df_dist.columns = ['%s_%s_hist'%(F,str(age_range)), \
+                        '%s_%s_edges'%(F,str(age_range)), \
+                        '%s_%s_x'%(F,str(age_range)), \
+                        '%s_%s_pdf'%(F,str(age_range))]
+    return df_dist
+    # outputFile = "output/%s_Dist.csv" %file_name
+    # os.makedirs(os.path.dirname(outputFile), exist_ok=True)
+    # # df_dist.to_csv(outputFile)
+    
+    # if os.path.exists(outputFile) == False:
+    #     with open(outputFile, 'w') as f:
+    #         df_dist.to_csv(f)
+    # if os.path.exists(outputFile) == True:
+    #     with open(outputFile, 'a') as f:
+    #         df_dist.to_csv(f)
 
-    outputFile = "output/Output_Dist/%s_Dist_%s.csv" %(F,str(age_range))
-    os.makedirs(os.path.dirname(outputFile), exist_ok=True)
-    df_dist.to_csv(outputFile)
-
-    print('************************************************')
-    print('Distribution plot %s_Dist_%s is done' %(F,str(age_range)))
+    # print('************************************************')
+    # print('Distribution plot %s_Dist_%s is done' %(F,str(age_range)))
 
 
 ###############################
 #### Plot Categorical vars ####
 ###############################
-def plot_catCat(df, fea_1, fea_2, file):
+def plot_catCat(df, fea_1, fea_2, file_name):
     print(fea_1, fea_2)
     temp = df[[fea_1,fea_2]] ###
     temp = temp.replace(np.nan, -9999, regex=True)
@@ -123,9 +134,18 @@ def plot_catCat(df, fea_1, fea_2, file):
     var_df = pd.DataFrame.from_records(var_list,columns=var_2_keys)
     var_df.index=var_1_keys
 
-    outputFile = "output/Output_CatCat/%s_%s_%s.csv" %(fea_1,fea_2,file)
+    outputFile = "output/%s_CatCat.csv" %file_name
     os.makedirs(os.path.dirname(outputFile), exist_ok=True)
-    var_df.to_csv(outputFile)
+    # var_df.to_csv(outputFile)
+
+    if os.path.exists(outputFile) == False:
+        with open(outputFile, 'w') as f:
+            f.write("Table for %s - %s \n" %(fea_1,fea_2))
+            var_df.to_csv(f)
+    if os.path.exists(outputFile) == True:
+        with open(outputFile, 'a') as f:
+            f.write("Table for %s - %s \n" %(fea_1,fea_2))
+            var_df.to_csv(f)
 
     print('************************************************')
     print("Categorical-Categorical feature plot is done!")

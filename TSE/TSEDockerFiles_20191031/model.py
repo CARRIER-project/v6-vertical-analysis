@@ -1,11 +1,12 @@
 
 ########## Simple Linear Regression ##########
+import os
 import time
 start_time0 = time.time()
 import json
 import func
-import pandas as pd
 import numpy as np
+import pandas as pd
 from collections import Counter
 
 import warnings
@@ -53,13 +54,15 @@ elif len(feature_sum) > 0:
     elif type(feature_sum[0]) == list:
         for i in range(0,len(feature_sum)):
             sel_df[sum_name[i]] = sel_df[feature_sum[i]].sum(axis=1)
-            if replace == True:
-                sel_df = sel_df.drop([feature_sum[i]], axis=1)
+            if (replace == True) and (i == 0):
+                print(i)
+                sel_df = sel_df.drop(feature_sum[i], axis=1)
 
 
 ### Separate features to numerical and categorical ###
 catFea = []
 numFea = []
+col = sel_df.columns
 for c in col:
     if len(Counter(sel_df[c].dropna())) > 10:
         numFea.append(c)
@@ -90,11 +93,31 @@ def main(input_json, combined_df, col, file_name, ctrl_values):
     if CorrMatrix == True:
         func.corr_Matrix(combined_df[col], file_name)
 
+    existFile = "output/%s_CatCat.csv" %file_name
+    if os.path.exists(existFile):
+        os.remove(existFile)
     ### Function for distribution plot ###
     dist_plot = input_json["Distribution_Plot"][i]
     if dist_plot == True:
-        for c in col:
-            func.dist_Plot(combined_df,c,ctrl_values,file_name)
+        for c in range(0,len(col)):
+            df_dist = func.dist_Plot(combined_df,col[c],ctrl_values,file_name)
+            if c == 0:
+                save_dist = df_dist
+            else: 
+                save_dist = pd.concat([save_dist,df_dist],axis=1, join='inner')
+        outputFile = "output/%s_Dist.csv" %file_name
+        os.makedirs(os.path.dirname(outputFile), exist_ok=True)
+        # df_dist.to_csv(outputFile)
+        
+        if os.path.exists(outputFile) == False:
+            with open(outputFile, 'w') as f:
+                save_dist.to_csv(f)
+        if os.path.exists(outputFile) == True:
+            with open(outputFile, 'a') as f:
+                save_dist.to_csv(f)
+
+        print('************************************************')
+        print('Distribution plot is done')
 
 
     print("Basic info took", time.time() - start_time0, "to run")
@@ -108,91 +131,103 @@ def main(input_json, combined_df, col, file_name, ctrl_values):
     print('\n\n')
     if task != False: 
         start_time1 = time.time()
-        task = task.lower()
-        model = input_json['model'][i].lower()
-        scoring = input_json['evaluation_methods'][i]
-        kFold = input_json['k_fold'][i]
-        params = input_json['parameters'][i]
+
+        def training(task, input_json, target_feature):
+            task = task.lower()
+            model = input_json['model'][i].lower()
+            scoring = input_json['evaluation_methods'][i]
+            kFold = input_json['k_fold'][i]
+            params = input_json['parameters'][i]
 
 
-        ### set up restrictions for inputs ###
-        scoring_reg = ["neg_mean_absolute_error","neg_mean_squared_error","neg_mean_squared_log_error","r2"]
-        scoring_cls = ['precision', 'recall', 'f1', 'roc_auc']
+            ### set up restrictions for inputs ###
+            scoring_reg = ["neg_mean_absolute_error","neg_mean_squared_error","neg_mean_squared_log_error","r2"]
+            scoring_cls = ['precision', 'recall', 'f1', 'roc_auc']
 
-        ### Separate features and target class
+            ### training features
+            training_features = input_json['training_features'][i]
+
+
+            ####################################
+            ### Training and target features ###
+            ####################################
+            print('*************************************************')
+            print('Missing values in training and target features:')
+            combined_df_selected = combined_df[training_features + [target_feature]]
+            print(pd.isnull(combined_df_selected).sum())
+            combined_df_selected = combined_df_selected[np.invert(pd.isnull(combined_df_selected).any(axis=1))]
+            print('Missing values are removed by default if you did not provide replacing value.')
+            print("The number of instances(rows): ", len(combined_df_selected))
+            print('*************************************************')
+
+            features = combined_df_selected[training_features]
+            target = combined_df_selected[target_feature]
+
+            ####################################
+            ########## Choose models ###########
+            ####################################
+            if task == 'regression':
+                if all(item in scoring_reg  for item in scoring):
+                    results = func.RegressionModel(model, params, features, target, scoring, kFold)
+                else:
+                    raise LookupError('Sorry, so far we only support mean_absolute_error, mean_squared_error, mean_squared_log_error, r2 to evaluation regression models.')
+                    
+            elif task == 'classification':
+                if all(item in scoring_cls  for item in scoring):
+                    results = func.ClassificationModel(model, params, features, target, scoring, kFold)
+                else:
+                    raise LookupError('Sorry, so far we only support Precision, Recall, F1-score, ROC to evaluation classification models.')
+
+            else:
+                raise LookupError('Sorry! Only classification and regression can be handled so far. We are still developing other functions. Thanks! ')
+
+
+            ####################################
+            ########## Output restuls ##########
+            ####################################
+
+            # file = open('output/%s_%s_result.txt' %(file,input_json['model']), 'w')
+            # file.write(results)
+            # file.close()
+
+
+            avgs = []
+            values = []
+            coef_list = []
+            for key in results.keys():
+                if key == 'estimator':
+                    for model in results[key]:
+                        coef_list.append(list(model.coef_))
+                else:
+                    avg = results[key].mean()
+                    avgs.append(avg)
+
+                    value = results[key].tolist()
+                    values.append(value)
+            save_keys = ['coef_'] + ['AVG_results'] + list(results.keys())   
+            save_values = [coef_list] + [avgs] + values 
+            save_results = dict(zip(save_keys, save_values))
+
+            with open('output/%s_%s_result.json' %(file_name,target_feature), 'w') as fp:
+                json.dump(save_results, fp)
+
+            print("%s: Analysis took" %file_name, time.time() - start_time1, "to run")
+            print("%s: Result is generated at TSE!" %file_name)
+
+        ### target features
         target_feature = input_json['target_feature'][i]
-        training_features = input_json['training_features'][i]
-        if type(target_feature) != str:
-            raise ValueError('Please provide the name of ONE target feature!')
         
-        if target_feature not in combined_df.columns:
-            raise ValueError('Please provide target features from the dataset!')
+        if type(target_feature) == str:
+            # raise ValueError('Please provide the name of ONE target feature!')
+            if target_feature not in combined_df.columns:
+                raise ValueError('Please provide target features from the dataset!')
+            training(task, input_json,target_feature)
+        elif type(target_feature) == list:
+            for each in target_feature: 
+                if each not in combined_df.columns:
+                    raise ValueError('Please provide target features from the dataset!')
+                training(task, input_json, each)
 
-        ####################################
-        ### Training and target features ###
-        ####################################
-        print('*************************************************')
-        print('Missing values in training and target features:')
-        combined_df_selected = combined_df[training_features+ [target_feature]]
-        print(pd.isnull(combined_df_selected).sum())
-        combined_df_selected = combined_df_selected[np.invert(pd.isnull(combined_df_selected).any(axis=1))]
-        print('Missing values are removed by default if you did not provide replacing value.')
-        print("The number of instances(rows): ", len(combined_df_selected))
-        print('*************************************************')
-
-        features = combined_df_selected[training_features]
-        target = combined_df_selected[target_feature]
-
-        ####################################
-        ########## Choose models ###########
-        ####################################
-        if task == 'regression':
-            if all(item in scoring_reg  for item in scoring):
-                results = func.RegressionModel(model, params, features, target, scoring, kFold)
-            else:
-                raise LookupError('Sorry, so far we only support mean_absolute_error, mean_squared_error, mean_squared_log_error, r2 to evaluation regression models.')
-                
-        elif task == 'classification':
-            if all(item in scoring_cls  for item in scoring):
-                results = func.ClassificationModel(model, params, features, target, scoring, kFold)
-            else:
-                raise LookupError('Sorry, so far we only support Precision, Recall, F1-score, ROC to evaluation classification models.')
-
-        else:
-            raise LookupError('Sorry! Only classification and regression can be handled so far. We are still developing other functions. Thanks! ')
-
-
-        ####################################
-        ########## Output restuls ##########
-        ####################################
-
-        # file = open('output/%s_%s_result.txt' %(file,input_json['model']), 'w')
-        # file.write(results)
-        # file.close()
-
-
-        avgs = []
-        values = []
-        coef_list = []
-        for key in results.keys():
-            if key == 'estimator':
-                for model in results[key]:
-                    coef_list.append(list(model.coef_))
-            else:
-                avg = results[key].mean()
-                avgs.append(avg)
-
-                value = results[key].tolist()
-                values.append(value)
-        save_keys = ['coef_'] + ['AVG_results'] + list(results.keys())   
-        save_values = [coef_list] + [avgs] + values 
-        save_results = dict(zip(save_keys, save_values))
-
-        with open('output/%s_result.json' %(file_name), 'w') as fp:
-            json.dump(save_results, fp)
-
-        print("%s: Analysis took" %file_name, time.time() - start_time1, "to run")
-        print("%s: Result is generated at TSE!" %file_name)
 
 
 for i in range(0, len(input_json['taskName'])):
