@@ -1,0 +1,10 @@
+
+{   "parties": ["dms","cbs"],
+    "receiver_url": false,
+    "dmsfileUUID": "055848f1-dda7-4336-b1c3-e84e94c94de7", 
+    "dmsencryptKey": "RFelRcRYQODheRF8h5rfJlos+JG1Xlb1CMd0c4BEFL0=", 
+    "dmsverifyKey": "nRSjZgVdYEH0ylKAgnFRfgK7mWyWT19lZ4tDYBCYV8M=",
+    "cbsfileUUID": "eba91ee4-3393-4e1f-ab09-a819b6eda63b", 
+    "cbsencryptKey": "a5AVk4+BJ0tCrji2pfnesLlsocF9jmMOra0SdFSCw3c=", 
+    "cbsverifyKey": "VBGKCSOooqSFSoo490yk8aa8xz92p3fQexNguxLTJqw="
+}

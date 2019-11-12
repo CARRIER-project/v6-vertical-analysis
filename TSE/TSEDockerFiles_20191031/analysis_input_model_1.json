@@ -1,9 +1,9 @@
 {   
     "receiver_url": false,
     
-    "taskName": ["basic","adjusted_T2D"],
+    "taskName": ["basic","adjusted_T2D","model_1"],
     "variables": "all",
-    "exclude_variables":[],
+    "exclude_variables":["RandomID"],
 
     "feature_sum": [
                     ["ZVWKHUISARTS_2011", "ZVWKHUISARTS_2012", "ZVWKHUISARTS_2013", 
@@ -43,35 +43,32 @@
                 "Sum_ZVWKZIEKENVERVOER", "Sum_ZVWKBUITENLAND", "Sum_ZVWKOVERIG", "Sum_ZVWKEERSTELIJNSPSYCHO",
                 "Sum_ZVWKGGZ", "Sum_ZVWKWYKVERPLEGING", "Sum_ZVWKMULTIDISC"],
 
-    "replace?": true,
+    "replace?": false,
 
-    "check_missing": [true, true],
+    "check_missing": [true, true, true],
 
-    "control_var":[false, "N_Diabetes_WHO_2"],
-    "control_values":[[],[0,1,2,3]],
+    "control_var":[false, "N_Diabetes_WHO_2", false],
+    "control_values":[[],[0,1,2,3],[]],
 
-    "basic_Information": [true, true],
+    "basic_Information": [true, true, true],
 
-    "correlation_matrix": [true, true],
+    "correlation_matrix": [true, true, true],
 
-    "Distribution_Plot": [true,false],
+    "Distribution_Plot": [true,true, true],
 
-    "task": [false,false],
+    "task": [false,false,false],
 
-    "model": ["linear regression",false], 
+    "model": [false,false,"linear regression"], 
 
-    "parameters": [{"fit_intercept":true, "normalize":false, "copy_X":true},false], 
+    "parameters": [false,false,{"fit_intercept":true, "normalize":false, "copy_X":true}], 
 
-    "training_features":[["SEX", "Age", "N_Education_3cat",
-        "Employment_status", "Occupational_category",
-        "n_smokingcat4", "WOZ", "N_ALCOHOL_CAT", "NIT_kcal", "medGRscore_TR",
-        "height", "weight", "bmi", "N_BMICAT", "N_CVD", "med_depression",
-        "PHQ9_depr", "MINIcurrdepr", "MINIlifedepr", "N_HT", "SF36_Q7",
-        "SF36_Q10", "TOTALPA", "MVPA", "waist", "hip", "Mobility_lim"],false], 
+    "training_features":[false,false,["N_Diabetes_WHO_2"]], 
 
-    "target_feature":["Sum_ZVWKHUISARTS", false], 
+    "target_feature":[false,false,["Sum_ZVWKHUISARTS","Sum_ZVWKFARMACIE","Sum_ZVWKZIEKENHUIS","Sum_ZVWKPARAMEDISCH","Sum_ZVWKHULPMIDDEL",
+        "Sum_ZVWKZIEKENVERVOER", "Sum_ZVWKBUITENLAND", "Sum_ZVWKOVERIG", "Sum_ZVWKEERSTELIJNSPSYCHO",
+        "Sum_ZVWKGGZ", "Sum_ZVWKWYKVERPLEGING", "Sum_ZVWKMULTIDISC"]], 
 
-    "evaluation_methods": [["neg_mean_absolute_error","neg_mean_squared_error","neg_mean_squared_log_error","r2"],false],
+    "evaluation_methods": [false,false,["neg_mean_absolute_error","neg_mean_squared_error","r2"]],
 
-    "k_fold": [2,false]
+    "k_fold": [false,false,10]
 }
