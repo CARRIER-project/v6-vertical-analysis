@@ -76,6 +76,11 @@ def main(input_json, combined_df, col, file_name, ctrl_values):
     ###############################
     # 1.Overview on combined data #
     ###############################
+    
+    ### For checking data types ###
+    combined_df.dtypes.to_csv('/output/dataType_%s'%file_name, header=False)
+    # Convert to numeric, string will be converted to Nan
+    combined_df = combined_df.apply(pd.to_numeric,errors='coerce')
 
     ### For checking missings ###
     checkMissing = input_json['check_missing'][i]
@@ -112,7 +117,7 @@ def main(input_json, combined_df, col, file_name, ctrl_values):
         if os.path.exists(outputFile) == False:
             with open(outputFile, 'w') as f:
                 save_dist.to_csv(f)
-        if os.path.exists(outputFile) == True:
+        elif os.path.exists(outputFile) == True:
             with open(outputFile, 'a') as f:
                 save_dist.to_csv(f)
 

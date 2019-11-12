@@ -142,7 +142,7 @@ def plot_catCat(df, fea_1, fea_2, file_name):
         with open(outputFile, 'w') as f:
             f.write("Table for %s - %s \n" %(fea_1,fea_2))
             var_df.to_csv(f)
-    if os.path.exists(outputFile) == True:
+    elif os.path.exists(outputFile) == True:
         with open(outputFile, 'a') as f:
             f.write("Table for %s - %s \n" %(fea_1,fea_2))
             var_df.to_csv(f)

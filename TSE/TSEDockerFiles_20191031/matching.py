@@ -14,7 +14,8 @@ parties = inputJson['parties']
 smallest = 0
 dataset_list = []
 for p in parties: 
-    dataset_list.append(pd.read_csv('/data/encrypted_%s.csv' %(p)).set_index('encString'))
+    df_eachParty = pd.read_csv('/data/encrypted_%s.csv' %(p)).set_index('encString')
+    dataset_list.append(df_eachParty)
 
 # Order the size of datasets from small to large #
 sizes = []
