@@ -3,6 +3,8 @@
 *.sav
 *.csv
 *.enc
+!eba91ee4-3393-4e1f-ab09-a819b6eda63b.enc
+!055848f1-dda7-4336-b1c3-e84e94c94de7.enc
 .DS_Store
 _PRIVATE_signing_key_CBS
 _PRIVATE_symmetric_key_CBS
