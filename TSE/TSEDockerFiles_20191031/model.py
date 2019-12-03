@@ -78,7 +78,7 @@ def main(input_json, combined_df, col, file_name, ctrl_values):
     ###############################
     
     ### For checking data types ###
-    combined_df.dtypes.to_csv('/output/dataType_%s'%file_name, header=False)
+    combined_df.dtypes.to_csv('/output/dataType'%file_name, header=False)
     # Convert to numeric, string will be converted to Nan
     combined_df = combined_df.apply(pd.to_numeric,errors='coerce')
 
