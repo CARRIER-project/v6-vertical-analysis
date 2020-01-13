@@ -157,15 +157,10 @@ if task != False:
         raise LookupError("K-Fold has to be an integer (>=3) or 0 (No cross validation)")
 
 
-    num_models = input_json['num_models']    
-    num_training = input_json['num_training']
-
     print('Start checking if training and target features are in the dataset.')
     print('... ...')
 
-    ### Define training and target features ###
-    mode = 'checking'
-    model_name, features, target = MLmodel.defineFeatures(combined_df, mode)
+   model_name, training_features, target_feature = MLmodel.defineFeatures()
 
     if len(model_name) != len(features):
         raise ValueError("Length of models names needs to match with length of training features.")
@@ -193,10 +188,12 @@ if task != False:
         print('Start training %s' %m)
         start_time_each = time.time()
         model = MLmodel.defineMLModels(model_name[m])
-        
+        model_name, training_features, target_feature = MLmodel.defineFeatures()
+        num_training  = len(target_feature)
+
         for i_training in range(0, num_training-1):
             model_setting = [m, i_training]
-            model_name, features, target, target_name = MLmodel.defineFeatures(combined_df, model_setting)
+            model_name, features, target, target_name = MLmodel.customizeFeatures(combined_df, model_setting, model_name, training_features, target_feature)
 
             ### If use cross validation ###
             if kFold == 0:

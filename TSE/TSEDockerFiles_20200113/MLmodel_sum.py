@@ -27,7 +27,7 @@ from sklearn.metrics import classification_report, f1_score, precision_score, re
 def sum_features(sel_df):
 
     ### input features which need to be operated ###
-    feature_sum = [
+    feature_sum = 
                     ["ZVWKHUISARTS_2011", "ZVWKHUISARTS_2012", "ZVWKHUISARTS_2013", 
                         "ZVWKHUISARTS_2014", "ZVWKHUISARTS_2015", "ZVWKHUISARTS_2016"],
 
@@ -81,7 +81,7 @@ def sum_features(sel_df):
 ###############################
 
 ### Provide your Training and target features ###
-def defineFeatures(combined_df, model_setting):
+def defineFeatures():
     model_name = ['model_1', 'model_2', 'model_3', 'model_4', 'model_5', 'model_6', 'model_7', 'model_8', 'model_9', 'model_10']
 
     training_features = [["SEX", "Age", "N_Education_3cat", "N_Diabetes_WHO_2"],
@@ -99,41 +99,39 @@ def defineFeatures(combined_df, model_setting):
                     "Sum_ZVWKZIEKENVERVOER", "Sum_ZVWKBUITENLAND", "Sum_ZVWKOVERIG", "Sum_ZVWKEERSTELIJNSPSYCHO",
                     "Sum_ZVWKGGZ", "Sum_ZVWKWYKVERPLEGING", "Sum_ZVWKMULTIDISC"]
 
-    if model_setting == 'checking':
-        features = training_features
-        target = target_feature
-        return model_name, features, target
+    return model_name, training_features, target_feature
 
-    elif type(model_setting) == list:
-        i_model = model_setting[0]
-        i_training = model_setting[1]
+def customizeFeatures(combined_df, model_setting, model_name, training_features, target_feature):
 
-        ###### Remove missing values ######
-        print('*************************************************')
-        print('Missing values in training and target features:')
-        combined_df_selected = combined_df[training_features[i_model] + [target_feature[i_training]]]
-        print(pd.isnull(combined_df_selected).sum())
-        combined_df_selected = combined_df_selected[np.invert(pd.isnull(combined_df_selected).any(axis=1))]
+    i_model = model_setting[0]
+    i_training = model_setting[1]
 
-        print('Missing values are removed by default.')
-        print("The number of instances(rows): ", len(combined_df_selected))
+    ###### Remove missing values ######
+    print('*************************************************')
+    print('Missing values in training and target features:')
+    combined_df_selected = combined_df[training_features[i_model] + [target_feature[i_training]]]
+    print(pd.isnull(combined_df_selected).sum())
+    combined_df_selected = combined_df_selected[np.invert(pd.isnull(combined_df_selected).any(axis=1))]
 
-        ###### Normalization ######
-        print('\n*************************************************')
-        print('***** Normalization *****')
-        scaler = RobustScaler(quantile_range=(15,85)) #MinMaxScaler(feature_range=(-1, 1)) RobustScaler
-        scaled = scaler.fit_transform(combined_df_selected) # trans_features
+    print('Missing values are removed by default.')
+    print("The number of instances(rows): ", len(combined_df_selected))
 
-        combined_df_scaled = pd.DataFrame.from_records(scaled)
-        combined_df_scaled.columns = combined_df_selected.columns
-        
-        ##### Get training features and target #####
-        features = combined_df_scaled[training_features[i_model]]
-        target = combined_df_scaled[target_feature[i_training]]
-        target_name = target_feature[i_training]
+    ###### Normalization ######
+    print('\n*************************************************')
+    print('***** Normalization *****')
+    scaler = RobustScaler(quantile_range=(15,85)) #MinMaxScaler(feature_range=(-1, 1)) RobustScaler
+    scaled = scaler.fit_transform(combined_df_selected) # trans_features
+
+    combined_df_scaled = pd.DataFrame.from_records(scaled)
+    combined_df_scaled.columns = combined_df_selected.columns
+    
+    ##### Get training features and target #####
+    features = combined_df_scaled[training_features[i_model]]
+    target = combined_df_scaled[target_feature[i_training]]
+    target_name = target_feature[i_training]
 
 
-        return model_name, features, target, target_name
+    return model_name, features, target, target_name
 
 ######################################
 ### Define Machine learning Models ###

@@ -20,9 +20,6 @@
     "task": "regression",
     
     "taskName": "Training_20200103", 
-    
-    "num_models": 11,
-    "num_training": 12, 
 
     "evaluation_methods": ["neg_mean_absolute_error","neg_mean_squared_error","r2"],
 

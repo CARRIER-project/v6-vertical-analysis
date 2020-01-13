@@ -28,34 +28,34 @@ def sum_features(sel_df):
 
     ### input features which need to be operated ###
     feature_sum = [
-                    ["ZVWKHUISARTS_2011", "ZVWKHUISARTS_2012", "ZVWKHUISARTS_2013", 
+                    ["ZVWKHUISARTS_2010", "ZVWKHUISARTS_2011", "ZVWKHUISARTS_2012", "ZVWKHUISARTS_2013", 
                         "ZVWKHUISARTS_2014", "ZVWKHUISARTS_2015", "ZVWKHUISARTS_2016"],
 
-                    ["ZVWKFARMACIE_2011", "ZVWKFARMACIE_2012", "ZVWKFARMACIE_2013",
+                    ["ZVWKFARMACIE_2010", "ZVWKFARMACIE_2011", "ZVWKFARMACIE_2012", "ZVWKFARMACIE_2013",
                         "ZVWKFARMACIE_2014", "ZVWKFARMACIE_2015", "ZVWKFARMACIE_2016"],
                         
-                    ["ZVWKZIEKENHUIS_2011", "ZVWKZIEKENHUIS_2012", "ZVWKZIEKENHUIS_2013",
+                    ["ZVWKZIEKENHUIS_2010", "ZVWKZIEKENHUIS_2011", "ZVWKZIEKENHUIS_2012", "ZVWKZIEKENHUIS_2013",
                         "ZVWKZIEKENHUIS_2014", "ZVWKZIEKENHUIS_2015", "ZVWKZIEKENHUIS_2016"],
                         
-                    ["ZVWKPARAMEDISCH_2011", "ZVWKPARAMEDISCH_2012", "ZVWKPARAMEDISCH_2013",
+                    ["ZVWKPARAMEDISCH_2010", "ZVWKPARAMEDISCH_2011", "ZVWKPARAMEDISCH_2012", "ZVWKPARAMEDISCH_2013",
                         "ZVWKPARAMEDISCH_2014", "ZVWKPARAMEDISCH_2015", "ZVWKPARAMEDISCH_2016"],
                     
-                    ["ZVWKHULPMIDDEL_2011", "ZVWKHULPMIDDEL_2012", "ZVWKHULPMIDDEL_2013",
+                    ["ZVWKHULPMIDDEL_2010", "ZVWKHULPMIDDEL_2011", "ZVWKHULPMIDDEL_2012", "ZVWKHULPMIDDEL_2013",
                         "ZVWKHULPMIDDEL_2014", "ZVWKHULPMIDDEL_2015", "ZVWKHULPMIDDEL_2016"],
                         
-                    ["ZVWKZIEKENVERVOER_2011", "ZVWKZIEKENVERVOER_2012", "ZVWKZIEKENVERVOER_2013",
+                    ["ZVWKZIEKENVERVOER_2010", "ZVWKZIEKENVERVOER_2011", "ZVWKZIEKENVERVOER_2012", "ZVWKZIEKENVERVOER_2013",
                         "ZVWKZIEKENVERVOER_2014", "ZVWKZIEKENVERVOER_2015", "ZVWKZIEKENVERVOER_2016"],
                         
-                    ["ZVWKBUITENLAND_2011", "ZVWKBUITENLAND_2012", "ZVWKBUITENLAND_2013",
+                    ["ZVWKBUITENLAND_2010", "ZVWKBUITENLAND_2011", "ZVWKBUITENLAND_2012", "ZVWKBUITENLAND_2013",
                         "ZVWKBUITENLAND_2014", "ZVWKBUITENLAND_2015", "ZVWKBUITENLAND_2016"],
                         
-                    ["ZVWKOVERIG_2011", "ZVWKOVERIG_2012", "ZVWKOVERIG_2013",
+                    ["ZVWKOVERIG_2010", "ZVWKOVERIG_2011", "ZVWKOVERIG_2012", "ZVWKOVERIG_2013",
                         "ZVWKOVERIG_2014", "ZVWKOVERIG_2015", "ZVWKOVERIG_2016"],
                         
-                    ["ZVWKEERSTELIJNSPSYCHO_2011", "ZVWKEERSTELIJNSPSYCHO_2012",
+                    ["ZVWKEERSTELIJNSPSYCHO_2010", "ZVWKEERSTELIJNSPSYCHO_2011", "ZVWKEERSTELIJNSPSYCHO_2012",
                         "ZVWKEERSTELIJNSPSYCHO_2013"],
                     
-                    ["ZVWKGGZ_2011", "ZVWKGGZ_2012", "ZVWKGGZ_2013"],
+                    ["ZVWKGGZ_2010", "ZVWKGGZ_2011", "ZVWKGGZ_2012", "ZVWKGGZ_2013"],
                     
                     ["ZVWKWYKVERPLEGING_2014", "ZVWKWYKVERPLEGING_2015", "ZVWKWYKVERPLEGING_2016"],
 
@@ -89,7 +89,7 @@ def sum_features(sel_df):
 ###############################
 
 ### Provide your Training and target features ###
-def defineFeatures(combined_df, model_setting):
+def defineFeatures():
     model_name = ['model_0', 'model_1', 'model_2', 'model_3', 'model_4', 'model_5', 'model_6', 'model_7', 'model_8', 'model_9', 'model_10']
 
     training_features = [["N_Diabetes_WHO_2"],
@@ -108,42 +108,39 @@ def defineFeatures(combined_df, model_setting):
                     "Ave_ZVWKZIEKENVERVOER", "Ave_ZVWKBUITENLAND", "Ave_ZVWKOVERIG", "Ave_ZVWKEERSTELIJNSPSYCHO",
                     "Ave_ZVWKGGZ", "Ave_ZVWKWYKVERPLEGING", "Ave_ZVWKMULTIDISC"]
 
-    if model_setting == 'checking':
-        features = training_features
-        target = target_feature
-        return model_name, features, target
+    return model_name, training_features, target_feature
 
-    elif type(model_setting) == list:
-        i_model = model_setting[0]
-        i_training = model_setting[1]
+def customizeFeatures(combined_df, model_setting, model_name, training_features, target_feature):
 
-        ###### Remove missing values ######
-        print('*************************************************')
-        print('Missing values in training and target features:')
-        combined_df_selected = combined_df[training_features[i_model] + [target_feature[i_training]]]
-        print(pd.isnull(combined_df_selected).sum())
-        combined_df_selected = combined_df_selected[np.invert(pd.isnull(combined_df_selected).any(axis=1))]
+    i_model = model_setting[0]
+    i_training = model_setting[1]
 
-        print('Missing values are removed by default.')
-        print("The number of instances(rows): ", len(combined_df_selected))
+    ###### Remove missing values ######
+    print('*************************************************')
+    print('Missing values in training and target features:')
+    combined_df_selected = combined_df[training_features[i_model] + [target_feature[i_training]]]
+    print(pd.isnull(combined_df_selected).sum())
+    combined_df_selected = combined_df_selected[np.invert(pd.isnull(combined_df_selected).any(axis=1))]
 
-        ###### Normalization ######
-        print('\n*************************************************')
-        print('***** Normalization *****')
-        scaler = RobustScaler(quantile_range=(15,85)) #MinMaxScaler(feature_range=(-1, 1)) RobustScaler
-        scaled = scaler.fit_transform(combined_df_selected) # trans_features
+    print('Missing values are removed by default.')
+    print("The number of instances(rows): ", len(combined_df_selected))
 
-        combined_df_scaled = pd.DataFrame.from_records(scaled)
-        combined_df_scaled.columns = combined_df_selected.columns
-        
-        ##### Get training features and target #####
-        features = combined_df_scaled[training_features[i_model]]
-        target = combined_df_scaled[target_feature[i_training]]
-        target_name = target_feature[i_training]
+    ###### Normalization ######
+    print('\n*************************************************')
+    print('***** Normalization *****')
+    scaler = RobustScaler(quantile_range=(15,85)) #MinMaxScaler(feature_range=(-1, 1)) RobustScaler
+    scaled = scaler.fit_transform(combined_df_selected) # trans_features
+
+    combined_df_scaled = pd.DataFrame.from_records(scaled)
+    combined_df_scaled.columns = combined_df_selected.columns
+    
+    ##### Get training features and target #####
+    features = combined_df_scaled[training_features[i_model]]
+    target = combined_df_scaled[target_feature[i_training]]
+    target_name = target_feature[i_training]
 
 
-        return model_name, features, target, target_name
-
+    return model_name, features, target, target_name
 ######################################
 ### Define Machine learning Models ###
 ######################################
