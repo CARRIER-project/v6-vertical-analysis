@@ -141,14 +141,16 @@ def defineFeatures(combined_df, model_setting):
 def defineMLModels(model_name):
     ### Configure models ###
     define_models = {
-        'model_1': LinearRegression(normalize=True),
+        'model_0': LinearRegression(normalize=True),
         'model_2': LinearRegression(normalize=True),
         'model_3': LinearRegression(normalize=True),
         'model_4': LinearRegression(normalize=True),
         'model_5': LinearRegression(normalize=True),
         'model_6': LinearRegression(normalize=True),
         'model_7': LinearRegression(normalize=True),
-        'model_8': LinearRegression(normalize=True)
+        'model_8': LinearRegression(normalize=True),
+        'model_9': LinearRegression(normalize=True),
+        'model_10': LinearRegression(normalize=True)
     }
 
     print('************* Model parameters *****************')
