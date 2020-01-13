@@ -1,0 +1,30 @@
+{
+    "receiver_url": false,
+
+    "variables": "all",
+    "exclude_variables":["WOZ", "CBKBeginGeldigheid", "CBKEindGeldigheid", "ID_in_2010", "ID_in_2011", "ID_in_2012", "ID_in_2013", "ID_in_2014", "ID_in_2015", "ID_in_2016"],
+
+    "customize_features": true,
+
+    "check_missing": false,
+
+    "control_var":false,
+    "control_values":[],
+
+    "basic_Information": false,
+
+    "correlation_matrix": false,
+
+    "Distribution_Plot": false,
+
+    "task": "regression",
+    
+    "taskName": "Training_20200103", 
+    
+    "num_models": 8,
+    "num_training": 12, 
+
+    "evaluation_methods": ["neg_mean_absolute_error","neg_mean_squared_error","r2"],
+
+    "k_fold": 10
+}

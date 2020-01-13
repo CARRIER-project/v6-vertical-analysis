@@ -1,7 +1,7 @@
 import os
 import errno
 import numpy as np
-import os
+import json
 from math import pi
 import pandas as pd
 import seaborn as sns
@@ -9,13 +9,8 @@ from decimal import Decimal
 from collections import Counter
 import matplotlib.pyplot as plt
 
-from sklearn import svm
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.naive_bayes import GaussianNB, BernoulliNB
-from sklearn.model_selection import train_test_split, cross_validate
-from sklearn.linear_model import LinearRegression,LogisticRegression
-from sklearn.ensemble import RandomForestClassifier,GradientBoostingClassifier
-from sklearn.metrics import mean_absolute_error, mean_squared_error, mean_squared_log_error,r2_score
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_absolute_error, mean_squared_error, mean_squared_log_error,r2_score, make_scorer
 from sklearn.metrics import classification_report, f1_score, precision_score, recall_score, roc_auc_score
 
 ###########################################
@@ -96,19 +91,6 @@ def dist_Plot (df,featureName,age_range,file_name):
                         '%s_%s_x'%(F,str(age_range)), \
                         '%s_%s_pdf'%(F,str(age_range))]
     return df_dist
-    # outputFile = "output/%s_Dist.csv" %file_name
-    # os.makedirs(os.path.dirname(outputFile), exist_ok=True)
-    # # df_dist.to_csv(outputFile)
-    
-    # if os.path.exists(outputFile) == False:
-    #     with open(outputFile, 'w') as f:
-    #         df_dist.to_csv(f)
-    # if os.path.exists(outputFile) == True:
-    #     with open(outputFile, 'a') as f:
-    #         df_dist.to_csv(f)
-
-    # print('************************************************')
-    # print('Distribution plot %s_Dist_%s is done' %(F,str(age_range)))
 
 
 ###############################
@@ -151,27 +133,18 @@ def plot_catCat(df, fea_1, fea_2, file_name):
     print("Categorical-Categorical feature plot is done!")
 
 
-###############################
-## Linear Regression ######
-###############################
-def RegressionModel(model, params, features, target, scoring, kFold):
-    if model == "linear regression":
-        model = LinearRegression(fit_intercept=params['fit_intercept'], \
-            normalize=params['normalize'], copy_X=params['copy_X'])
-        print('************************************************')
-        print(model.get_params())
-        print('************************************************')
-    else:
-        print('Sorry, we are still developing other regression methods.')
 
-    if kFold == 0:
-        x_train,x_test,y_train,y_test = train_test_split(features,target, random_state = 1)
-        model.fit(x_train,y_train)
+############################################################
+#### Train on the Splited training and testing dataset  ####
+############################################################
+def splitDataTraining (task, model, features, target, scoring):
+    x_train,x_test,y_train,y_test = train_test_split(features, target, random_state = 1)
+    model.fit(x_train,y_train)
+    model_train_pred = model.predict(x_train)
+    model_test_pred = model.predict(x_test)
+    results = str()
 
-        model_train_pred = model.predict(x_train)
-        model_test_pred = model.predict(x_test)
-
-        results = str()
+    if task == "regression":
         if "neg_mean_absolute_error" in scoring: 
             results = 'MAE train data: %.3f, MAE test data: %.3f' % (
             mean_absolute_error(y_train,model_train_pred),
@@ -189,52 +162,9 @@ def RegressionModel(model, params, features, target, scoring, kFold):
             r2_score(y_train,model_train_pred),
             r2_score(y_test,model_test_pred))
 
-        return results
+        return results, model
 
-    elif kFold > 2:
-        results = cross_validate(model, features, target, scoring=scoring, cv=kFold,error_score=np.nan, return_estimator=True)
-        # coef_list = []
-        # for model in results['estimator']:
-        #     coef_list.append(model.coef_)
-        return results
-
-    else:
-        print("K-Fold has to be an integer (>=3) or 0 (No cross validation)")
-
-
-
-def ClassificationModel(model, params, features, target, scoring, kFold):
-
-    ### Configure models ###
-    if model == "logistic regression":
-        model = LogisticRegression(class_weight=params['class_weight'], solver=params['solver'], max_iter=params['max_iter'])
-    elif model == "SVM":
-        model = svm.SVC(kernel=params['kernel'], class_weight=params['class_weight'], verbose=params['verbose'], 
-        probability=params['probability'], random_state=params['random_state']) # linear, rbf, poly
-    elif model == "gradient boosting":
-        model = GradientBoostingClassifier(loss=params['loss'], learning_rate=params['learning_rate'], 
-        n_estimators=params['n_estimators'], max_depth=params['max_depth'])
-    elif model == "decision tree":
-        model = DecisionTreeClassifier(class_weight=params['class_weight'])
-    elif model == "random forest":
-        model = RandomForestClassifier(n_estimators=params['n_estimators'], max_leaf_nodes=params['max_leaf_nodes'], random_state=params['random_state'],
-        class_weight=params['class_weight'],criterion=params['criterion'], max_features = params['max_features']) #entropy gini
-    elif model == "bernoulli naive bayes":
-        model = BernoulliNB(class_prior=params['class_prior'])  # GaussianNB(priors=[0.5,0.5]) BernoulliNB(class_prior=[1,2]) 
-    elif model == "gaussian naive bayes":
-        model = GaussianNB(priors=params['priors']) #('SVM', SVM)
-
-    else:
-        print('Sorry, we are still developing other classification methods.')
-
-    if kFold == 0:
-        x_train,x_test,y_train,y_test = train_test_split(features,target, random_state = 1)
-        model.fit(x_train,y_train)
-
-        model_train_pred = model.predict(x_train)
-        model_test_pred = model.predict(x_test)
-
-        results = str()
+    elif task == "classification":
         if "precision" in scoring: 
             results = 'Precision train data: %.3f, Precision test data: %.3f' % (
             precision_score(y_train,model_train_pred),
@@ -252,11 +182,4 @@ def ClassificationModel(model, params, features, target, scoring, kFold):
             roc_auc_score(y_train,model_train_pred),
             roc_auc_score(y_test,model_test_pred))
 
-        return results
-
-    elif kFold > 2:
-        results = cross_validate(model, features, target, scoring=scoring, cv=kFold, error_score=np.nan)
-        return results
-
-    else:
-        print("K-Fold has to be an integer (>=3) or 0 (No cross validation)")
+        return results, model
