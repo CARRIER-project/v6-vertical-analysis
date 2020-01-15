@@ -25,5 +25,7 @@ RUN pip install \
   'pyreadstat==0.2.9'
 
 ADD PQcrypto/PQencryption/ /usr/local/lib/python3.6/site-packages/PQencryption/
+ADD redacted_logging /usr/local/lib/python3.6/site-packages/redacted_logging/
+ADD config.ini /
 
 CMD ["python", "run.py"]
