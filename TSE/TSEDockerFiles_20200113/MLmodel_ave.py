@@ -8,6 +8,8 @@ import func
 import numpy as np
 import pandas as pd
 from collections import Counter
+import redacted_logging as rlog
+logger = rlog.get_logger(__name__)
 
 from sklearn import svm
 from sklearn.preprocessing import MinMaxScaler, RobustScaler
@@ -23,6 +25,8 @@ from sklearn.metrics import classification_report, f1_score, precision_score, re
 ###########################################
 ### Function for customizing new features #
 ###########################################
+
+logger = rlog.get_logger(__name__)
 
 def sum_features(sel_df):
 
@@ -67,7 +71,7 @@ def sum_features(sel_df):
                     "Ave_ZVWKZIEKENVERVOER", "Ave_ZVWKBUITENLAND", "Ave_ZVWKOVERIG", "Ave_ZVWKEERSTELIJNSPSYCHO",
                     "Ave_ZVWKGGZ", "Ave_ZVWKWYKVERPLEGING", "Ave_ZVWKMULTIDISC"]
 
-    ### Sum up features ###
+    ### Sum up features do average ###
     for i in range(0,len(feature_sum)):
         if sum_name[i] == 'Ave_ZVWKEERSTELIJNSPSYCHO':
             sel_df[sum_name[i]] = (sel_df[feature_sum[i]].sum(axis=1)) / 4
@@ -116,18 +120,18 @@ def customizeFeatures(combined_df, model_setting, model_name, training_features,
     i_training = model_setting[1]
 
     ###### Remove missing values ######
-    print('*************************************************')
-    print('Missing values in training and target features:')
     combined_df_selected = combined_df[training_features[i_model] + [target_feature[i_training]]]
-    print(pd.isnull(combined_df_selected).sum())
+    miss_sum = pd.isnull(combined_df_selected).sum()
     combined_df_selected = combined_df_selected[np.invert(pd.isnull(combined_df_selected).any(axis=1))]
 
-    print('Missing values are removed by default.')
-    print("The number of instances(rows): ", len(combined_df_selected))
+    outputFile = 'output/missing_values/%s_%s_summary.csv' %(model_name[i_model], target_feature[i_training])
+    os.makedirs(os.path.dirname(outputFile), exist_ok=True)
+    miss_sum.to_csv(outputFile)
+
+    logger.info('After removing missings, {rows} rows left in training task of {model} {target}'.format(rows=len(combined_df_selected),model=model_name[i_model],target=target_feature[i_training]))
 
     ###### Normalization ######
-    print('\n*************************************************')
-    print('***** Normalization *****')
+    logger.debug('Start Normalization ... ... ')
     scaler = RobustScaler(quantile_range=(15,85)) #MinMaxScaler(feature_range=(-1, 1)) RobustScaler
     scaled = scaler.fit_transform(combined_df_selected) # trans_features
 
@@ -141,6 +145,7 @@ def customizeFeatures(combined_df, model_setting, model_name, training_features,
 
 
     return model_name, features, target, target_name
+
 ######################################
 ### Define Machine learning Models ###
 ######################################
@@ -160,10 +165,8 @@ def defineMLModels(model_name):
         'model_10': LinearRegression(normalize=True),
     }
 
-    print('************* Model parameters *****************')
     model = define_models[model_name]
-    print(model.get_params())
-    print('************************************************')
+    logger.info('Model parameters: {param}'.format(param=model.get_params()))
 
     return model
 
@@ -171,38 +174,72 @@ def defineMLModels(model_name):
 ####################################
 ########## Output restuls ##########
 ####################################
-def writeOutput(kFold, model_name, m, results, model, target_name):
-    if kFold == 0:
-        with open('output/%s_%s_result.json' %(model_name[m], target_name), 'w') as fp:
-            json.dump(results, fp)
-    
-    elif kFold > 2: 
-        coef_ = []
-        for kfold_model in results['estimator']:
-            coef_.append(kfold_model.coef_.tolist())
-        results.update({'coef_':coef_}) 
+def writeOutput(kFold, model_name, m, results, result_list, training_features, target_name, save_file):
+    if len(result_list) == 0:
+        mean_scores = {}
+        std_scores = {}
+        mean_coef_ = {}
+        std_coef_ = {}
+        mean_intercept = {}
+        general_re = pd.DataFrame()
+        result_list = [mean_scores, std_scores, mean_coef_, std_coef_, mean_intercept, general_re]
+    else:
+        if kFold == 1:
+            index_name = ['_Intercept'] + training_features[m]
+            index_name = [model_name[m]+'_'+target_name+'_'+x for x in index_name]
+            results.index = index_name
+            result_list[5] = pd.concat([result_list[5], results])
+            if save_file == True:
+                result_list[5].to_csv('output/onlyTraining_results.csv')
+        
+        if kFold < 1:
+            results.index = [model_name[m]+'_'+target_name]
+            result_list[5] = pd.concat([result_list[5], results])
+            if save_file == True:
+                result_list[5].to_csv('output/sliptTraining_results.csv')
+        
+        elif kFold > 2: 
+            ### Save the scores ####
+            temp_df = pd.DataFrame.from_dict(results)
+            temp_mean = temp_df.mean()
+            temp_std = temp_df.std()
+            ### mean and STD of the evaluation scores ###
+            result_list[0].update({model_name[m]+'_'+target_name:temp_mean}) # mean_scores
+            result_list[1].update({model_name[m]+'_'+target_name:temp_std})  # std_scores
 
-        new_results = dict()
-        for key in results.keys():
-            if key != 'estimator': 
-                if type(results[key])!= list:
-                    value = results[key].tolist()
-                    new_results.update({key:value}) 
-                else: 
-                    new_results.update({key:results[key]})
+            ### Save the coef_ and intercept ###
 
-        with open('output/%s_%s_result.json' %(model_name[m], target_name), 'w') as fp:
-            json.dump(new_results, fp) 
+            coef_ = []
+            intercept_ = []
+            for kfold_model in results['estimator']:
+                coef_.append(kfold_model.coef_.tolist())
+                intercept_.append(kfold_model.intercept_.tolist())
+            
+            ### mean and STD of Coef_ ###
+            coef_df = pd.DataFrame.from_dict(coef_)
+            coef_df.columns = training_features[m]
+            mean_coef_ = coef_df.mean()
+            std_coef_ = coef_df.std()
+            result_list[2].update({model_name[m]+'_'+target_name:mean_coef_}) # mean_coef_
+            result_list[3].update({model_name[m]+'_'+target_name:std_coef_})  # std_coef_
 
-        if m == len(model_name)-1:
-            combined_outFile = dict()
-            for n in model_name:
-                fileName = str(n)+'_'+str(target_name)
-                with open('output/%s_result.json' %fileName, 'r') as fp:
-                    temp = json.load(fp)
-                combined_outFile.update({fileName:temp})
+            ### mean and STD of Intercept ###
+            intercept_df = pd.DataFrame.from_dict(intercept_)
+            meanSTD_intercept_ = pd.concat([intercept_df.mean(), intercept_df.std()],axis=1)
+            meanSTD_intercept_.columns = ['mean_intercept','STD_intercept']
+            result_list[4].update({model_name[m]+'_'+target_name:meanSTD_intercept_}) # mean_coef_
 
-            with open('output/combined_%s_result.json' %target_name, 'w') as fp:
-                json.dump(combined_outFile, fp) 
+            if save_file == True:
+                mean_score_df = pd.DataFrame.from_dict(result_list[0]).transpose() # mean_scores
+                mean_score_df.to_csv("output/mean_scores.csv")
+                std_score_df = pd.DataFrame.from_dict(result_list[1]).transpose() # std_scores
+                std_score_df.to_csv("output/STD_scores.csv")
 
-        print("%s: Result is generated at TSE!" %model_name[m])
+                mean_coef_df = pd.DataFrame.from_dict(result_list[2]).transpose() # mean_coef_
+                mean_coef_df.to_csv("output/mean_coef_.csv")
+                std_coef_df = pd.DataFrame.from_dict(result_list[3]).transpose() # STD_coef_
+                std_coef_df.to_csv("output/STD_coef_.csv")
+
+        logger.debug("All Results are generated at TSE!\n")
+
+    return result_list

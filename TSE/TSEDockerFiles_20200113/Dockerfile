@@ -1,9 +1,9 @@
-FROM datasharing/base:2019-09-25
+FROM datasharing/base:2020-01-15
 
 COPY verDec.py verDec.py
 COPY matching.py matching.py
 COPY func.py func.py
 COPY main.py main.py
-COPY run.sh run.sh
+COPY run.py run.py
 
-CMD ["sh", "run.sh"]
+CMD ["python", "run.py"]
