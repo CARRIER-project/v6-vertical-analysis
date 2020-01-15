@@ -71,8 +71,11 @@ def probe_config_file(config_file):
         FileNotFoundError: If config_file is not found.
     """
     if not os.path.isfile(config_file):
-        raise FileNotFoundError("Config file " + config_file +
-                                " does not exist.")
+        raise FileNotFoundError("Config file " + config_file + " " +
+                                "does not exist. Create it or use " +
+                                "get_logger(__name__, " +
+                                "config_file=\"./my_config_file\") to " +
+                                "point to another name or location.")
 
 
 class NoStacktraceFormatter(logging.Formatter):
