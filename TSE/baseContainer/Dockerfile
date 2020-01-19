@@ -22,7 +22,8 @@ RUN pip install \
   'requests==2.22.0' \
   'seaborn==0.9.0' \
   'bokeh==1.3.4' \
-  'pyreadstat==0.2.9'
+  'pyreadstat==0.2.9'\
+  'scipy==1.4.1'
 
 ADD PQcrypto/PQencryption/ /usr/local/lib/python3.6/site-packages/PQencryption/
 ADD redacted_logging /usr/local/lib/python3.6/site-packages/redacted_logging/
