@@ -19,7 +19,9 @@ Until Feb 2020, PPDL infrastructure contains 5 components:
 
 ### Diagram of PPDL ###
 
-[Diagram video of PPDL](https://youtu.be/zorPZ8Xg-r8)
+[1. Video explanation](https://youtu.be/zorPZ8Xg-r8)
+
+[2. Slides explanation](https://docs.google.com/presentation/d/14YsNCly2bhog102dxgU7OmXb6veDxo4I9BqAr6n6gs8/edit?usp=sharing)
 
 ### Prerequisites
 
