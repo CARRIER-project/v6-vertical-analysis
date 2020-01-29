@@ -1,0 +1,30 @@
+{
+    "creators": [
+        {
+            "affiliation": "UMC+ Maastricht",
+            "name": "van Soest PhD, Johan",
+            "orcid": "0000-0003-2548-0330"
+        },
+        {
+            "affiliation": "UMC+ Maastricht",
+            "name": "Sun MSc, Chang",
+            "orcid": "0000-0001-8325-8848"
+        },
+        {
+            "affiliation": "Statistics Netherlands (CBS)",
+            "name": "Mussmann PhD, Bjoern Ole",
+            "orcid": "0000-0002-3803-4287"
+        }
+    ],
+    "description": "\"FAIRHealth project is a collaboration between Maastricht University and\nStatistics Netherlands from Feb 2018 to Feb 2020. It is funded by Dutch\nNational Research Agenda (NWA) under VWData program. In this project, we\npropose an innovative infrastructure for the secure and privacy-preserving\nanalysis of personal health data from multiple providers with different\ngovernance policies.  The approach involves distributed machine learning to\nanalyze vertically partitioned data (different variables/attributes/features\nabout a particular individual are distributed over a set of data sources).\n\nThe main idea of our infrastructure is to send data-processing or analysis\nalgorithms to data sources rather than transferring data to the researchers.\nOnly the final (verified) results can be return to the researchers. Our\ninfrastructure is an extension of Personal Health Train Archtecture. The\ntrains (applications) containing analytic algorithms are sent to the data\nstations (sources). The stations (sources) can inspect whether the train is\nallowed to execute the application on (a subset of) the available data.\"\n",
+    "keywords": [
+        "FAIRhealth",
+        "VWData",
+        "privacy preserving analysis",
+        "PPA"
+    ],
+    "license": {
+        "id": "Apache-2.0"
+    },
+    "title": "FAIRHealth"
+}
