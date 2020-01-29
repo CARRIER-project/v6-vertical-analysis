@@ -48,5 +48,5 @@ license: "Apache-2.0"
 message: "If you use this software, please cite it using these metadata."
 repository-code: "https://gitlab.com/CBDS/DataSharing"
 title: FAIRHealth
-version: "0.1"
+version: "0.0.1"
 ...
