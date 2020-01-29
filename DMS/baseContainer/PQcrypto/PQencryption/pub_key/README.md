@@ -1,1 +1,0 @@
-I cannot find out yet if it's best to sign first, then encrypt or the other way around. Until we have good arguments for one of the options, I would recommend to sign-encrypt-sign. Let's test how much overhead this produces.

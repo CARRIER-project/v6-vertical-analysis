@@ -1,0 +1,28 @@
+### input the data parties names ###
+### These have to be the same as the ones data parties put in when they encrypt the data files ###
+parties: 
+    - dms
+    - cbs
+
+### If the encrypted data file is from a server, please input the URL ###
+### If not, please set "receiver_url" as false. In this case, your encrypted
+### data files should be in input folder 
+receiver_url: false
+
+### Please give the correct (data) keys for each data party ###
+dmsfileUUID: "dc450aed-68f8-44f4-a5b5-dc0380d73f2e"
+dmsencryptKey: "TJlyq4x6ZgjzcBO2zSR1/pVkYaYMB/XPNkRcw5Y9LiI="
+dmsverifyKey: "udOScjAiil2zncEoMyLVvOu5rQwd/gcmSlTzO2NIZis="
+
+cbsfileUUID: "c857569b-4e6d-4b7a-9bda-97a57b3c4ea3"
+cbsencryptKey: "LkNEwN+Y2WQatbEq0c8nx88ql4Qs/hApgHcESmkCYGQ="
+cbsverifyKey: "G+F18sftO4ypfcOYGTCSdrgBN8SSUXz/z9YuAsL1Peo="
+
+
+### Input the modelID and verification keys of the model file from all parties ###
+### Inputs below should have the same items ###
+modelNames:
+
+dmsmodelkey:
+cbsmodelkey:
+
