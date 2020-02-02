@@ -138,9 +138,9 @@ sophia921025/datasharing_tse:v0.1
 If Docker container runs properly, you will see execution logs as below. In the end, all results and logging histories (***ppds.log***) are stored in the ***output*** folder. To avoid data leakage from error shooting, if errors occur during executions, the error messages will saved in the ***ppds.log*** instead of printing out on the screen.
 
 ```powershell
-INFO     ░ 2020-01-19 10:24:33,292 ░ verDec ░ verDec.py line 77 ▓ Verification and decryption took 1.2064s to run
-INFO     ░ 2020-01-19 10:24:35,093 ░ matching ░ matching.py line 26 ▓ dms has 3285 rows
-INFO     ░ 2020-01-19 10:24:35,094 ░ matching ░ matching.py line 26 ▓ cbs has 5000 rows
+INFO     ░ 2020-02-02 19:40:56,751 ░ verDec ░ verDec.py line 14 ▓ Reading request.yaml file...
+INFO     ░ 2020-02-02 19:40:56,944 ░ verDec ░ verDec.py line 111 ▓ Signed models has been verified successfully!
+INFO     ░ 2020-02-02 19:40:56,945 ░ verDec ░ verDec.py line 151 ▓ Verification and decryption took 0.3028s to run
 ... 
 ... ...
 INFO     ░ 2020-01-19 10:25:05,619 ░ main ░ main.py line 272 ▓ In total, all models training took 16.6441 to run.
