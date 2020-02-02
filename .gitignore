@@ -3,7 +3,7 @@
 *.sav
 *.csv
 *.enc
-*verKeys.json
+*.json
 .DS_Store
 _PRIVATE_signing_key_CBS
 _PRIVATE_symmetric_key_CBS
