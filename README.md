@@ -121,8 +121,8 @@ Mac/Linux:
 docker run --rm \
 -v "$(pwd)/input:/input" \
 -v "$(pwd)/output:/output" \
--v "$(pwd)/analysis_input.yaml:/analysis_input.yaml" \
--v "$(pwd)/security_input.yaml:/security_input.yaml" sophia921025/datasharing_tse:v0.1
+-v "$(pwd)/input/security_input.yaml:/inputVolume/security_input.yaml" \
+sophia921025/datasharing_tse:v0.1
 ```
 
 Windows:
@@ -131,8 +131,8 @@ Windows:
 docker run --rm \
 -v "%cd%/input:/input" \
 -v "%cd%/output:/output" \
--v "%cd%/analysis_input.json:/analysis_input.json" \
--v "%cd%/security_input.json:/security_input.json" sophia921025/datasharing_tse:v0.1
+-v "%cd%/input/security_input.yaml:/inputVolume/security_input.yaml" \
+sophia921025/datasharing_tse:v0.1
 ```
 
 If Docker container runs properly, you will see execution logs as below. In the end, all results and logging histories (***ppds.log***) are stored in the ***output*** folder. To avoid data leakage from error shooting, if errors occur during executions, the error messages will saved in the ***ppds.log*** instead of printing out on the screen.
