@@ -9,7 +9,7 @@ logger = rlog.get_logger(__name__)
 
 #read input file
 try:
-    with open(r'/input/security_input.yaml') as file:
+    with open(r'/inputVolume/security_input.yaml') as file:
         inputYAML = yaml.load(file, Loader=yaml.FullLoader)
         logger.info("Reading request.yaml file...")
 
@@ -94,17 +94,18 @@ else:
         verified_models = []
 
         for i in range(0, len(verifyBase64_list)):
-            # try:
-            verify_key_model = nacl.signing.VerifyKey(verifyBase64_list[i], encoder=nacl.encoding.Base64Encoder)
+            try:
+                verify_key_model = nacl.signing.VerifyKey(verifyBase64_list[i], encoder=nacl.encoding.Base64Encoder)
+                #read signed model file
+                with open(modelFile_list[i], 'rb') as m_file:
+                    myModel = m_file.read()
 
-            #read signed model file
-            with open(modelFile_list[i], 'rb') as m_file:
-                myModel = m_file.read()
+                #verify-model
+                verified_models.append(utilities.verify_models(myModel, verify_key_model))
+            except:
+                logger.error("%s model verification failed." %str(i))
+                sys.exit("Execution interrupted!")
 
-            #verify-model
-            verified_models.append(utilities.verify_models(myModel, verify_key_model))
-            # except:
-            #     logger.error("%s model verification failed." %str(i))
             
         if all(m == verified_models[0] for m in verified_models):
             logger.info("Signed models has been verified successfully!")
@@ -137,7 +138,7 @@ else:
         for p in parties:
             keys = inputYAML["%sModelKey" %(p)]
             temp.append(keys[i])
-            modelPath.append("/%s_%s.enc" %(p,modelNames[i]))
+            modelPath.append("%s_%s.enc" %(p,modelNames[i]))
         modelKeys.update({modelNames[i]:temp})
         modelFileNames.update({modelNames[i]:modelPath})
 

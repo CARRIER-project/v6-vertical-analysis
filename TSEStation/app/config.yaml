@@ -1,0 +1,18 @@
+input: {
+    host: "/Users/changsun/GoogleDrive/VWData P8/Infrastructure/Infra_Installation/DataSharing_Repo_Branches/DataSharing_Web/TSEStation/input",
+    container: "/input"
+    }
+
+output: {
+    host: "/Users/changsun/GoogleDrive/VWData P8/Infrastructure/Infra_Installation/DataSharing_Repo_Branches/DataSharing_Web/TSEStation/output",
+    container: "/output"
+    }
+
+inputVolume: {
+    volumeName: "inputVolume",
+    pathContainer: "/inputVolume",
+        
+    pathWebhost: "/inputVolume",
+    pathSecurityInput: "security_input.yaml"
+    # pathAnalysisInput: "analysis_input.yaml"
+    }

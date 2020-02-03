@@ -1,7 +1,6 @@
 ### Read healthcare cost data from vektis https://www.vektis.nl/intelligence/open-data ###
 ### Please read the data description before using the data ###
-import re
-import yaml
+import re, yaml, ntpath
 import func
 import pyreadstat
 import numpy as np
@@ -11,7 +10,7 @@ import redacted_logging as rlog
 logger = rlog.get_logger(__name__)
 
 try:
-    with open(r'request.yaml') as file:
+    with open(r'/inputVolume/request.yaml') as file:
         inputYAML = yaml.load(file, Loader=yaml.FullLoader)
         logger.info("Reading request.yaml file...")
 except:
@@ -22,7 +21,7 @@ file_path = inputYAML['data_file']
 file_sep = inputYAML['delimiter']
 
 ### Read data (csv or sav) ###
-file_name = re.split('\.',file_path)[-2]
+file_name = ntpath.basename(file_path).split('.')[0]
 
 try:
     if '.csv' in file_path:
@@ -73,6 +72,7 @@ else:
                 catFea.append(c)
 
         ### Function for distribution plot ###
+
         if inputYAML['distribution_plot'] == True:
             if inputYAML['distribution_feature'] == 'ALL':
                 for f in numFea:

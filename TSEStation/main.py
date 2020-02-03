@@ -26,11 +26,11 @@ except FileNotFoundError:
 
 try:
     ### Read json file ###
-    with open(r'analysis_input.yaml') as file:
+    with open(r'/input/analysis_input.yaml') as file:
         inputYAML = yaml.load(file, Loader=yaml.FullLoader)
-        logger.info("Reading request.yaml file...")
+        logger.info("Reading analysis_input.yaml file...")
 except FileNotFoundError:
-    logger.error("Please provide your analysis input file and mount to the container. '-v $(pwd)/*YOURINPUT.json*:/analysis_input.json' ")
+    logger.error("Please provide your analysis input file and mount to the container. '-v $(pwd)/*YOURINPUT.yaml*:/analysis_input.yaml' ")
 
 else:
     ### Select variables ###

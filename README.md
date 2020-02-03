@@ -53,42 +53,50 @@ docker pull sophia921025/datasharing_base:v0.1
 
 ```powershell
 docker pull sophia921025/datasharing_overview:v0.1
+docker pull sophia921025/datasharing_overview_web:v0.1
 ```
 
 ​		In the folder which contains ***data file*** and ***request.yaml***, Mac/Linux run: (please change the third line "data_party_1.csv" to the name of your own data file.)
 
 ```powershell
-docker run --rm \
--v "$(pwd)/request.yaml:/request.yaml" \
--v "$(pwd)/data_party_1.csv:/data_party_1.csv" \
--v "$(pwd)/output:/output" sophia921025/datasharing_overview:v0.1
+docker run -it --rm -p 80:80 \
+-v "/var/run/docker.sock":"/var/run/docker.sock" \
+-v "$(pwd)/app/config.yaml":"/app/config.yaml" \
+-v "inputVolume:/inputVolume" sophia921025/datasharing_overview_web:v0.1
 ```
 
 ​		Windows run (please change the third line "data_party_1.csv" to the name of your own data file.)
 
 ```powershell
-docker run --rm \
--v "%cd%/request.yaml:/request.yaml" \ 
--v "%cd%/data_party_1.csv:/data_party_1.csv" \ 
--v "%cd%/output:/output" sophia921025/datasharing_overview:v0.1
+docker run -it --rm -p 80:80 \
+-v "/var/run/docker.sock":"/var/run/docker.sock" \
+-v "%cd%/app/config.yaml":"/app/config.yaml" \
+-v "inputVolume:/inputVolume" sophia921025/datasharing_overview_web:v0.1
 ```
 
-3. **Pseudonymization and encryption**: to pseudonymize the personal identifiers (PI) for linking multiple datasets, and encrypt the data files (pseudonymized PI + actual data). Go to the folder which contains ***data file*** and ***encrypt_input.yaml***. Please configure ***encrypt_input.yaml*** first. Then in the terminal (Mac/Linux): (please change the second line "data_party_1.csv" to the name of your own data file.)
+3. **Pseudonymization and encryption**: to pseudonymize the personal identifiers (PI) for linking multiple datasets, and encrypt the data files (pseudonymized PI + actual data). Go to the folder which contains ***data file*** and ***encrypt_input.yaml***. Please configure ***encrypt_input.yaml*** first. Then in the terminal 
 
 ```powershell
-docker run --rm \
--v "$(pwd)/data_party_1.csv:/data_party_1.csv" \
--v "$(pwd)/encrypt_input.yaml:/encrypt_input.yaml" \
--v "$(pwd)/output:/output" sophia921025/datasharing_encdata:v0.1
+docker pull sophia921025/datasharing_encdata:v0.1
+docker pull sophia921025/datasharing_enc_web:v0.1
+```
+
+Mac/Linux: (please change the second line "data_party_1.csv" to the name of your own data file.)
+
+```powershell
+docker run -it --rm -p 80:80 \
+-v "/var/run/docker.sock":"/var/run/docker.sock" \
+-v "$(pwd)/app/config.yaml":"/app/config.yaml" \
+-v "inputVolume:/inputVolume" sophia921025/datasharing_enc_web:v0.1
 ```
 
 Windows (please change the second line "data_party_1.csv" to the name of your own data file.):
 
 ```powershell
-docker run --rm \
--v "%cd%/data_party_1.csv:/data_party_1.csv" \
--v "%cd%/encrypt_input.yaml:/encrypt_input.yaml" \
--v "%cd%/output:/output" sophia921025/datasharing_encdata:v0.1
+docker run -it --rm -p 80:80 \
+-v "var/run/docker.sock":"/var/run/docker.sock" \
+-v "%cd%/app/config.yaml":"/app/config.yaml" \
+-v "inputVolume:/inputVolume" sophia921025/datasharing_enc_web:v0.1
 ```
 
 After successful execution, your encrypted data file and key file (keys.json) will be stored locally/to the server (e.g., trusted third party, trusted secure environment).
@@ -96,24 +104,29 @@ After successful execution, your encrypted data file and key file (keys.json) wi
 4. Sign your model file (python script) by all data parties. Create a folder where contains ***your_model.py*** and ***encrypt_input.yaml*** (need to be configured). Then in the terminal, Mac/Linux (please change the second line "your_model.py" to the name of your own model file): 
 
 ```powershell
-docker run --rm \
--v "$(pwd)/your_model.py:/your_model.py" \
--v "$(pwd)/encrypt_input.yaml:/encrypt_input.yaml" \
--v "$(pwd)/output:/output" sophia921025/datasharing_signmodel:v0.1
+docker run -it --rm -p 80:80 \
+-v "/var/run/docker.sock":"/var/run/docker.sock" \
+-v "$(pwd)/app/config.yaml":"/app/config.yaml" \
+-v "inputVolume:/inputVolume" sophia921025/datasharing_signmodel_web:v0.1
 ```
 
 Windows (please change the second line "your_model.py" to the name of your own model file): 
 
 ```powershell
-docker run --rm \
--v "%cd%/your_model.py:/your_model.py" \
--v "%cd%/encrypt_input.yaml:/encrypt_input.yaml" \
--v "%cd%/output:/output" sophia921025/datasharing_signmodel:v0.1
+docker run -it --rm -p 80:80 \
+-v "/var/run/docker.sock":"/var/run/docker.sock" \
+-v "%cd%/app/config.yaml":"/app/config.yaml" \
+-v "inputVolume:/inputVolume" sophia921025/datasharing_signmodel_web:v0.1
 ```
 
 
 
 5. At **Trusted Secure Environment (TSE)**, create a folder, put ***encrypted data files*** from data parties, ***security_input.yaml***, and ***analysis_input.yaml***, and your ***analysis python script*** (ML models) into this folder. Configure ***security_input.yaml*** based on the keys from data parties, and ***analysis_input.yaml*** based on your analysis requirements. In your terminal:
+
+```powershell
+docker pull sophia921025/datasharing_tse:v0.1
+docker pull sophia921025/datasharing_tse_web:v0.1
+```
 
 Mac/Linux:
 
@@ -138,10 +151,11 @@ docker run --rm \
 If Docker container runs properly, you will see execution logs as below. In the end, all results and logging histories (***ppds.log***) are stored in the ***output*** folder. To avoid data leakage from error shooting, if errors occur during executions, the error messages will saved in the ***ppds.log*** instead of printing out on the screen.
 
 ```powershell
-INFO     ░ 2020-01-19 10:24:33,292 ░ verDec ░ verDec.py line 77 ▓ Verification and decryption took 1.2064s to run
-INFO     ░ 2020-01-19 10:24:35,093 ░ matching ░ matching.py line 26 ▓ dms has 3285 rows
-INFO     ░ 2020-01-19 10:24:35,094 ░ matching ░ matching.py line 26 ▓ cbs has 5000 rows
+INFO     ░ 2020-02-02 19:40:56,751 ░ verDec ░ verDec.py line 14 ▓ Reading request.yaml file...
+INFO     ░ 2020-02-02 19:40:56,944 ░ verDec ░ verDec.py line 111 ▓ Signed models has been verified successfully!
+INFO     ░ 2020-02-02 19:40:56,945 ░ verDec ░ verDec.py line 151 ▓ Verification and decryption took 0.3028s to run
 ... 
 ... ...
 INFO     ░ 2020-01-19 10:25:05,619 ░ main ░ main.py line 272 ▓ In total, all models training took 16.6441 to run.
 ```
+
