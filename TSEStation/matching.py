@@ -9,7 +9,11 @@ logger = rlog.get_logger(__name__)
 
 #read input file
 try:
+<<<<<<< HEAD
     with open(r'/inputVolume/security_input.yaml') as file:
+=======
+    with open(r'/input/security_input.yaml') as file:
+>>>>>>> 570086569db26e0a46968d3436e9eba76fa6fef8
         inputYAML = yaml.load(file, Loader=yaml.FullLoader)
         logger.info("Reading request.yaml file...")
 except FileNotFoundError:

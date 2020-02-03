@@ -1,6 +1,11 @@
 ### Read healthcare cost data from vektis https://www.vektis.nl/intelligence/open-data ###
 ### Please read the data description before using the data ###
+<<<<<<< HEAD
 import re, yaml, ntpath
+=======
+import re
+import yaml
+>>>>>>> 570086569db26e0a46968d3436e9eba76fa6fef8
 import func
 import pyreadstat
 import numpy as np
@@ -10,7 +15,11 @@ import redacted_logging as rlog
 logger = rlog.get_logger(__name__)
 
 try:
+<<<<<<< HEAD
     with open(r'/inputVolume/request.yaml') as file:
+=======
+    with open(r'request.yaml') as file:
+>>>>>>> 570086569db26e0a46968d3436e9eba76fa6fef8
         inputYAML = yaml.load(file, Loader=yaml.FullLoader)
         logger.info("Reading request.yaml file...")
 except:
@@ -21,7 +30,11 @@ file_path = inputYAML['data_file']
 file_sep = inputYAML['delimiter']
 
 ### Read data (csv or sav) ###
+<<<<<<< HEAD
 file_name = ntpath.basename(file_path).split('.')[0]
+=======
+file_name = re.split('\.',file_path)[-2]
+>>>>>>> 570086569db26e0a46968d3436e9eba76fa6fef8
 
 try:
     if '.csv' in file_path:
@@ -72,7 +85,10 @@ else:
                 catFea.append(c)
 
         ### Function for distribution plot ###
+<<<<<<< HEAD
 
+=======
+>>>>>>> 570086569db26e0a46968d3436e9eba76fa6fef8
         if inputYAML['distribution_plot'] == True:
             if inputYAML['distribution_feature'] == 'ALL':
                 for f in numFea:

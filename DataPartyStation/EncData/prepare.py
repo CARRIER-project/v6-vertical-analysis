@@ -9,7 +9,11 @@ import redacted_logging as rlog
 logger = rlog.get_logger(__name__)
 
 try:
+<<<<<<< HEAD
     with open(r'/inputVolume/encrypt_input.yaml') as file:
+=======
+    with open(r'encrypt_input.yaml') as file:
+>>>>>>> 570086569db26e0a46968d3436e9eba76fa6fef8
         inputYAML = yaml.load(file, Loader=yaml.FullLoader)
         logger.info("Reading encrypt_input.yaml file...")
 except FileNotFoundError:
