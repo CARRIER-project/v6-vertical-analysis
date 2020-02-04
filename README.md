@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3635839.svg)](https://doi.org/10.5281/zenodo.3635839)
+
 ## FAIRHealth Project: Privacy-Preserving Distributed Learning Infrastructure (PPDL)
 
 ### Introduction ###
