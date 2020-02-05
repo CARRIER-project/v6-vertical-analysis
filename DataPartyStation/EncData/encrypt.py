@@ -18,13 +18,9 @@ logger = rlog.get_logger(__name__)
 
 try:
     #read input file
-<<<<<<< HEAD
     with open(r'/inputVolume/encrypt_input.yaml') as file:
-=======
-    with open(r'encrypt_input.yaml') as file:
->>>>>>> 570086569db26e0a46968d3436e9eba76fa6fef8
         inputYAML = yaml.load(file, Loader=yaml.FullLoader)
-        logger.info("Reading encrypt_input.yaml file...")
+        logger.debug("Reading encrypt_input.yaml file...")
 except FileNotFoundError:
     logger.error("Cannot find encrypt_input.yaml file ")
 

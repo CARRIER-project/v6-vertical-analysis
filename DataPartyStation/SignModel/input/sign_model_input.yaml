@@ -1,6 +1,6 @@
 ### Please provide information to encrypt your data file ###
 # The name of your organization (has to start with letters)#
-party_name: dms
+party_name: cbs
 
 # Path to your model files (can be multiple) #
 model_files:

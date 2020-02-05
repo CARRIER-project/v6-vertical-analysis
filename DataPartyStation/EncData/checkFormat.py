@@ -11,7 +11,8 @@ def checking(df, PI):
     for var in standardName:
         if var in PI:
             if df[var].isnull().sum() > 0:
-                logger.info("%s has missing values. Linking features cannot have missing values" %var)
+                logger.warning("%s has missing values. Missing in linking features will cause the instances not being matched" %var)
+            
                 
             if var == "GBAGeboorteJaar":
                 df[var] = df[var].astype(str)
@@ -21,7 +22,7 @@ def checking(df, PI):
                         logger.warning("%s type has to be string" %var)
                         if len(value) != 4:
                             logger.warning("%s length has to be 4" %var)
-                logger.info("%s checking is done" %var)
+                logger.debug("%s checking is done" %var)
                             
                 
             if var == "GBAGeboorteMaand":
@@ -32,7 +33,7 @@ def checking(df, PI):
                         logger.warning("%s type has to be string" %var)
                         if len(value) != 2:
                             logger.warning("%s length has to be 2" %var)
-                logger.info("%s checking is done" %var)
+                logger.debug("%s checking is done" %var)
                             
                 
             if var == "GBAGeboorteDag":
@@ -43,7 +44,7 @@ def checking(df, PI):
                         logger.warning("%s type has to be string" %var)
                         if len(value) != 2:
                             logger.warning("%s length has to be 2" %var)
-                logger.info("%s checking is done" %var)
+                logger.debug("%s checking is done" %var)
             
                             
             if var == "GBAGeslacht":
@@ -54,7 +55,7 @@ def checking(df, PI):
                         logger.warning("%s type has to be string" %var)
                         if value != 1 or value != 2:
                             logger.warning("%s has to be 1 or 2" %var)
-                logger.info("%s checking is done" %var)
+                logger.debug("%s checking is done" %var)
             
                             
             if var == "GBAPostcode":
@@ -65,7 +66,7 @@ def checking(df, PI):
                         logger.warning("%s type has to be string" %var)
                         if len(value) != 6:
                             logger.warning("%s length has to be 6" %var)
-                logger.info("%s checking is done" %var)
+                logger.debug("%s checking is done" %var)
             
                             
             if var == "GBAHuisnummer":
@@ -76,7 +77,7 @@ def checking(df, PI):
                         logger.warning("%s type has to be string" %var)
                         if len(value) < 5:
                             logger.warning("%s length has to be less 5" %var)
-                logger.info("%s checking is done" %var)
+                logger.debug("%s checking is done" %var)
             
                             
             if var == "GBAToev":
@@ -87,7 +88,7 @@ def checking(df, PI):
                         logger.warning("%s type has to be string" %var)
                         if len(value) < 7:
                             logger.warning("%s length has to be less 7" %var)
-                logger.info("%s checking is done" %var)
+                logger.debug("%s checking is done" %var)
             
                 
         else:

@@ -1,0 +1,19 @@
+input: {
+    host: "/Users/changsun/GoogleDrive/VWData P8/Infrastructure/Infra_Installation/DataSharing_Repo_Branches/DataSharing_Web/DataPartyStation/input",
+    container: "/input"
+    }
+
+output: {
+    host: "/Users/changsun/GoogleDrive/VWData P8/Infrastructure/Infra_Installation/DataSharing_Repo_Branches/DataSharing_Web/DataPartyStation/output",
+    container: "/output"
+    }
+
+inputVolume: {
+    volumeName: "inputVolume",
+    pathContainer: "/inputVolume",
+        
+    pathWebhost: "/inputVolume",
+    pathEncDataInput: "encrypt_input.yaml",
+    pathOverviewInput: "request.yaml",
+    pathSignModelInput: "sign_model_input.yaml"
+    }
