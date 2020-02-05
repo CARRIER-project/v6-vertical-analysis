@@ -9,13 +9,9 @@ logger = rlog.get_logger(__name__)
 
 #read input file
 try:
-<<<<<<< HEAD
     with open(r'/inputVolume/security_input.yaml') as file:
-=======
-    with open(r'/input/security_input.yaml') as file:
->>>>>>> 570086569db26e0a46968d3436e9eba76fa6fef8
         inputYAML = yaml.load(file, Loader=yaml.FullLoader)
-        logger.info("Reading request.yaml file...")
+        logger.debug("Reading request.yaml file...")
 
     parties = inputYAML['parties']
     modelNames = inputYAML["modelNames"]
@@ -98,7 +94,6 @@ else:
         verified_models = []
 
         for i in range(0, len(verifyBase64_list)):
-<<<<<<< HEAD
             try:
                 verify_key_model = nacl.signing.VerifyKey(verifyBase64_list[i], encoder=nacl.encoding.Base64Encoder)
                 #read signed model file
@@ -111,19 +106,6 @@ else:
                 logger.error("%s model verification failed." %str(i))
                 sys.exit("Execution interrupted!")
 
-=======
-            # try:
-            verify_key_model = nacl.signing.VerifyKey(verifyBase64_list[i], encoder=nacl.encoding.Base64Encoder)
-
-            #read signed model file
-            with open(modelFile_list[i], 'rb') as m_file:
-                myModel = m_file.read()
-
-            #verify-model
-            verified_models.append(utilities.verify_models(myModel, verify_key_model))
-            # except:
-            #     logger.error("%s model verification failed." %str(i))
->>>>>>> 570086569db26e0a46968d3436e9eba76fa6fef8
             
         if all(m == verified_models[0] for m in verified_models):
             logger.info("Signed models has been verified successfully!")
@@ -156,11 +138,7 @@ else:
         for p in parties:
             keys = inputYAML["%sModelKey" %(p)]
             temp.append(keys[i])
-<<<<<<< HEAD
             modelPath.append("%s_%s.enc" %(p,modelNames[i]))
-=======
-            modelPath.append("/%s_%s.enc" %(p,modelNames[i]))
->>>>>>> 570086569db26e0a46968d3436e9eba76fa6fef8
         modelKeys.update({modelNames[i]:temp})
         modelFileNames.update({modelNames[i]:modelPath})
 

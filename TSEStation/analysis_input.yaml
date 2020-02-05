@@ -20,7 +20,7 @@ basic_Information: true
 correlation_matrix: true
 
 ### Plot distribution figure (true or false) ###
-Distribution_Plot: true
+distribution_plot: true
 # If set up controlled variables when you plot distribution figure #
 control_var: false
 

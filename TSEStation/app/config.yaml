@@ -13,6 +13,6 @@ inputVolume: {
     pathContainer: "/inputVolume",
         
     pathWebhost: "/inputVolume",
-    pathSecurityInput: "security_input.yaml"
-    # pathAnalysisInput: "analysis_input.yaml"
+    pathSecurityInput: "security_input.yaml",
+    pathAnalysisInput: "analysis_input.yaml"
     }

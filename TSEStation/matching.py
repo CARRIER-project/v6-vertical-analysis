@@ -9,11 +9,7 @@ logger = rlog.get_logger(__name__)
 
 #read input file
 try:
-<<<<<<< HEAD
     with open(r'/inputVolume/security_input.yaml') as file:
-=======
-    with open(r'/input/security_input.yaml') as file:
->>>>>>> 570086569db26e0a46968d3436e9eba76fa6fef8
         inputYAML = yaml.load(file, Loader=yaml.FullLoader)
         logger.info("Reading request.yaml file...")
 except FileNotFoundError:
@@ -64,23 +60,29 @@ else:
                         no_match.append(i)
 
                 # Report matches #   
-                logger.info('Matching result - Exact {exNum}'.format(exNum=len(exact_match)))
-                logger.info('Matching result - Multi {mulNum}'.format(mulNum=len(multi_match)))
-                logger.info('Matching result - None {noNum}'.format(noNum=len(no_match)))
-                logger.info("Multi-matching array: {array} ".format(array=str(multi_match_number)))
+                logger.debug('Matching result - Exact {exNum}'.format(exNum=len(exact_match)))
+                logger.debug('Matching result - Multi {mulNum}'.format(mulNum=len(multi_match)))
+                logger.debug('Matching result - None {noNum}'.format(noNum=len(no_match)))
+                logger.debug("Multi-matching array: {array} ".format(array=str(multi_match_number)))
 
                 # Link and combine actual data with person identifiers #
                 combined_df = pd.concat([combined_df.loc[exact_match], dataset_list[order[item]].loc[exact_match]], axis=1, join='inner')
-        if len(exact_match) > 0:
-            logger.debug('Features in combined dataset are saved locally')
-            cmb_col = list(combined_df.columns)
-            with open('/output/CombinedFeatures.txt', 'w') as f:
-                for item in cmb_col:
-                    f.write("%s\n" % item)
 
-            # Save file #
-            combined_df.to_csv('/data/act_data.csv')
-            logger.info("Matching and linking took {runtime:.4f}s to run.".format(runtime=(time.time() - start_time)))
+        if len(exact_match) > 0:
+            # Restrict analysis if exact match is less than 100 #
+            if len(exact_match) < 100:
+                logger.warning("The number of exact-matched instances is less than 100!!")
+                sys.exit("Due to priavcy concerns, execution is interrupted here. Please provide datasets which have more common instances!")
+            else:
+                cmb_col = list(combined_df.columns)
+                with open('/output/CombinedFeatures.txt', 'w') as f:
+                    for item in cmb_col:
+                        f.write("%s\n" % item)
+
+                # Save file #
+                combined_df.to_csv('/data/act_data.csv')
+                logger.debug('Features in combined dataset are saved locally')
+                logger.info("Matching and linking took {runtime:.4f}s to run.".format(runtime=(time.time() - start_time)))
             
         else:
-            logger.info('No records have been exactly matched so that no combined dataset is generated!!')
+            logger.error('No records have been exactly matched so that no combined dataset is generated!!')

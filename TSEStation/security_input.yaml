@@ -10,13 +10,13 @@ parties:
 receiver_url: false
 
 ### Please give the correct (data) keys for each data party ###
-dmsfileUUID: "dc450aed-68f8-44f4-a5b5-dc0380d73f2e"
-dmsencryptKey: "TJlyq4x6ZgjzcBO2zSR1/pVkYaYMB/XPNkRcw5Y9LiI="
-dmsverifyKey: "udOScjAiil2zncEoMyLVvOu5rQwd/gcmSlTzO2NIZis="
+dmsfileUUID: "7541057e-094b-42bb-895e-ab80a174b27c"
+dmsencryptKey: "6xzBSrO4q/JN6TckNPY1vBHk0LBypyQlK8/nuXmoQ5U="
+dmsverifyKey: "j1XkMs4ay87ikTijK6ERI4VB91jDtSPch9tadKGk1wQ="
 
-cbsfileUUID: "c857569b-4e6d-4b7a-9bda-97a57b3c4ea3"
-cbsencryptKey: "LkNEwN+Y2WQatbEq0c8nx88ql4Qs/hApgHcESmkCYGQ="
-cbsverifyKey: "G+F18sftO4ypfcOYGTCSdrgBN8SSUXz/z9YuAsL1Peo="
+cbsfileUUID: "22b48faa-ffb5-48b8-913b-aca87ddec6a3"
+cbsencryptKey: "ZhAMFecZ7RGF1Cifn+dBUkh8f7/EdWqvKx5PT4mQnDI="
+cbsverifyKey: "PVKUVs45lpPi+DbLWj1HvT/aJzLPrb8eg2/Yuxx+B7c="
 
 
 ### Input the modelID and verification keys of the model file from all parties ###
@@ -25,7 +25,7 @@ modelNames:
     - MLmodel_test.py
 
 dmsModelKey: 
-    - nUisqiNNJV4c2fIPCHwgycOI7X+s1dw8h7j9VEsyHjw=
+    - bZjmS9NcOMA4JuQ7Sl5RbnGe3aP4KYHqciOcIWnblFg=
 cbsModelKey: 
-    - dfwwJVaFK1A89l351WrS4YfRR6ewFfBz0v9rSpmt+qg=
+    - 3NWxrxzoFhsImPgYBU1IG/YfeVo9T4U509RtCzw7GuI=
 
