@@ -6,6 +6,8 @@ RUN mkdir /data
 
 RUN mkdir /models
 
+RUN mkdir /inputVolume
+
 RUN mkdir /output
 
 COPY run.py run.py
