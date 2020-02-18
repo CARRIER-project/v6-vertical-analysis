@@ -4,6 +4,7 @@ start_time = time.time()
 import json, yaml, sys
 import shutil
 import requests
+import pp_enc
 import redacted_logging as rlog
 logger = rlog.get_logger(__name__)
 
@@ -70,8 +71,16 @@ else:
     import nacl.encoding
     import base64
 
+    privateKeys = {
+        "dms": pp_importKey("/privateDMS.pem"),
+        "cbs": pp_importKey("/privateCBS.pem")
+    }
+
     ### run decryption and verification on data files ###
-    def verify_and_decrypt(verifyBase64, decryptKey, encFile, newFile):
+    def verify_and_decrypt(verifyBase64, decryptKey, encFile, newFile, privateKey):
+        verifyBase64 = pp_decrypt(verifyBase64, privateKey)
+        decryptKey = pp_decrypt(decryptKey, privateKey)
+
         #create signing key
         verify_key = nacl.signing.VerifyKey(verifyBase64, encoder=nacl.encoding.Base64Encoder)
 
@@ -121,7 +130,7 @@ else:
     try:
         for p in parties:
             logger.debug('Verifying %s' %p)
-            verify_and_decrypt(inputYAML["%sverifyKey" %(p)], inputYAML["%sencryptKey" %(p)], '/data/%sData.enc' %(p), "/data/encrypted_%s.csv" %(p) )
+            verify_and_decrypt(inputYAML["%sverifyKey" %(p)], inputYAML["%sencryptKey" %(p)], '/data/%sData.enc' %(p), "/data/encrypted_%s.csv" %(p), privateKeys[p] )
         logger.debug("Your signiture is verified and datasets are decrypted!")
     except:
         logger.error("Verification and decrption failed. Please check all your keys")
