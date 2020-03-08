@@ -10,6 +10,8 @@ RUN mkdir /inputVolume
 
 RUN mkdir /output
 
+COPY pp_enc.py pp_enc.py
+
 COPY run.py run.py
 
 RUN pip install \

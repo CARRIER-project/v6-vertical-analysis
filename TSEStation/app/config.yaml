@@ -1,10 +1,10 @@
 input: {
-    host: "/Users/changsun/GoogleDrive/VWData P8/Infrastructure/Infra_Installation/DataSharing_Repo_Branches/DataSharing_Web/TSEStation/input",
+    host: "/Users/changsun/Google Drive/VWData P8/Infrastructure/Infra_Installation/DataSharing_Repo_Branches/DataSharing_web/TSEStation/input",
     container: "/input"
     }
 
 output: {
-    host: "/Users/changsun/GoogleDrive/VWData P8/Infrastructure/Infra_Installation/DataSharing_Repo_Branches/DataSharing_Web/TSEStation/output",
+    host: "/Users/changsun/Google Drive/VWData P8/Infrastructure/Infra_Installation/DataSharing_Repo_Branches/DataSharing_web/TSEStation/output",
     container: "/output"
     }
 
