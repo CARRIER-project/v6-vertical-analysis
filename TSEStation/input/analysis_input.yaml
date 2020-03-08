@@ -20,7 +20,7 @@ basic_Information: true
 correlation_matrix: true
 
 ### Plot distribution figure (true or false) ###
-Distribution_Plot: true
+distribution_plot: true
 # If set up controlled variables when you plot distribution figure #
 control_var: false
 
@@ -28,7 +28,7 @@ control_var: false
 task: regression
 
 ### Give a name of this task ###
-taskName: Training_20200103
+taskName: Training_20200308
 
 ### Give the evalaution methods (the same as sklearn names)
 evaluation_methods: 

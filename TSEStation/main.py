@@ -26,11 +26,11 @@ except FileNotFoundError:
 
 try:
     ### Read json file ###
-    with open(r'analysis_input.yaml') as file:
+    with open(r'/inputVolume/analysis_input.yaml') as file:
         inputYAML = yaml.load(file, Loader=yaml.FullLoader)
-        logger.info("Reading request.yaml file...")
+        logger.debug("Reading analysis_input.yaml file...")
 except FileNotFoundError:
-    logger.error("Please provide your analysis input file and mount to the container. '-v $(pwd)/*YOURINPUT.json*:/analysis_input.json' ")
+    logger.error("Please provide your analysis input file and mount to the container. '-v $(pwd)/*YOURINPUT.yaml*:/analysis_input.yaml' ")
 
 else:
     ### Select variables ###
@@ -112,7 +112,7 @@ else:
     ######################################
     ### Function for distribution plot ###
     ######################################
-    dist_plot = inputYAML["Distribution_Plot"]
+    dist_plot = inputYAML["distribution_plot"]
     if dist_plot == True:
         if ctrl_var == False:
             # ### Write to tables (generated too many numbers) ###

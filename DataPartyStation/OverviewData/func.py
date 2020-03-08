@@ -50,14 +50,14 @@ def check_missing(df, col, file):
         os.makedirs(os.path.dirname(outputFile), exist_ok=True)
         sort_table.to_csv(outputFile)
         logger.info('Check missing outcome is saved to output/%s_missings.csv' %file)
-    logger.info('Missing values check is done!')
+    logger.debug('Missing values check is done!')
 
 def data_describe(df, col, file):
     outputFile = 'output/%s_describe.csv' %file
     os.makedirs(os.path.dirname(outputFile), exist_ok=True)
     df.describe().to_csv(outputFile)
     logger.info('There is %d rows and %d columns' %(len(df), len(col)))
-    logger.info('Data description is done!')
+    logger.debug('Data description is done!')
 
 ###########################################
 ### Function for plot Correlation Matrix ##
@@ -83,7 +83,7 @@ def corr_Matrix(df, file):
     filename = 'output/Output_CM/%s.png' %file
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     plt.savefig(filename)
-    logger.info('Correlation Matrix plot is done')
+    logger.debug('Correlation Matrix plot is done')
     plt.clf()
 
 
@@ -154,7 +154,7 @@ def dist_Plot (df,featureName,file):
     filename = "output/Output_Dist/%s_%s.html" %(file,featureName)
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     save(p, filename=filename)
-    logger.info('%s - Distribution plot is done' %featureName)
+    logger.debug('%s - Distribution plot is done' %featureName)
 
 ##########################################
 ######## Function for box plot ###########
@@ -189,7 +189,7 @@ def box_Plot(df, featureSet, file, catFea):
         filename = "output/Output_BoxPlot/%s.png" %(file_N)
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         plt.savefig(filename)
-        logger.info('%s - box plot is done' %filename)
+        logger.debug('%s - box plot is done' %filename)
         plt.clf()
 
 ##########################################
@@ -222,7 +222,7 @@ def plot_catNum(df,featureSet,file, catFea):
         filename = "output/Output_CatNum/%s.png" %(file_N)
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         p.savefig(filename)
-        logger.info('Categorical-numerical features plot is done')
+        logger.debug('Categorical-numerical features plot is done')
         plt.clf()
 
 
@@ -260,5 +260,5 @@ def plot_numNum(df,featureSet,file, catFea):
         filename = "output/Output_NumNum/%s.png" %(file_N)
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         p.savefig(filename)
-    logger.info('Numerical-numerical features plot is done')
+    logger.debug('Numerical-numerical features plot is done')
     plt.clf()

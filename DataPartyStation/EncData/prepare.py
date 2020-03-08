@@ -9,9 +9,9 @@ import redacted_logging as rlog
 logger = rlog.get_logger(__name__)
 
 try:
-    with open(r'encrypt_input.yaml') as file:
+    with open(r'/inputVolume/encrypt_input.yaml') as file:
         inputYAML = yaml.load(file, Loader=yaml.FullLoader)
-        logger.info("Reading encrypt_input.yaml file...")
+        logger.debug("Reading encrypt_input.yaml file...")
 except FileNotFoundError:
     logger.error("Cannot find the encrypt_input.yaml! ")
 else:
@@ -50,7 +50,7 @@ else:
         if inputYAML['check_format'] == True:
             checkFormat.checking(df, PI)
         else:
-            logger.info("You did not check format of linking features which might cause mis-matchings!")
+            logger.warning("You did not check format of linking features which might cause mis-matchings!")
 
         try:
             hashedPI = []

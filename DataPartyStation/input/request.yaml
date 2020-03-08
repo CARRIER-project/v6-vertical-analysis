@@ -4,7 +4,7 @@
 data_file: data_party_1.csv
 
 # The delimiter of your data file #
-delimiter: '[,;]'
+delimiter: ','
 
 # Give the column name of the features you want to have an overview #
 # If you input ALL, then all featuers will be included excluding the excluded_features#
@@ -50,12 +50,6 @@ Cat_Num_feature: false
 ### Plot for numerical-numerical features (true or false) #
 ### First: x-axis (numerical), Second: y-axis (numerical) ###
 ### Third: target feature (caterical) ###
-Num_Num_Plot: true
+Num_Num_Plot: false
 # If True, which features (column names) #
-Num_Num_feature: 
-    - - var1
-      - var2
-    - - var3
-      - var4
-    - - var5
-      - var6
+Num_Num_feature: false

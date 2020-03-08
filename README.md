@@ -1,5 +1,3 @@
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3635839.svg)](https://doi.org/10.5281/zenodo.3635839)
-
 ## FAIRHealth Project: Privacy-Preserving Distributed Learning Infrastructure (PPDL)
 
 ### Introduction ###
@@ -47,95 +45,109 @@ Software:
 
 1. **Install base containers:** in all data stations (data parties and Trusted Secure Environment), a basic container needs to to installed. In your terminal: 
 
-``` powershell
-docker pull sophia921025/datasharing_base:v0.1
-```
+   ```shell
+   docker pull sophia921025/datasharing_base:v0.1
+   ```
 
-2. **Get an overview of data:** At each data party station, create a folder, put ***data file*** and ***request.yaml*** into this folder. Configure ***request.yaml*** based on the overview of data you need. In your terminal, 
+   
 
-```powershell
-docker pull sophia921025/datasharing_overview:v0.1
-```
+2. **Get an overview of data:** At each data party station, create a folder, put ***data file*** and ***request.yaml*** into this folder. Configure ***request.yaml*** based on the overview of data you need. In the folder which contains ***data file*** and ***request.yaml***, Mac/Linux run: (please change the third line "data_party_1.csv" to the name of your own data file.)
 
-​		In the folder which contains ***data file*** and ***request.yaml***, Mac/Linux run: (please change the third line "data_party_1.csv" to the name of your own data file.)
+   ```shell
+   docker run --rm \
+   -v "$(pwd)/input/request.yaml:/inputVolume/request.yaml" \
+   -v "$(pwd)/input/data_party_1.csv:/data_party_1.csv" \
+   -v "$(pwd)/output:/output" sophia921025/datasharing_overview:local0.1
+   ```
 
-```powershell
-docker run --rm \
--v "$(pwd)/request.yaml:/request.yaml" \
--v "$(pwd)/data_party_1.csv:/data_party_1.csv" \
--v "$(pwd)/output:/output" sophia921025/datasharing_overview:v0.1
-```
+   Windows run (please change the third line "data_party_1.csv" to the name of your own data file.)
 
-​		Windows run (please change the third line "data_party_1.csv" to the name of your own data file.)
+   ```shell
+   docker run --rm \
+   -v "%cd%/input/request.yaml:/inputVolume/request.yaml" \ 
+   -v "%cd%/input/data_party_1.csv:/data_party_1.csv" \ 
+   -v "%cd%/output:/output" sophia921025/datasharing_overview:local0.1
+   ```
 
-```powershell
-docker run --rm \
--v "%cd%/request.yaml:/request.yaml" \ 
--v "%cd%/data_party_1.csv:/data_party_1.csv" \ 
--v "%cd%/output:/output" sophia921025/datasharing_overview:v0.1
-```
+   
 
-3. **Pseudonymization and encryption**: to pseudonymize the personal identifiers (PI) for linking multiple datasets, and encrypt the data files (pseudonymized PI + actual data). Go to the folder which contains ***data file*** and ***encrypt_input.yaml***. Please configure ***encrypt_input.yaml*** first. Then in the terminal (Mac/Linux): (please change the second line "data_party_1.csv" to the name of your own data file.)
+3. Generate public-priavte keys for encryption and verficiation keys transferring. 
 
-```powershell
-docker run --rm \
--v "$(pwd)/data_party_1.csv:/data_party_1.csv" \
--v "$(pwd)/encrypt_input.yaml:/encrypt_input.yaml" \
--v "$(pwd)/output:/output" sophia921025/datasharing_encdata:v0.1
-```
+   ```shell
+   docker run --rm \
+   -v "$(pwd)/input/ppkeys_input.yaml:/inputVolume/ppkeys_input.yaml" \
+   -v "$(pwd)/output:/output" sophia921025/datasharing_ppkeys:local0.1
+   ```
 
-Windows (please change the second line "data_party_1.csv" to the name of your own data file.):
+   
 
-```powershell
-docker run --rm \
--v "%cd%/data_party_1.csv:/data_party_1.csv" \
--v "%cd%/encrypt_input.yaml:/encrypt_input.yaml" \
--v "%cd%/output:/output" sophia921025/datasharing_encdata:v0.1
-```
+4. Pseudonymization and encryption**: to pseudonymize the personal identifiers (PI) for linking multiple datasets, and encrypt the data files (pseudonymized PI + actual data). Go to the folder which contains ***data file*** and ***encrypt_input.yaml***. Please configure ***encrypt_input.yaml*** first. Then in the terminal (Mac/Linux): (please change the second line "data_party_1.csv" to the name of your own data file.)
+
+   ```shell
+   docker run --rm \
+   -v "$(pwd)/input/data_party_1.csv:/data_party_1.csv" \
+   -v "$(pwd)/input/publicKey_dms.pem:/publicKey.pem" \
+   -v "$(pwd)/input/encrypt_input.yaml:/inputVolume/encrypt_input.yaml" \
+   -v "$(pwd)/output:/output" sophia921025/datasharing_encdata:local0.1
+   ```
+
+   Windows (please change the second line "data_party_1.csv" to the name of your own data file.):
+
+   ```shell
+   docker run --rm \
+   -v "%cd%/input/data_party_1.csv:/data_party_1.csv" \
+   -v "%cd%/input/encrypt_input.yaml:/inputVolume/encrypt_input.yaml" \
+   -v "%cd%/output:/output" sophia921025/datasharing_encdata:local0.1
+   ```
+
+   
 
 After successful execution, your encrypted data file and key file (keys.json) will be stored locally/to the server (e.g., trusted third party, trusted secure environment).
 
-4. Sign your model file (python script) by all data parties. Create a folder where contains ***your_model.py*** and ***encrypt_input.yaml*** (need to be configured). Then in the terminal, Mac/Linux (please change the second line "your_model.py" to the name of your own model file): 
+5. Sign your model file (python script) by all data parties. Create a folder where contains ***your_model.py*** and ***encrypt_input.yaml*** (need to be configured). Then in the terminal, Mac/Linux (please change the second line "your_model.py" to the name of your own model file): 
 
-```powershell
-docker run --rm \
--v "$(pwd)/your_model.py:/your_model.py" \
--v "$(pwd)/encrypt_input.yaml:/encrypt_input.yaml" \
--v "$(pwd)/output:/output" sophia921025/datasharing_signmodel:v0.1
-```
+   ```shell
+   docker run --rm \
+   -v "$(pwd)/input/MLmodel_test.py:/MLmodel_test.py" \
+   -v "$(pwd)/input/sign_model_input.yaml:/inputVolume/sign_model_input.yaml" \
+   -v "$(pwd)/output:/output" datasharing_signmodel:local0.1
+   ```
 
-Windows (please change the second line "your_model.py" to the name of your own model file): 
+   Windows (please change the second line "your_model.py" to the name of your own model file): 
 
-```powershell
-docker run --rm \
--v "%cd%/your_model.py:/your_model.py" \
--v "%cd%/encrypt_input.yaml:/encrypt_input.yaml" \
--v "%cd%/output:/output" sophia921025/datasharing_signmodel:v0.1
-```
+   ```shell
+   docker run --rm \
+   -v "%cd%/input/your_model.py:/your_model.py" \
+   -v "%cd%/input/encrypt_input.yaml:/inputVolume/encrypt_input.yaml" \
+   -v "%cd%/output:/output" sophia921025/datasharing_signmodel:local0.1
+   ```
 
+   
 
+6. At **Trusted Secure Environment (TSE)**, create a folder, put ***encrypted data files*** from data parties, ***security_input.yaml***, and ***analysis_input.yaml***, and your ***analysis python script*** (ML models) into this folder. Configure ***security_input.yaml*** based on the keys from data parties, and ***analysis_input.yaml*** based on your analysis requirements. In your terminal:
 
-5. At **Trusted Secure Environment (TSE)**, create a folder, put ***encrypted data files*** from data parties, ***security_input.yaml***, and ***analysis_input.yaml***, and your ***analysis python script*** (ML models) into this folder. Configure ***security_input.yaml*** based on the keys from data parties, and ***analysis_input.yaml*** based on your analysis requirements. In your terminal:
+   Mac/Linux:
 
-Mac/Linux:
+   ```shell
+   docker run --rm \
+   -v "$(pwd)/input:/input" \
+   -v "$(pwd)/output:/output" \
+   -v "$(pwd)/input/security_input.yaml:/inputVolume/security_input.yaml" \
+   -v "$(pwd)/input/analysis_input.yaml:/inputVolume/analysis_input.yaml" \
+   sophia921025/datasharing_tse:v0.1
+   ```
 
-```powershell
-docker run --rm \
--v "$(pwd)/input:/input" \
--v "$(pwd)/output:/output" \
--v "$(pwd)/input/security_input.yaml:/inputVolume/security_input.yaml" \
-sophia921025/datasharing_tse:v0.1
-```
+   Windows:
 
-Windows:
+   ```shell
+   docker run --rm \
+   -v "%cd%/input:/input" \
+   -v "%cd%/output:/output" \
+   -v "%cd%/input/security_input.yaml:/inputVolume/security_input.yaml" \
+   sophia921025/datasharing_tse:v0.1
+   ```
 
-```powershell
-docker run --rm \
--v "%cd%/input:/input" \
--v "%cd%/output:/output" \
--v "%cd%/input/security_input.yaml:/inputVolume/security_input.yaml" \
-sophia921025/datasharing_tse:v0.1
-```
+   
 
 If Docker container runs properly, you will see execution logs as below. In the end, all results and logging histories (***ppds.log***) are stored in the ***output*** folder. To avoid data leakage from error shooting, if errors occur during executions, the error messages will saved in the ***ppds.log*** instead of printing out on the screen.
 

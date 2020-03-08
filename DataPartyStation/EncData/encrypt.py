@@ -12,15 +12,16 @@ from PQencryption.symmetric_encryption import salsa20_256_PyNaCl
 from PQencryption import utilities
 import nacl.encoding
 import base64
+import pp_enc
 
 import redacted_logging as rlog
 logger = rlog.get_logger(__name__)
 
 try:
     #read input file
-    with open(r'encrypt_input.yaml') as file:
+    with open(r'/inputVolume/encrypt_input.yaml') as file:
         inputYAML = yaml.load(file, Loader=yaml.FullLoader)
-        logger.info("Reading encrypt_input.yaml file...")
+        logger.debug("Reading encrypt_input.yaml file...")
 except FileNotFoundError:
     logger.error("Cannot find encrypt_input.yaml file ")
 
@@ -132,11 +133,16 @@ else:
             except:
                 logger.error("Failed to save or send files for TSE")
             else:
+                
+                # Load the public key
+                publicKey = pp_enc.pp_importKey(inputYAML['pubkey_path'])
+
                 ### Save keys files in output folder ###
                 result = {
                     "%sfileUUID" %(fileStr): saved_uuid,
-                    "%sencryptKey" %(fileStr): encryptionKeyBase64.decode('ascii'),
-                    "%sverifyKey" %(fileStr): verifyBase64.decode('ascii')
+                    "%sencryptKey" %(fileStr): pp_enc.pp_encrypt(encryptionKeyBase64.decode('ascii'), publicKey),
+                    "%sverifyKey" %(fileStr): pp_enc.pp_encrypt(verifyBase64.decode('ascii'), publicKey)
+
                 }
                 with open('output/%s_data_keys.json' %(fileStr), 'w') as fp:
                     json.dump(result, fp)

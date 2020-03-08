@@ -3,7 +3,7 @@
 party_name: cbs
 
 # Path to your data file #
-data_file: data_party_1.csv
+data_file: data_file.csv
 delimiter: ','
 
 # Input the salt which is agreed on by all data parties #
@@ -26,3 +26,6 @@ local_save: true
 # Send the encrypted file to a server (URL), then set "receiver_address" as true #
 # Set "local_save" as false
 receiver_address: false
+
+# Path to your public key #
+pubkey_path: publicKey.pem
