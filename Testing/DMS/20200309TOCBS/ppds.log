@@ -1,5 +1,0 @@
-DEBUG    ░ 2020-03-09 07:37:37,770 ░ __main__ ░ encrypt.py line 24 ▓ Reading encrypt_input.yaml file...
-INFO     ░ 2020-03-09 07:37:37,841 ░ __main__ ░ encrypt.py line 131 ▓ Encrypted data is successfully saved at local machine.
-INFO     ░ 2020-03-09 07:37:37,842 ░ __main__ ░ encrypt.py line 132 ▓ UUID: cfc9ef64-44a8-422f-a749-a4343d1d61ff
-INFO     ░ 2020-03-09 07:37:37,853 ░ __main__ ░ encrypt.py line 150 ▓ Your data keys are stored in output folder
-INFO     ░ 2020-03-09 07:37:37,854 ░ __main__ ░ encrypt.py line 161 ▓ Data encryption program took 0.3285s to run

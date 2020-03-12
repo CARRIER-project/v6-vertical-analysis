@@ -9,3 +9,5 @@ local_save: true
 # Send the encrypted file to a server (URL), then set "receiver_address" as true #
 # Set "local_save" as false
 receiver_address: false
+
+# SophiaSophia!!!383842

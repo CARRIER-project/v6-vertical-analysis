@@ -1,6 +1,6 @@
 ### Please provide information to generate public-private keys ###
 # The name of your organization (has to start with letters)#
-party_name: cbs
+party_name: dms
 
 # Save the encrypted file locally, then set "local_save" as true # 
 # Set "receiver_address" as false #
