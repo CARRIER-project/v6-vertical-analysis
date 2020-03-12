@@ -1,0 +1,5 @@
+docker run --rm \
+-v "$(pwd)/input:/input" \
+-v "$(pwd)/output:/output" \
+-v "$(pwd)/input/security_input.yaml:/inputVolume/security_input.yaml" \
+-v "$(pwd)/input/analysis_input.yaml:/inputVolume/analysis_input.yaml" datasharing_tse:local0.1

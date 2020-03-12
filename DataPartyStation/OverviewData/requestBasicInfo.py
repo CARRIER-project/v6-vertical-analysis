@@ -43,7 +43,8 @@ else:
                 if excluded_features == False: 
                     col = df.columns
                 else:
-                    col = df.drop(excluded_features, axis=1).columns
+                    df = df.drop(excluded_features, axis=1)
+                    col = df.columns
             else:
                 col = selected_features
 

@@ -6,10 +6,8 @@ import requests, json, yaml, uuid,sys
 ####################################
 # encryption part
 ####################################
-from PQencryption.pub_key.pk_signature.quantum_vulnerable import signing_Curve25519_PyNaCl
-from PQencryption.pub_key.pk_encryption.quantum_vulnerable import encryption_Curve25519_PyNaCl
-from PQencryption.symmetric_encryption import salsa20_256_PyNaCl
-from PQencryption import utilities
+
+import PQencryption as cr
 import nacl.encoding
 import base64
 
@@ -20,9 +18,9 @@ try:
     #read input file
     with open(r'/inputVolume/sign_model_input.yaml') as file:
         inputYAML = yaml.load(file, Loader=yaml.FullLoader)
-        logger.debug("Reading encrypt_input.yaml file...")
+        logger.debug("Reading sign_model_input.yaml file...")
 except FileNotFoundError:
-    logger.error("Cannot find encrypt_input.yaml file ")
+    logger.error("Cannot find sign_model_input.yaml file ")
 
 else:
     party_name = inputYAML['party_name']
@@ -31,7 +29,7 @@ else:
 
     for m in model_files:
         try:
-            myModel = open(m, 'rb').read()
+            myModel = open('/inputVolume/'+m, 'r').read()
             
         except FileNotFoundError:
             logger.error("Cannot find model file %s" %str(m))
@@ -42,18 +40,18 @@ else:
         else:
             try:
                 ### create signing key for model files ###
-                signing_key_model, verify_key_model = signing_Curve25519_PyNaCl.key_gen()
-                verifyBase64_model = verify_key_model.encode(encoder=nacl.encoding.Base64Encoder)
-                
-                ### Sign the model file ###
-                signed_models = utilities.sign_models(myModel, signing_key_model)
+                path = '/inputVolume/'
+                signing_key = cr.import_key(path + inputYAML['signing_key'], silent=False)
+
+                from PQencryption.eddsa import EdDSA
+                signing_cipher = EdDSA(signing_key)
+                signed_models = signing_cipher.sign(myModel)
 
                 #save signed model file temporarily
-                wb_model_file = open("/models/%s.enc" %str(m), "wb")
+                wb_model_file = open("/models/%s.enc" %str(m), "w")
                 wb_model_file.write(signed_models)
                 wb_model_file.close()
 
-                verKey_list.append(verifyBase64_model.decode('ascii'))
 
             except:
                 logger.error("Signing model file {modelName} failed. ".format(modelName=str(m)))
@@ -65,7 +63,7 @@ else:
                 #############################################
                 try:
                     if inputYAML['local_save'] == True:
-                        output_model = open("/output/%s_%s.enc" %(party_name, m), "wb")
+                        output_model = open("/output/%s_%s.enc" %(party_name, m), "w")
                         output_model.write(signed_models)
                         output_model.close()
 
@@ -77,7 +75,7 @@ else:
                             model_files = inputYAML['model_files']
                             for m in model_files:
                                 res = requests.post(url=input_address+'/addFile',
-                                        files={"fileObj": open('/%s_%s.enc' %(party_name, m), 'rb')})
+                                        files={"fileObj": open('/%s_%s.enc' %(party_name, m), 'r')})
                 except:
                     logger.error("Failed to save or send files for TSE")
                     sys.exit("Execution interrupted!")
@@ -85,13 +83,6 @@ else:
     ##############################
     ### Save verification keys ###
     ##############################
-
-    model_verKeys = {}
-    model_files = inputYAML['model_files']
-    for i in range(0, len(verKey_list)):
-        model_verKeys.update({model_files[i] : verKey_list[i]})
-        with open('output/%s_%s_verKeys.json' %(party_name, model_files[i]), 'w') as fp:
-            json.dump(model_verKeys, fp)
     
     logger.info("Your model verification keys are stored in output folder!")
 

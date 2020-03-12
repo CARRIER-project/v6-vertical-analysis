@@ -1,4 +1,4 @@
-FROM datasharing_base:v0.1
+FROM datasharing_base:v1.0
 
 COPY verDec.py verDec.py
 COPY matching.py matching.py

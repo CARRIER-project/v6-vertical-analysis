@@ -1,139 +1,170 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Jul 13 08:46:20 CEST 2017
+""" Implementation examples for using the PQcrypto package.
 
-@author: BMMN
+Uncomment a function name under 'if __name__ == "__main__":' and run this
+script.
+
+See also test.py
 """
 
 from __future__ import print_function  # make print python3 compatible
 import gc  # garbage collection
 
-def example_hashing_hashlib():
-    from PQencryption.hashing import sha_512_hashlib
+def example_hashing():
+    import PQencryption as cr
+    print()
+    print()
+    print("=== example_hashing() ===")
+    print()
+
+    message = "This is a message. Hash me!"
+    print("message: " + message)
+
+    hashed = cr.hash512(message)
+    print("hashed:  " + hashed)
+
+    # make sure all memory is flushed after operations
+    del message
+    gc.collect()
+
+def example_salthashing():
+    import PQencryption as cr
+    print()
+    print()
+    print("=== example_salthashing() ===")
+    print()
     # In production the salt should come from a hardware random number generator
     # and will be shared between parties.
 
-    # Salt must be 128 bytes in hex.
+    # Salt must be 128 bytes in base64.
     salt = "a" * 128
 
     message = "This is a message. Hash me!"
-    print(message)
+    print("message:    " + message)
 
-    hashed = sha_512_hashlib.sha512_hash(salt, message)
-    print(hashed)
+    hashed = cr.salthash(salt, message)
+    print("salthashed: " + hashed)
 
     # make sure all memory is flushed after operations
     del salt
     del message
     gc.collect()
 
-def example_hashing_PyNaCl():
-    from PQencryption.hashing import sha_512_PyNaCl
-    # In production the salt should come from a hardware random number generator
-    # and will be shared between parties.
+def example_generate_keys():
+    import  PQencryption as cr
+    print()
+    print()
+    print("=== example_generate_keys() ===")
+    print()
 
-    # Salt must be 128 bytes in hex.
-    salt = "a" * 128
-
-    message = "This is a message. Hash me!"
-    print(message)
-
-    hashed = sha_512_PyNaCl.sha512_hash(salt, message)
-    print(hashed)
-
-    # make sure all memory is flushed after operations
-    del salt
-    del message
+    ciphers = [cr.AES256, cr.McBits, cr.Salsa20, cr.EdDSA, cr.DiffieHellman]
+    for cipher in ciphers:
+        cipher_name = str(cipher).split(".")[-1].split("'")[0]
+        print(cipher_name)
+        print(cipher.key_gen())
+        print()
+        del cipher
     gc.collect()
 
-def example_AES256():
-    from PQencryption.symmetric_encryption import aes_256_Crypto
-    from Crypto import Random
-    from Crypto.Cipher import AES
+def example_symmetric_block_encryption_AES256():
+    import PQencryption as cr
+    print()
+    print()
+    print("=== example_symmetric_block_encryption_AES256() ===")
+    print()
     # This in an example. In production, you would want to read the key from an
     # external file or the command line. The key must be 32 bytes long.
 
     # DON'T DO THIS IN PRODUCTION!
-    key = b'Thirtytwo byte key, this is long'
+    key = cr.AES256.key_gen()
 
-    # In production, you would want to have a hardware random number generator
-    # for this.
-    initialization_vector = Random.new().read(AES.block_size)
-
-    message = 'This is my message.'
+    message = "This is my message."
     print("message  : " + message)
-    my_cipher = aes_256_Crypto.AES256Cipher(key)
+
+    symmetric_cipher = cr.AES256(key)
 
     # encryption
-    my_encrypted_message = my_cipher.encrypt(message, initialization_vector)
+    # In production, make sure that pythons Crypto.Random has access to
+    # a hardware random number generator!
+    my_encrypted_message = symmetric_cipher.encrypt(message)
     print("encrypted: " + my_encrypted_message)
 
     # decryption
-    mydec = my_cipher.decrypt(my_encrypted_message)
-    print("decrypted: " + mydec)
-
-    # make sure all memory is flushed after operations
-    del key
-    del message
-    del mydec
-    gc.collect()
-
-def example_salsa20_256_PyNaCl():
-    from PQencryption.symmetric_encryption import salsa20_256_PyNaCl
-
-    # This in an example. In production, you would want to read the key from an
-    # external file or the command line. The key must be 32 bytes long.
-
-    # DON'T DO THIS IN PRODUCTION!
-    key = b'Thirtytwo byte key, this is long'
-
-    message = 'This is my message.'
-    print("message  : " + message)
-    my_cipher = salsa20_256_PyNaCl.Salsa20Cipher(key)
-
-    # encryption
-    my_encrypted_message = my_cipher.encrypt(message)
-    print("encrypted: " + my_encrypted_message)
-
-    # decryption
-    my_decrypted_message = my_cipher.decrypt(my_encrypted_message)
+    my_decrypted_message = symmetric_cipher.decrypt(my_encrypted_message)
     print("decrypted: " + my_decrypted_message)
 
     # make sure all memory is flushed after operations
     del key
     del message
+    del symmetric_cipher
     del my_decrypted_message
     gc.collect()
 
-def example_quantum_vulnerable_encryption():
-    from PQencryption.pub_key.pk_encryption.quantum_vulnerable import encryption_Curve25519_PyNaCl
-    from PQencryption import utilities
+def example_symmetric_streaming_encryption_salsa20():
+    import PQencryption as cr
+    print()
+    print()
+    print("=== example_symmetric_streaming_encryption_salsa20() ===")
+    print()
 
     # This in an example. In production, you would want to read the key from an
     # external file or the command line. The key must be 32 bytes long.
 
     # DON'T DO THIS IN PRODUCTION!
-    public_key_Alice, secret_key_Alice = \
-            utilities.generate_public_private_keys()
-    public_key_Bob, secret_key_Bob = \
-            utilities.generate_public_private_keys()
+    key = cr.Salsa20.key_gen()
 
-    message = 'This is my message.'
+    message = "This is my message."
     print("message  : " + message)
 
+    symmetric_cipher = cr.Salsa20(key)
+
+    # encryption
+    my_encrypted_message = symmetric_cipher.encrypt(message)
+    print("encrypted: " + my_encrypted_message)
+
+    # decryption
+    my_decrypted_message = symmetric_cipher.decrypt(my_encrypted_message)
+    print("decrypted: " + my_decrypted_message)
+
+    # make sure all memory is flushed after operations
+    del key
+    del message
+    del symmetric_cipher
+    del my_decrypted_message
+    gc.collect()
+
+def example_classic_pubkey_encryption():
+    import PQencryption as cr
+    print()
+    print()
+    print("=== example_classic_pubkey_encryption() ===")
+    print()
+
+    # This in an example. In production, you would want to read the key from an
+    # external file or the command line. The key must be 32 bytes long.
+
+    # DON'T DO THIS IN PRODUCTION!
+    secret_key_Alice, public_key_Alice = cr.DiffieHellman.key_gen()
+    secret_key_Bob, public_key_Bob = cr.DiffieHellman.key_gen()
+
+    message = "This is my message."
+    print("message  :    " + message)
+
+    q_vuln_pubkey_cipher_Alice = cr.DiffieHellman(secret_key_Alice,
+            public_key_Bob)
+    q_vuln_pubkey_cipher_Bob = cr.DiffieHellman(secret_key_Bob,
+            public_key_Alice)
+
     # encrypting
-    encrypted = encryption_Curve25519_PyNaCl.encrypt(message,
-            secret_key_Alice, public_key_Bob)
-    print("encrypted: " + utilities.to_hex(encrypted))
+    encrypted = q_vuln_pubkey_cipher_Alice.encrypt(message)
+    print("encrypted:    " + encrypted)
 
     # decrypting
-    decrypted_BA = encryption_Curve25519_PyNaCl.decrypt(encrypted,
-            secret_key_Bob, public_key_Alice)
+    decrypted_BA = q_vuln_pubkey_cipher_Bob.decrypt(encrypted)
     print("decrypted_BA: " + decrypted_BA)
 
-    decrypted_AB = encryption_Curve25519_PyNaCl.decrypt(encrypted,
-            secret_key_Alice, public_key_Bob)
+    decrypted_AB = q_vuln_pubkey_cipher_Alice.decrypt(encrypted)
     print("decrypted_AB: " + decrypted_BA)
 
     # make sure all memory is flushed after operations
@@ -145,40 +176,114 @@ def example_quantum_vulnerable_encryption():
     del decrypted_AB
     gc.collect()
 
-def example_quantum_vulnerable_signing():
-    from PQencryption.pub_key.pk_signature.quantum_vulnerable import signing_Curve25519_PyNaCl
-    from PQencryption import utilities
+def example_quantum_safe_pubkey_encryption():
+    import PQencryption as cr
+    print()
+    print()
+    print("=== example_quantum_safe_pubkey_encryption() ===")
+    print()
+
     # This in an example. In production, you would want to read the key from an
     # external file or the command line. The key must be 32 bytes long.
 
     # DON'T DO THIS IN PRODUCTION!
-    signing_key, verify_key = utilities.generate_signing_verify_keys()
+    secret_key_Alice, public_key_Alice = cr.McBits.key_gen()
 
-    message = 'This is my message.'
-    print()
+    message = "This is my message."
     print("message  : " + message)
+
+    q_safe_pubkey_cipher_Bob = cr.McBits(public_key_Alice)
+    q_safe_pubkey_cipher_Alice = cr.McBits(secret_key_Alice)
+
+    # encrypting
+    encrypted = q_safe_pubkey_cipher_Bob.encrypt(message)
+    print("encrypted: " + encrypted)
+
+    # decrypting
+    decrypted = q_safe_pubkey_cipher_Alice.decrypt(encrypted)
+    print("decrypted: " + decrypted)
+
+    # make sure all memory is flushed after operations
+    del secret_key_Alice
+    del message
+    del decrypted
+    gc.collect()
+
+def example_export_import_keys():
+    import  PQencryption as cr
     print()
+    print()
+    print("=== example_export_import_keys() ===")
+    print()
+    print("====================================")
+    print("Sample password for copy&pasting:")
+    print("Aa0!asdfasdfasdfasdf")
+    print("====================================")
+
+    path = ".tmp/"
+    owner = "CBS"
+
+    # As an example, we use EdDSA signing keys. The syntax is the same for
+    # all other ciphers. Note that symmetric ciphers have only one key instead
+    # of two, the iteration through the key_objects is then not necessary.
+    key_objects = cr.EdDSA.key_gen()
+
+    for key_object in key_objects:
+        print()
+        print("Exporting key " + str(key_object))
+        print()
+        key_object.export_key(path, owner, force=True, silent=False)
+
+        print()
+        print("Importing key")
+        print()
+        file_name = key_object.name + "_" + owner + ".key"
+        imported_key = cr.import_key(path + file_name, silent=False)
+        print()
+        print("Key: " + str(imported_key))
+        print()
+        del imported_key
+    gc.collect()
+
+def example_quantum_vulnerable_signing():
+    import PQencryption as cr
+    print()
+    print()
+    print("=== example_quantum_vulnerable_signing() ===")
+    print()
+
+    # This in an example. In production, you would want to read the key from an
+    # external file or the command line. The key must be 32 bytes long.
+
+    # DON'T DO THIS IN PRODUCTION!
+    signing_key, verify_key = cr.EdDSA.key_gen()
+
+    message = "This is my message."
+    print()
+    print("message           : " + message)
 
     # signing
-    signed, verify_key = signing_Curve25519_PyNaCl.sign(signing_key,
-            message)
-    verify_key_hex = utilities.to_hex(str(verify_key))
-    print()
-    print("signed (will look garbled): " + signed)
-    print()
-    print("verify_key_hex: " + verify_key_hex)
-    print()
+    signing = cr.EdDSA(signing_key)
+    signed = signing.sign(message)
+
+    print("signed            : " + signed)
+
+    # In production, you would simply import the verify_key from a file:
+    # verify_key = cr.import(filename_with_path)
+    # Here, we have to jump through some hoops to make the key printable.
+    import nacl.encoding
+    print("verify_key_base64 : " + nacl.encoding.Base64Encoder.encode(bytes(verify_key.key)).decode("utf-8"))
 
     # verification
+    verifying = cr.EdDSA(verify_key)
     try:
-        print()
-        print("verification positive: " + verify_key.verify(signed))
+        print("verification positive: " + verifying.verify(signed))
         print()
         print("verification negative:")
         print("="*79)
         print("THIS WILL FAIL WITH AN ERROR, AS EXPECTED.")
         print("="*79)
-        print(verify_key.verify("0"*len(signed)))
+        print(verifying.verify("0"*len(signed)))
     except:
         raise
 
@@ -187,123 +292,153 @@ def example_quantum_vulnerable_signing():
         print("Yes, clean-up is still executed, even after raising errors:")
         print("begin cleanup ...")
         # make sure all memory is flushed after operations
-        del signing_key
-        del signed
         del message
+        del signing_key
+        del signing
+        del signed
         del verify_key
-        del verify_key_hex
+        del verifying
         gc.collect()
         print("... end cleanup.")
         print("="*79)
 
-def example_export_symmetric_key():
-    import nacl.encoding
-    from PQencryption import utilities
-    s_raw = utilities.generate_symmetric_key()
-    s = nacl.encoding.HexEncoder.encode(s_raw)
-    path = "."
-    s_header = ("# This is an encrypted symmetric key."
-            "KEEP IT PRIVATE!\n")
-    s_name = "_PRIVATE_symmetric_key_CBS"
-    utilities.export_key(s, path, s_name, s_header, key_type="SymmetricKey")
-    return path, s, s_name
-
-def example_export_public_key():
-    import nacl.encoding
-    from PQencryption import utilities
-    s_raw, v_raw = utilities.generate_signing_verify_keys()
-    s = s_raw.encode(encoder=nacl.encoding.HexEncoder)
-    v = v_raw.encode(encoder=nacl.encoding.HexEncoder)
-    path = "."
-    s_header = ("# This is an encrypted private signing key."
-            "KEEP IT PRIVATE!\n")
-    v_header = ("# This is a public verification key."
-            "Distribute it to your respondents.\n")
-    s_name = "_PRIVATE_signing_key_CBS"
-    v_name = "verify_key_CBS"
-    utilities.export_key(s, path, s_name, s_header, key_type="SigningKey")
-    utilities.export_key(v, path, v_name, v_header, key_type="VerifyKey")
-    return path, s, s_name, v, v_name
-
-def example_import_public_key(path, signing_key, s_name, verify_key, v_name):
-    import nacl.encoding
-    from PQencryption import utilities
-
-    print("="*79)
-    print("signing_key", signing_key)
-    print("verify_key", verify_key)
-    print("="*79)
+def example_sign_encrypt_sign_pubkey():
+    import PQencryption as cr
     print()
-    print("Importing signing key.")
-    imported_signing_key = utilities.import_key(path, s_name, "SigningKey")
-    print("Importing verify key.")
-    imported_verify_key = utilities.import_key(path, v_name, "VerifyKey")
-    print("="*79)
-    print("imported_signing_key", imported_signing_key.encode(
-        encoder=nacl.encoding.HexEncoder))
-    print("imported_verify_key", imported_verify_key.encode(
-        encoder=nacl.encoding.HexEncoder))
-    print("="*79)
-
-def example_import_symmetric_key(path, symmetric_key, s_name):
-    import nacl.encoding
-    from PQencryption import utilities
-
-    print("="*79)
-    print("symmetric_key", symmetric_key)
-    print("="*79)
     print()
-    print("Importing symmetric key.")
-    imported_symmetric_key = utilities.import_key(path, s_name, "SymmetricKey")
-    print("="*79)
-    print("imported_symmetric_key", nacl.encoding.HexEncoder.encode(
-        imported_symmetric_key))
-    print("="*79)
+    print("=== example_sign_encrypt_sign_pubkey() ===")
+    print()
 
-def example_generate_public_private_keys():
-    import nacl.encoding
-    from PQencryption import utilities
-    pu_raw, pr_raw = utilities.generate_public_private_keys()
-    public_key = pu_raw.encode(encoder=nacl.encoding.HexEncoder)
-    private_key = pr_raw.encode(encoder=nacl.encoding.HexEncoder)
-    print(public_key)
-    print(private_key)
+    # This in an example. In production, you would want to read the key from an
+    # external file or the command line. The key must be 32 bytes long.
 
-def example_generate_signing_verify_keys():
-    import nacl.encoding
-    from PQencryption import utilities
-    s_raw, v_raw = utilities.generate_signing_verify_keys()
-    signing_key = s_raw.encode(encoder=nacl.encoding.HexEncoder)
-    verify_key = v_raw.encode(encoder=nacl.encoding.HexEncoder)
-    print(signing_key)
-    print(verify_key)
+    # DON'T DO THIS IN PRODUCTION!
+    signing_key, verifying_key = cr.EdDSA.key_gen()
+    quantum_safe_secret_key, quantum_safe_public_key = cr.McBits.key_gen()
+    classic_secret_key_Alice, classic_public_key_Alice = \
+            cr.DiffieHellman.key_gen()
+    classic_secret_key_Bob, classic_public_key_Bob = \
+            cr.DiffieHellman.key_gen()
 
-def example_generate_symmetric_key():
-    from PQencryption import utilities
-    import nacl.encoding
-    s_raw = utilities.generate_symmetric_key()
-    symmetric_key = nacl.encoding.HexEncoder.encode(s_raw)
-    print(symmetric_key)
+    message = "This is my message."
+    print()
+    print("message                  : " + message)
+
+    ciphertext = cr.sign_encrypt_sign_pubkey(signing_key,
+            quantum_safe_public_key, classic_secret_key_Alice,
+            classic_public_key_Bob, message)
+
+    print()
+    print("signed, encrypted, signed: " + ciphertext)
+
+    try:
+        print()
+        print("decryption, verification positive: " \
+                + cr.verify_decrypt_verify_pubkey(verifying_key,
+            quantum_safe_secret_key, classic_secret_key_Bob,
+            classic_public_key_Alice, ciphertext))
+        print()
+        print("decryption, verification negative:")
+        print("="*79)
+        print("THIS WILL FAIL WITH AN ERROR, AS EXPECTED.")
+        print("="*79)
+        print(cr.verify_decrypt_verify_pubkey(verifying_key,
+            quantum_safe_secret_key, classic_secret_key_Bob,
+            classic_public_key_Alice, "0"*len(ciphertext)))
+    except:
+        raise
+
+    finally:
+        print("="*79)
+        print("Yes, clean-up is still executed, even after raising errors:")
+        print("begin cleanup ...")
+        # make sure all memory is flushed after operations
+        del message
+        del signing_key
+        del quantum_safe_secret_key
+        del classic_secret_key_Alice
+        del classic_secret_key_Bob
+        del verifying_key
+        del ciphertext
+        gc.collect()
+        print("... end cleanup.")
+        print("="*79)
+
+def example_sign_encrypt_sign_symmetric():
+    import PQencryption as cr
+    print()
+    print()
+    print("=== example_sign_encrypt_sign_pubkey() ===")
+    print()
+
+    # This in an example. In production, you would want to read the key from an
+    # external file or the command line. The key must be 32 bytes long.
+
+    # DON'T DO THIS IN PRODUCTION!
+    symmetric_encryption_key = cr.Salsa20.key_gen()
+    signing_key, verifying_key = cr.EdDSA.key_gen()
+
+    message = "This is my message."
+
+
+    print()
+    print("message                  : " + message)
+
+    ciphertext = cr.sign_encrypt_sign_symmetric(signing_key,
+            symmetric_encryption_key, message)
+
+    print()
+    print("signed, encrypted, signed: " + ciphertext)
+
+    try:
+        print()
+        print("decryption, verification positive: " \
+                + cr.verify_decrypt_verify_symmetric(verifying_key,
+                symmetric_encryption_key, ciphertext))
+
+        print()
+        print("decryption, verification negative:")
+        print("="*79)
+        print("THIS WILL FAIL WITH AN ERROR, AS EXPECTED.")
+        print("="*79)
+        print(cr.verify_decrypt_verify_symmetric(verifying_key,
+                symmetric_encryption_key, "0"*len(ciphertext)))
+    except:
+        raise
+
+    finally:
+        print("="*79)
+        print("Yes, clean-up is still executed, even after raising errors:")
+        print("begin cleanup ...")
+        # make sure all memory is flushed after operations
+        del message
+        del symmetric_encryption_key
+        del signing_key
+        del verifying_key
+        del ciphertext
+        gc.collect()
+        print("... end cleanup.")
+        print("="*79)
 
 if __name__ == "__main__":
-    #example_hashing_PyNaCl()
+#    example_hashing()
 
-    #example_hashing_hashlib()
+#    example_salthashing()
 
-    #example_AES256()
+#    example_symmetric_block_encryption_AES256()
 
-    #example_salsa20_256_PyNaCl()
+#    example_symmetric_streaming_encryption_salsa20()
 
-    #example_generate_public_private_keys()
+#    example_classic_pubkey_encryption()
 
-    #example_generate_signing_verify_keys()
+#    example_quantum_safe_pubkey_encryption()
 
-    #example_generate_symmetric_key()
+#    example_generate_keys()
 
-    #example_import_public_key(*example_export_public_key())
+#    example_export_import_keys()
 
-    #example_import_symmetric_key(*example_export_symmetric_key())
+#    example_quantum_vulnerable_signing()
 
-    #example_quantum_vulnerable_encryption()
+#    example_sign_encrypt_sign_pubkey()
 
-    #example_quantum_vulnerable_signing()
+#    example_sign_encrypt_sign_symmetric()

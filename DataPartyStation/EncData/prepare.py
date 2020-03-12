@@ -3,7 +3,7 @@ start_time = time.time()
 import pyreadstat
 import pandas as pd
 import checkFormat
-from PQencryption.hashing import sha_512_PyNaCl
+import PQencryption as cr
 
 import redacted_logging as rlog
 logger = rlog.get_logger(__name__)
@@ -37,7 +37,7 @@ else:
             salt_text = salt_text + ("a" * salt_missing)
         if salt_missing < 0:
             salt_text = salt_text[:salt_missing]
-        salt = salt_text.encode('UTF-8')
+        salt = salt_text#.encode('UTF-8')
 
         # Input names of PI columns
         PI = inputYAML['linking_features'] 
@@ -63,7 +63,7 @@ else:
                     
                     # Remove space from strings #
                     combine_PI =  combine_PI.replace(' ', '')
-                    hashed = sha_512_PyNaCl.sha512_hash(salt, combine_PI.encode('UTF-8'))
+                    hashed = cr.salthash(salt, combine_PI)#.encode('UTF-8')
                     hashedPI.append(hashed)
             else:
                 logger.error("Work cannot be done because missing values are in personal identifiers!")

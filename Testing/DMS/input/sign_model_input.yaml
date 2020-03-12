@@ -1,0 +1,17 @@
+### Please provide information to encrypt your data file ###
+# The name of your organization (has to start with letters)#
+party_name: dms
+
+signing_key: "dms_SECRET_EdDSA_Key.key"
+# Path to your model files (can be multiple) #
+model_files:
+    - MLmodel_ave.py
+    - MLmodel_sum.py
+
+# Save the encrypted file locally, then set "local_save" as true # 
+# Set "receiver_address" as false #
+local_save: true 
+
+# Send the encrypted file to a server (URL), then set "receiver_address" as true #
+# Set "local_save" as false
+receiver_address: false

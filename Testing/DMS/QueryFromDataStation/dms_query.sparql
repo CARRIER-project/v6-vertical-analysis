@@ -1,0 +1,51 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX db: <http://localhost/rdf/ontology/>
+PREFIX dbo: <http://um-cds/ontologies/databaseontology/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?encString ?N_DM_DUR_2 ?N_GTS_WHO ?N_Diabetes_WHO_2 ?N_DIABETES_2 ?N_T2DM_new_diagn ?SEX ?Age
+WHERE {
+    ?dataTableRow rdf:type db:dataset;
+				dbo:has_column [
+        			rdf:type db:dataset.RandomID;
+        			dbo:has_value ?myRandomInt;
+    			];
+        		dbo:has_column [
+        			rdf:type db:dataset.N_DM_DUR_2;
+        			dbo:has_value ?N_DM_DUR_2;
+    			];
+        		dbo:has_column [
+        			rdf:type db:dataset.N_GTS_WHO;
+        			dbo:has_value ?N_GTS_WHO;
+    			];
+        		dbo:has_column [
+        			rdf:type db:dataset.N_Diabetes_WHO_2;
+        			dbo:has_value ?N_Diabetes_WHO_2;
+    			];
+        		dbo:has_column [
+        			rdf:type db:dataset.N_DIABETES_2;
+        			dbo:has_value ?N_DIABETES_2;
+    			];
+        		dbo:has_column [
+        			rdf:type db:dataset.N_T2DM_new_diagn;
+        			dbo:has_value ?N_T2DM_new_diagn;
+    			];
+        		dbo:has_column [
+        			rdf:type db:dataset.SEX;
+        			dbo:has_value ?SEX;
+    			];
+        		dbo:has_column [
+        			rdf:type db:dataset.Age;
+        			dbo:has_value ?Age;
+    			].
+    BIND (xsd:string(CONCAT(?myRandomInt, ".0")) AS ?myRandomDouble).
+    
+    ?encTableRow rdf:type db:encryptedIdentifiers;
+				dbo:has_column [
+                    rdf:type db:encryptedIdentifiers.encString;
+                    dbo:has_value ?encString;
+                ];
+				dbo:has_column [
+					rdf:type db:encryptedIdentifiers.RandomID;
+                    dbo:has_value ?myRandomDouble;
+                ].
+}

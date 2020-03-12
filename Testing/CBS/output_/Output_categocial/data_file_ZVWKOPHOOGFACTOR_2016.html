@@ -1,0 +1,84 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    
+      <meta charset="utf-8">
+      <title>Bokeh Plot</title>
+      
+      
+        
+          
+        
+        
+          
+        <script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-1.3.4.min.js"></script>
+        <script type="text/javascript">
+            Bokeh.set_log_level("info");
+        </script>
+        
+      
+      
+    
+  </head>
+  
+  
+  <body>
+    
+      
+        
+          
+          
+            
+              <div class="bk-root" id="ec8fe1ca-1391-46f5-899d-3fbd317820ce" data-root-id="11028"></div>
+            
+          
+        
+      
+      
+        <script type="application/json" id="11127">
+          {"d1d69393-004b-4db4-9b39-690cc725ce1b":{"roots":{"references":[{"attributes":{},"id":"11035","type":"CategoricalScale"},{"attributes":{},"id":"11037","type":"LinearScale"},{"attributes":{},"id":"11060","type":"BasicTickFormatter"},{"attributes":{},"id":"11044","type":"BasicTicker"},{"attributes":{},"id":"11069","type":"Selection"},{"attributes":{"callback":null,"factors":["0.0"]},"id":"11031","type":"FactorRange"},{"attributes":{"text":"ZVWKOPHOOGFACTOR_2016 Counts"},"id":"11029","type":"Title"},{"attributes":{"data_source":{"id":"11027","type":"ColumnDataSource"},"glyph":{"id":"11053","type":"VBar"},"hover_glyph":null,"muted_glyph":null,"nonselection_glyph":{"id":"11054","type":"VBar"},"selection_glyph":null,"view":{"id":"11056","type":"CDSView"}},"id":"11055","type":"GlyphRenderer"},{"attributes":{"grid_line_color":null,"ticker":{"id":"11040","type":"CategoricalTicker"}},"id":"11042","type":"Grid"},{"attributes":{},"id":"11040","type":"CategoricalTicker"},{"attributes":{"items":[{"id":"11063","type":"LegendItem"}],"location":"top_center","orientation":"horizontal"},"id":"11062","type":"Legend"},{"attributes":{"source":{"id":"11027","type":"ColumnDataSource"}},"id":"11056","type":"CDSView"},{"attributes":{"formatter":{"id":"11060","type":"BasicTickFormatter"},"ticker":{"id":"11044","type":"BasicTicker"}},"id":"11043","type":"LinearAxis"},{"attributes":{"label":{"field":"feature"},"renderers":[{"id":"11055","type":"GlyphRenderer"}]},"id":"11063","type":"LegendItem"},{"attributes":{},"id":"11058","type":"CategoricalTickFormatter"},{"attributes":{"active_drag":"auto","active_inspect":"auto","active_multi":null,"active_scroll":"auto","active_tap":"auto","tools":[{"id":"11048","type":"HoverTool"}]},"id":"11049","type":"Toolbar"},{"attributes":{"callback":null,"tooltips":"@feature: @counts"},"id":"11048","type":"HoverTool"},{"attributes":{"dimension":1,"ticker":{"id":"11044","type":"BasicTicker"}},"id":"11047","type":"Grid"},{"attributes":{"formatter":{"id":"11058","type":"CategoricalTickFormatter"},"ticker":{"id":"11040","type":"CategoricalTicker"}},"id":"11039","type":"CategoricalAxis"},{"attributes":{"callback":null,"start":0},"id":"11033","type":"DataRange1d"},{"attributes":{"fill_color":{"field":"feature","transform":{"id":"11051","type":"CategoricalColorMapper"}},"line_color":{"value":"white"},"top":{"field":"counts"},"width":{"value":0.5},"x":{"field":"feature"}},"id":"11053","type":"VBar"},{"attributes":{"below":[{"id":"11039","type":"CategoricalAxis"}],"center":[{"id":"11042","type":"Grid"},{"id":"11047","type":"Grid"},{"id":"11062","type":"Legend"}],"left":[{"id":"11043","type":"LinearAxis"}],"renderers":[{"id":"11055","type":"GlyphRenderer"}],"title":{"id":"11029","type":"Title"},"toolbar":{"id":"11049","type":"Toolbar"},"toolbar_location":"below","x_range":{"id":"11031","type":"FactorRange"},"x_scale":{"id":"11035","type":"CategoricalScale"},"y_range":{"id":"11033","type":"DataRange1d"},"y_scale":{"id":"11037","type":"LinearScale"}},"id":"11028","subtype":"Figure","type":"Plot"},{"attributes":{"fill_alpha":{"value":0.1},"fill_color":{"value":"#1f77b4"},"line_alpha":{"value":0.1},"line_color":{"value":"#1f77b4"},"top":{"field":"counts"},"width":{"value":0.5},"x":{"field":"feature"}},"id":"11054","type":"VBar"},{"attributes":{"factors":["0.0"],"palette":["#5e4fa2","#3288bd","#66c2a5","#abdda4","#e6f598","#fee08b","#fdae61","#f46d43","#d53e4f","#9e0142"]},"id":"11051","type":"CategoricalColorMapper"},{"attributes":{"callback":null,"data":{"counts":["5000"],"feature":["0.0"]},"selected":{"id":"11069","type":"Selection"},"selection_policy":{"id":"11070","type":"UnionRenderers"}},"id":"11027","type":"ColumnDataSource"},{"attributes":{},"id":"11070","type":"UnionRenderers"}],"root_ids":["11028"]},"title":"Bokeh Application","version":"1.3.4"}}
+        </script>
+        <script type="text/javascript">
+          (function() {
+            var fn = function() {
+              Bokeh.safely(function() {
+                (function(root) {
+                  function embed_document(root) {
+                    
+                  var docs_json = document.getElementById('11127').textContent;
+                  var render_items = [{"docid":"d1d69393-004b-4db4-9b39-690cc725ce1b","roots":{"11028":"ec8fe1ca-1391-46f5-899d-3fbd317820ce"}}];
+                  root.Bokeh.embed.embed_items(docs_json, render_items);
+                
+                  }
+                  if (root.Bokeh !== undefined) {
+                    embed_document(root);
+                  } else {
+                    var attempts = 0;
+                    var timer = setInterval(function(root) {
+                      if (root.Bokeh !== undefined) {
+                        embed_document(root);
+                        clearInterval(timer);
+                      }
+                      attempts++;
+                      if (attempts > 100) {
+                        console.log("Bokeh: ERROR: Unable to run BokehJS code because BokehJS library is missing");
+                        clearInterval(timer);
+                      }
+                    }, 10, root)
+                  }
+                })(window);
+              });
+            };
+            if (document.readyState != "loading") fn();
+            else document.addEventListener("DOMContentLoaded", fn);
+          })();
+        </script>
+    
+  </body>
+  
+</html>

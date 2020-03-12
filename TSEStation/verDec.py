@@ -4,7 +4,6 @@ start_time = time.time()
 import json, yaml, sys
 import shutil
 import requests
-import pp_enc
 import redacted_logging as rlog
 logger = rlog.get_logger(__name__)
 
@@ -23,7 +22,7 @@ try:
         for p in parties:
             url = receiver_url+'/file/%s' % inputYAML["%sfileUUID" %(p)]
             response = requests.get(url, stream=True)
-            with open('/data/%sData.enc' %(p), 'wb') as out_file:
+            with open('/data/%sData.enc' %(p), 'w') as out_file:
                 shutil.copyfileobj(response.raw, out_file)
             del response
         
@@ -32,7 +31,7 @@ try:
             for p in parties:
                 url = receiver_url+"/file/%s_%s.enc" %(p,m)####
                 response = requests.get(url, stream=True)
-                with open("/%s_%s.enc" %(p, m), 'wb') as out_file:
+                with open("/%s_%s.enc" %(p, m), 'w') as out_file:
                     shutil.copyfileobj(response.raw, out_file)
                 del response
 
@@ -40,7 +39,7 @@ try:
         ### Read encrypted data files ###
         for p in parties:
             fileUUID = inputYAML["%sfileUUID" %(p)]
-            with open("/input/"+fileUUID+".enc", 'rb') as f:
+            with open("/inputVolume/"+fileUUID+".enc", 'rb') as f:
                 contents = f.read()
             contents_file = open("/data/%sData.enc" %(p), "wb")
             contents_file.write(contents)
@@ -49,7 +48,7 @@ try:
         ### Read signed model files ###
         for m in modelNames:
             for p in parties:
-                with open("/input/%s_%s.enc" %(p,m), 'rb') as f:
+                with open("/inputVolume/%s_%s.enc" %(p,m), 'rb') as f:
                     contents = f.read()
                 contents_file = open("/%s_%s.enc" %(p, m), "wb")
                 contents_file.write(contents)
@@ -64,55 +63,51 @@ else:
     ####################################
     # decryption part
     ####################################
-    from PQencryption.pub_key.pk_signature.quantum_vulnerable import signing_Curve25519_PyNaCl
-    from PQencryption.pub_key.pk_encryption.quantum_vulnerable import encryption_Curve25519_PyNaCl
-    from PQencryption.symmetric_encryption import salsa20_256_PyNaCl
-    from PQencryption import utilities
+
+    # from PQencryption import utilities
+    import PQencryption as cr
     import nacl.encoding
     import base64
 
-    # privateKeys = {}
-    # for p in parties:
-    #     privateKeys.update({p:pp_enc.pp_importKey("/input/private%s.pem" %p)})
-    # print(privateKeys)
-
 
     ### run decryption and verification on data files ###
-    def verify_and_decrypt(verifyBase64_, decryptKey_, encFile, newFile, privateKey):
+    def verify_and_decrypt(verifying_key, quantum_safe_secret_key, classic_secret_key, classic_public_key_dataParty,\
+                            decryptKey_, encFile, newFile):
         
-        verifyBase64 = pp_enc.pp_decrypt(verifyBase64_, privateKey)
-        decryptKey = pp_enc.pp_decrypt(decryptKey_, privateKey)
+        # # read verification key #
+        from PQencryption.salsa20 import Salsa20Key
+        encryption_key_base64 = cr.verify_decrypt_verify_pubkey(verifying_key, quantum_safe_secret_key, classic_secret_key,\
+                                            classic_public_key_dataParty, decryptKey_)
+        encryption_key = Salsa20Key(bytearray(nacl.encoding.Base64Encoder.decode(encryption_key_base64)))
 
-        #create signing key
-        verify_key = nacl.signing.VerifyKey(verifyBase64, encoder=nacl.encoding.Base64Encoder)
-
-        #create symmetrical encryption key
-        encryption_key= base64.b64decode(decryptKey)
 
         #read encrypted data
-        with open(encFile, 'rb') as encrypted_file:
+        with open(encFile, 'r') as encrypted_file:
             myStr =encrypted_file.read()
 
         #verify-decrypt-verify
-        verified_decrypted_verified_message = utilities.verify_decrypt_verify(myStr, verify_key, encryption_key)
+        verified_decrypted_verified_message = cr.verify_decrypt_verify_symmetric(verifying_key, encryption_key, myStr)
 
         #save encrypted file temporarily
-        with open(newFile, "wb") as text_file:
+        with open(newFile, "w") as text_file:
             text_file.write(verified_decrypted_verified_message)
 
     ### run verification on model files ###
-    def verify_model(verifyBase64_list, modelFile_list, newFile):
+    def verify_model(verifying_key_list, modelFile_list, newFile):
         verified_models = []
 
-        for i in range(0, len(verifyBase64_list)):
+        for i in range(0, len(verifying_key_list)):
             try:
-                verify_key_model = nacl.signing.VerifyKey(verifyBase64_list[i], encoder=nacl.encoding.Base64Encoder)
+       
                 #read signed model file
-                with open(modelFile_list[i], 'rb') as m_file:
+                with open(modelFile_list[i], 'r') as m_file:
                     myModel = m_file.read()
 
                 #verify-model
-                verified_models.append(utilities.verify_models(myModel, verify_key_model))
+                from PQencryption.eddsa import EdDSA, EdDSAVerifyKey
+
+                verified_models.append(EdDSA(verifying_key_list[i]).verify(myModel))
+
             except:
                 logger.error("%s model verification failed." %str(i))
                 sys.exit("Execution interrupted!")
@@ -125,42 +120,49 @@ else:
             sys.exit("Execution interrupted!")
 
         # save verified model file temporarily #
-        with open(newFile, "wb") as text_file:
+        with open(newFile, "w") as text_file:
             text_file.write(verified_models[0])
 
 
     #run decryption and verification on data
-    # try:
-    for p in parties:
-        logger.debug('Verifying %s' %p)
-        priavteKey = pp_enc.pp_importKey("/input/privateKey_%s.pem" %p)
-        print(priavteKey)
-        verify_and_decrypt(inputYAML["%sverifyKey" %(p)], inputYAML["%sencryptKey" %(p)], "/data/%sData.enc" %(p), "/data/encrypted_%s.csv" %(p), priavteKey)
-
-       
-    logger.debug("Your signiture is verified and datasets are decrypted!")
-    # except:
-    #     logger.error("Verification and decrption failed. Please check all your keys")
-    #     sys.exit("Execution interrupted!")
-
-    # run verification on model files # 
-
-    modelKeys = {}
-    modelFileNames = {}
-    for i in range(0, len(modelNames)):
-        temp = []
-        modelPath = []
-        for p in parties:
-            keys = inputYAML["%sModelKey" %(p)]
-            temp.append(keys[i])
-            modelPath.append("%s_%s.enc" %(p,modelNames[i]))
-        modelKeys.update({modelNames[i]:temp})
-        modelFileNames.update({modelNames[i]:modelPath})
-
     try:
-        for m in modelKeys.keys():
-            verify_model(modelKeys[m], modelFileNames[m], "/MLmodel.py")
+        for p in parties:
+            logger.debug('Verifying %s' %p)
+
+            path = '/inputVolume/'
+            verifying_key = cr.import_key(path + inputYAML["%sverifying_key" %(p)], silent=False)
+            quantum_safe_secret_key = cr.import_key(path + inputYAML["%squantum_safe_secret_key" %(p)], silent=False)
+            classic_secret_key = cr.import_key(path + inputYAML["%sclassic_secret_key" %(p)], silent=False)
+            classic_public_key_dataParty = cr.import_key(path + inputYAML["%sclassic_public_key_dataParty" %(p)], silent=False)
+
+
+            verify_and_decrypt(verifying_key, quantum_safe_secret_key, classic_secret_key, classic_public_key_dataParty,\
+                                inputYAML["%sencryptKey" %(p)], "/data/%sData.enc" %(p), "/data/encrypted_%s.csv" %(p))
+
+        logger.debug("Your signiture is verified and datasets are decrypted!")
+
     except:
-        logger.error("Model verification failed!")
-    else:
-        logger.info("Verification and decryption took {runtime:.4f}s to run".format(runtime=(time.time() - start_time)))
+        logger.error("Verification and decrption failed. Please check all your keys")
+        sys.exit("Execution interrupted!")
+
+    else: 
+        # run verification on model files # 
+        modelKeys = {}
+        modelFileNames = {}
+        for i in range(0, len(modelNames)):
+            temp = []
+            modelPath = []
+            for p in parties:
+                key = cr.import_key(path + inputYAML["%sverifying_key" %(p)], silent=False)
+                temp.append(key)
+                modelPath.append("%s_%s.enc" %(p,modelNames[i]))
+            modelKeys.update({modelNames[i]:temp})
+            modelFileNames.update({modelNames[i]:modelPath})
+
+        try:
+            for m in modelKeys.keys():
+                verify_model(modelKeys[m], modelFileNames[m], "/MLmodel.py")
+        except:
+            logger.error("Model verification failed!")
+        else:
+            logger.info("Verification and decryption took {runtime:.4f}s to run".format(runtime=(time.time() - start_time)))

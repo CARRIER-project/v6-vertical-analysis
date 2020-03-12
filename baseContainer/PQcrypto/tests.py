@@ -1,300 +1,282 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Jul 13 08:46:20 CEST 2017
+""" Run tests of the PQcrypto functions and utilities.
 
-@author: BMMN
+If all tests pass, your system is set up properly to use the PQcrypto package.
+The tests can also be seen as implementation examples.
 """
 
 from __future__ import print_function  # make print python3 compatible
-import gc  # garbage collection
-import unittest
-import mock
 import os
+import gc  # garbage collection
+import mock
+import unittest
+import PQencryption as cr
 
+temp_path = "./.tmp/"
 try:
-    os.mkdir("./.tmp")
+    os.mkdir(temp_path)
 except:
     pass
 
-with open("./.tmp/README.md", 'w') as f:
+with open(temp_path + "/README.md", 'w') as f:
     f.write("This directory stores temporary keys for testing.\n")
 
+# list of ciphers for key generation, import-export tests
+ciphers = [cr.AES256, cr.McBits, cr.Salsa20, cr.EdDSA, cr.DiffieHellman]
+
+
 class TestFunctions(unittest.TestCase):
-    def test_generate_signing_verify_key(self):
-        import nacl.signing
-        from PQencryption import utilities
-        from PQencryption.pub_key.pk_signature.quantum_vulnerable import signing_Curve25519_PyNaCl
-        s_raw, v_raw = signing_Curve25519_PyNaCl.key_gen()
-        signing_key_hex = utilities.to_hex(str(s_raw))
-        verify_key_hex = utilities.to_hex(str(v_raw))
+    def test_check_password(self):
+        cr._check_password("Aa0!asdfasdfasdfasdf")
 
-        # Are they of the correct type?
-        self.assertIsInstance(s_raw, nacl.signing.SigningKey)
-        self.assertIsInstance(v_raw, nacl.signing.VerifyKey)
+        with self.assertRaises(Exception) as e:
+            cr._check_password("Aa0!asdfasdfasdfasd")
+        self.assertEqual(type(e.exception), ValueError)
+        self.assertTrue("too short" in str(e.exception))
 
-        # Do they have the length correct?
-        self.assertEqual(len(signing_key_hex), 64)
-        self.assertEqual(len(verify_key_hex), 64)
+        with self.assertRaises(Exception) as e:
+            cr._check_password("Aaa!asdfasdfasdfasdf")
+        self.assertEqual(type(e.exception), ValueError)
+        self.assertTrue("does not contain digits" in str(e.exception))
 
-        # Are they properly converted to Hex?
-        try:
-            # if converting to "long, base16" works, it is Hex
-            s_to_long = long(signing_key_hex, 16)
-            v_to_long = long(verify_key_hex, 16)
-        except:
-            raise ValueError("Keys not converted to Hex format.")
+        with self.assertRaises(Exception) as e:
+            cr._check_password("AA0!ASDFASDFASDFASDF")
+        self.assertEqual(type(e.exception), ValueError)
+        self.assertTrue("does not contain lowercase" in str(e.exception))
 
-    def test_generate_public_private_key(self):
-        import nacl.public
-        from PQencryption import utilities
-        from PQencryption.pub_key.pk_encryption.quantum_vulnerable import encryption_Curve25519_PyNaCl
-        pub_raw, priv_raw = encryption_Curve25519_PyNaCl.key_gen()
-        public_key_hex = utilities.to_hex(str(pub_raw))
-        private_key_hex = utilities.to_hex(str(priv_raw))
+        with self.assertRaises(Exception) as e:
+            cr._check_password("aa0!asdfasdfasdfasdf")
+        self.assertEqual(type(e.exception), ValueError)
+        self.assertTrue("does not contain uppercase" in str(e.exception))
 
-        # Are they of the correct type?
-        self.assertIsInstance(pub_raw, nacl.public.PublicKey)
-        self.assertIsInstance(priv_raw, nacl.public.PrivateKey)
+        with self.assertRaises(Exception) as e:
+            cr._check_password("Aa01asdfasdfasdfasdf")
+        self.assertEqual(type(e.exception), ValueError)
+        self.assertTrue("does not contain any special" in str(e.exception))
 
-        # Do they have the length correct?
-        self.assertEqual(len(public_key_hex), 64)
-        self.assertEqual(len(private_key_hex), 64)
-
-        # Are they properly converted to Hex?
-        try:
-            # if converting to "long, base16" works, it is Hex
-            s_to_long = long(public_key_hex, 16)
-            v_to_long = long(private_key_hex, 16)
-        except:
-            raise ValueError("Keys not converted to Hex format.")
-
-    def test_generate_symmetric_key(self):
-        from PQencryption import utilities
-        from PQencryption.symmetric_encryption import salsa20_256_PyNaCl
-
-        sym_raw = salsa20_256_PyNaCl.key_gen()
-        symmetric_key_hex = utilities.to_hex(sym_raw)
-
-        # Is it of the correct type?
-        self.assertIsInstance(sym_raw, str)
-
-        # Does it have the length correct?
-        self.assertEqual(len(sym_raw), 32)
-
-        # Is it properly converted to Hex?
-        try:
-            # if converting to "long, base16" works, it is Hex
-            s_to_long = long(symmetric_key_hex, 16)
-        except:
-            raise ValueError("Key not converted to Hex format.")
-
-    @mock.patch('PQencryption.utilities.get_password',
+    @mock.patch("getpass.getpass",
             return_value="Aa0!asdfasdfasdfasdf")
-    def test_public_key_import_export(self, input):
-        import os
-        from PQencryption import utilities
-        from PQencryption.pub_key.pk_signature.quantum_vulnerable import signing_Curve25519_PyNaCl
-        s_raw, v_raw = signing_Curve25519_PyNaCl.key_gen()
-        signing_key_for_export_hex = utilities.to_hex(str(s_raw))
-        verify_key_for_export_hex = utilities.to_hex(str(v_raw))
-        path = ".tmp"
-        s_header = ("# This is an encrypted private signing key."
-                "KEEP IT PRIVATE!\n")
-        v_header = ("# This is a public verification key."
-                "Distribute it to your respondents.\n")
-        s_name = "_PRIVATE_signing_key_CBS"
-        v_name = "verify_key_CBS"
+    def test_get_password(self, input):
+        password = cr._get_password(validate=True,
+                print_requirements=False)
+        self.assertEqual(password, "Aa0!asdfasdfasdfasdf")
 
-        utilities.export_key(signing_key_for_export_hex, path, s_name,
-            s_header, key_type="SigningKey")
-        utilities.export_key(verify_key_for_export_hex, path, v_name,
-            v_header, key_type="VerifyKey")
+    @mock.patch("getpass.getpass",
+            side_effect=["Aa0!asdfasdfasdfasdf", "Aa0!ASDFASDFASDFASDF"])
+    def test_get_password_fail(self, input):
+        with self.assertRaises(Exception) as e:
+            password = cr._get_password(validate=True,
+                    print_requirements=False)
+        self.assertEqual(type(e.exception), ValueError)
+        self.assertTrue("Passwords differ." in str(e.exception))
 
-        signing_key_imported = utilities.import_key(path, s_name,
-                "SigningKey")
-        verify_key_imported = utilities.import_key(path, v_name, "VerifyKey")
+    def test_hashing(self):
+        message = "This is a message. Hash me!"
+        hashed = cr.hash512(message)
+        self.assertEqual(hashed, "ekHXd/YDKU112ETowqFV9GbxGo3I8UMwcDaHk+XVHsPIuXUWy3Jsv6JrCry+Yu8ugjRL+4DAha2IM4+B/HkXIQ==")
 
-        os.remove(path + "/" + s_name)
-        os.remove(path + "/" + v_name)
-
-        signing_key_imported_hex = utilities.to_hex(str(signing_key_imported))
-        verify_key_imported_hex = utilities.to_hex(str(verify_key_imported))
-
-        self.assertEqual(signing_key_for_export_hex, signing_key_imported_hex)
-        self.assertEqual(verify_key_for_export_hex, verify_key_imported_hex)
-
-    @mock.patch('PQencryption.utilities.get_password',
-            return_value="Aa0!asdfasdfasdfasdf")
-    def test_symmetric_key_import_export(self, input):
-        import os
-        from PQencryption import utilities
-        from PQencryption.symmetric_encryption import salsa20_256_PyNaCl
-        s_raw = salsa20_256_PyNaCl.key_gen()
-        symmetric_key_for_export_hex = utilities.to_hex(s_raw)
-        path = ".tmp"
-        s_header = ("# This is an encrypted symmetric key."
-                "KEEP IT PRIVATE!\n")
-        s_name = "_PRIVATE_symmetric_key_CBS"
-
-        utilities.export_key(symmetric_key_for_export_hex, path, s_name,
-            s_header, key_type="SymmetricKey")
-
-        symmetric_key_imported = utilities.import_key(path, s_name,
-                "SymmetricKey")
-
-        os.remove(path + "/" + s_name)
-
-        symmetric_key_imported_hex = utilities.to_hex(symmetric_key_imported)
-
-        self.assertEqual(symmetric_key_for_export_hex,
-                symmetric_key_imported_hex)
-
-    def test_hashing_hashlib(self):
-        from PQencryption.hashing import sha_512_hashlib
-        from PQencryption.hashing import sha_512_PyNaCl
+    def test_salthashing(self):
         salt = "a" * 128
         message = "This is a message. Hash me!"
-        hashed_hashlib = sha_512_hashlib.sha512_hash(salt, message)
-        self.assertEqual(hashed_hashlib, "ab90b1da9cd3a8625a75a0e0aaaa5c7a14ab9dde9006d23cacac665cc0edbc9309d8cc715aaf715cbcad61e9ddb32eac785881e880bff32c22108cb58cf6a8bf")
+        hashed = cr.salthash(salt, message)
+        self.assertEqual(hashed, "q5Cx2pzTqGJadaDgqqpcehSrnd6QBtI8rKxmXMDtvJMJ2MxxWq9xXLytYendsy6seFiB6IC/8ywiEIy1jPaovw==")
 
-    def test_hashing_PyNaCl(self):
-        from PQencryption.hashing import sha_512_hashlib
-        from PQencryption.hashing import sha_512_PyNaCl
-        salt = "a" * 128
-        message = "This is a message. Hash me!"
-        hashed_PyNaCl = sha_512_PyNaCl.sha512_hash(salt, message)
-        self.assertEqual(hashed_PyNaCl, "ab90b1da9cd3a8625a75a0e0aaaa5c7a14ab9dde9006d23cacac665cc0edbc9309d8cc715aaf715cbcad61e9ddb32eac785881e880bff32c22108cb58cf6a8bf")
+    def test_generate_keys(self):
+        for cipher in ciphers:
+            key_objects = cipher.key_gen()
+            if type(key_objects) is not tuple:  # is it just a single key?
+                key_objects = [key_objects]
+            for key_object in key_objects:
+                self.assertEqual(key_object._is_valid(), True)
 
     def test_symmetric_encryption_AES256(self):
-        from PQencryption.symmetric_encryption import aes_256_Crypto
-        from PQencryption import utilities
+        message = "This is my message."
+        key = cr.AES256.key_gen()
+        symmetric = cr.AES256(key)
 
-        key = aes_256_Crypto.key_gen()
-        message = 'This is my message.'
+        ciphertext = symmetric.encrypt(message)
 
-        # encryption
-        my_encrypted_message = aes_256_Crypto.encrypt(message, key)
+        cleartext = symmetric.decrypt(ciphertext)
 
-        # decryption
-        my_decrypted_message = aes_256_Crypto.decrypt(my_encrypted_message,
-                key)
+        self.assertNotEqual(message, ciphertext)
+        self.assertEqual(message, cleartext)
 
-        self.assertNotEqual(message, my_encrypted_message)
-        self.assertEqual(message, my_decrypted_message)
+    def test_symmetric_encryption_Salsa20(self):
+        message = "This is my message."
+        key = cr.Salsa20.key_gen()
+        symmetric = cr.Salsa20(key)
 
-    def test_symmetric_encryption_salsa20(self):
-        from PQencryption.symmetric_encryption import salsa20_256_PyNaCl
-        from PQencryption import utilities
+        ciphertext = symmetric.encrypt(message)
 
-        key = salsa20_256_PyNaCl.key_gen()
-        message = 'This is my message.'
+        cleartext = symmetric.decrypt(ciphertext)
 
-        # encryption
-        my_encrypted_message = salsa20_256_PyNaCl.encrypt(message, key)
+        self.assertNotEqual(message, ciphertext)
+        self.assertEqual(message, cleartext)
 
-        # decryption
-        my_decrypted_message = salsa20_256_PyNaCl.decrypt(my_encrypted_message,
-                key)
+    def test_asymmetric_encryption_Diffie_Hellman_Curve25519(self):
+        message = "This is my message."
 
-        self.assertNotEqual(message, my_encrypted_message)
-        self.assertEqual(message, my_decrypted_message)
+        secret_key_alice, pub_key_alice = cr.DiffieHellman.key_gen()
+        secret_key_bob, pub_key_bob = cr.DiffieHellman.key_gen()
 
-    def test_sign_encrypt_sign_and_verify_decrypt_verify(self):
-        from PQencryption.pub_key.pk_signature.quantum_vulnerable import signing_Curve25519_PyNaCl
-        from PQencryption.pub_key.pk_encryption.quantum_vulnerable import encryption_Curve25519_PyNaCl
-        from PQencryption.symmetric_encryption import salsa20_256_PyNaCl
-        from PQencryption import utilities
-        import nacl.encoding
+        # make encryption objects with correct keys
+        alice_asymmetric = cr.DiffieHellman(secret_key_alice, pub_key_bob)
+        bob_asymmetric = cr.DiffieHellman(secret_key_bob, pub_key_alice)
 
-        signing_key, verify_key = signing_Curve25519_PyNaCl.key_gen()
-        encryption_key = salsa20_256_PyNaCl.key_gen()
+        # try to make encryption objects with wrong keys
+        with self.assertRaises(Exception) as wrong_keys:
+            wrong_keys = cr.DiffieHellman(pub_key_bob, pub_key_alice)
+        self.assertTrue("Box must be created from a PrivateKey and a"
+                + " PublicKey" in str(wrong_keys.exception))
 
-        message = 'This is my message.'
+        ciphertext = alice_asymmetric.encrypt(message)
 
-        signed_encrypted_signed_message = utilities.sign_encrypt_sign(message,
-                signing_key, encryption_key)
+        cleartext_1 = alice_asymmetric.decrypt(ciphertext)
+        cleartext_2 = bob_asymmetric.decrypt(ciphertext)
+
+        self.assertNotEqual(message, ciphertext)
+        self.assertEqual(message, cleartext_1)
+        self.assertEqual(message, cleartext_2)
+
+        # test derived key
+        derived_public_key = secret_key_alice.public_key
+        self.assertEqual(bytes(pub_key_alice.key),
+                bytes(derived_public_key.key))
+        self.assertEqual(pub_key_alice.key_length,
+                derived_public_key.key_length)
+        self.assertEqual(pub_key_alice.name, derived_public_key.name)
+        self.assertEqual(pub_key_alice.description,
+                derived_public_key.description)
+        self.assertEqual(pub_key_alice.footer, derived_public_key.footer)
+        self.assertEqual(pub_key_alice.security_level,
+                derived_public_key.security_level)
+
+    def test_asymmetric_encryption_McBits(self):
+        message = "This is my message."
+        secret_key, pub_key = cr.McBits.key_gen()
+        bob_asymmetric = cr.McBits(pub_key)
+        alice_asymmetric = cr.McBits(secret_key)
+
+        ciphertext = bob_asymmetric.encrypt(message)
+
+        cleartext = alice_asymmetric.decrypt(ciphertext)
+
+        self.assertNotEqual(message, ciphertext)
+        self.assertEqual(message, cleartext)
+
+    @mock.patch("getpass.getpass",
+            return_value="Aa0!asdfasdfasdfasdf")
+    def test_key_import_export(self, input):
+        owner = "CBS"
+        for cipher in ciphers:
+            key_objects = cipher.key_gen()
+            if type(key_objects) is not tuple:  # is it just a single key?
+                key_objects = [key_objects]
+            for key_object in key_objects:
+                key_object.export_key(temp_path, owner, force=True,
+                        silent=True)
+                file_name = key_object.name + "_" + owner + ".key"
+                imported_key = cr.import_key(temp_path + file_name,
+                        silent=True)
+                self.assertEqual(bytes(key_object.key),
+                        bytes(imported_key.key))
+                self.assertEqual(key_object.key_length,
+                        imported_key.key_length)
+                self.assertEqual(key_object.name, imported_key.name)
+                self.assertEqual(key_object.description,
+                        imported_key.description)
+                self.assertEqual(key_object.footer, imported_key.footer)
+                self.assertEqual(key_object.security_level,
+                        imported_key.security_level)
+
+    def test_signing_EdDSA_Curve25519(self):
+        message = "This is my message."
+        sign_key, verify_key = cr.EdDSA.key_gen()
+
+        signing = cr.EdDSA(sign_key)
+        verifying = cr.EdDSA(verify_key)
+
+        signed_message = signing.sign(message)
+
+        # try wrong keys
+        with self.assertRaises(Exception) as wrong_key:
+            out = verifying.sign(signed_message)
+        self.assertTrue("Key is no EdDSA SigningKey"
+                in str(wrong_key.exception))
+
+        with self.assertRaises(Exception) as wrong_key:
+            out = signing.verify(signed_message)
+        self.assertTrue("Key is no EdDSA VerifyKey"
+                in str(wrong_key.exception))
 
         # verify positive
-        verified_decrypted_verified_message = utilities.verify_decrypt_verify(
-                signed_encrypted_signed_message, verify_key, encryption_key)
-        self.assertEqual(message, verified_decrypted_verified_message)
-
-        # verify negative
-        # we should test all layers of the onion, not only the outer one. TODO
-        with self.assertRaises(Exception) as bad_signature:
-            spoof = "0"*len(nacl.encoding.HexEncoder.encode(
-                verified_decrypted_verified_message))
-            verified_decrypted_verified_message = \
-                    utilities.verify_decrypt_verify(spoof, verify_key,
-                            encryption_key)
-        self.assertTrue("Signature was forged or corrupt"
-                in bad_signature.exception)
-
-    def test_quantum_vulnerable_signing(self):
-        from PQencryption.pub_key.pk_signature.quantum_vulnerable import signing_Curve25519_PyNaCl
-        from PQencryption import utilities
-
-        signing_key, verify_key = signing_Curve25519_PyNaCl.key_gen()
-
-        message = 'This is my message.'
-
-        # signing
-        signed = signing_Curve25519_PyNaCl.sign(signing_key, message)
-
-        # verify positive
-        out = verify_key.verify(signed)
+        out = verifying.verify(signed_message)
         self.assertEqual(message, out)
 
         # verify negative
         with self.assertRaises(Exception) as bad_signature:
-            spoof = "0"*len(signed)
-            out = verify_key.verify(spoof)
+            spoof = "0"*len(signed_message)
+            out = verifying.verify(spoof)
         self.assertTrue("Signature was forged or corrupt"
-                in bad_signature.exception)
+                in str(bad_signature.exception))
 
         # test derived key
-        derived_verify_key = signing_key.verify_key
-        self.assertEqual(verify_key, derived_verify_key)
+        derived_verify_key = sign_key.verify_key
+        self.assertEqual(bytes(verify_key.key), bytes(derived_verify_key.key))
+        self.assertEqual(verify_key.key_length, derived_verify_key.key_length)
+        self.assertEqual(verify_key.name, derived_verify_key.name)
+        self.assertEqual(verify_key.description,
+                derived_verify_key.description)
+        self.assertEqual(verify_key.footer, derived_verify_key.footer)
+        self.assertEqual(verify_key.security_level,
+                derived_verify_key.security_level)
 
-    def test_quantum_vulnerable_encryption(self):
-        from PQencryption.pub_key.pk_encryption.quantum_vulnerable import encryption_Curve25519_PyNaCl
-        from PQencryption import utilities
+    def test_sign_encrypt_sign_pubkey_and_reverse(self):
+        message = "This is my message."
 
-        public_key_Alice, secret_key_Alice = \
-                encryption_Curve25519_PyNaCl.key_gen()
+        signing_key, verifying_key = cr.EdDSA.key_gen()
+        quantum_safe_secret_key, quantum_safe_public_key = cr.McBits.key_gen()
+        classic_secret_key_Alice, classic_public_key_Alice = \
+                cr.DiffieHellman.key_gen()
+        classic_secret_key_Bob, classic_public_key_Bob = \
+                cr.DiffieHellman.key_gen()
 
-        public_key_Bob, secret_key_Bob = \
-                encryption_Curve25519_PyNaCl.key_gen()
+        ciphertext_AB = cr.sign_encrypt_sign_pubkey(signing_key,
+                quantum_safe_public_key, classic_secret_key_Alice,
+                classic_public_key_Bob, message)
+        ciphertext_BA = cr.sign_encrypt_sign_pubkey(signing_key,
+                quantum_safe_public_key, classic_secret_key_Bob,
+                classic_public_key_Alice, message)
+        cleartext_AB = cr.verify_decrypt_verify_pubkey(verifying_key,
+                quantum_safe_secret_key, classic_secret_key_Bob,
+                classic_public_key_Alice, ciphertext_AB)
+        cleartext_BA = cr.verify_decrypt_verify_pubkey(verifying_key,
+                quantum_safe_secret_key, classic_secret_key_Alice,
+                classic_public_key_Bob, ciphertext_BA)
 
-        message = 'This is my message.'
+        self.assertEqual(message, cleartext_AB)
+        self.assertEqual(cleartext_AB, cleartext_BA)
+        self.assertNotEqual(message, ciphertext_AB)
+        self.assertNotEqual(message, ciphertext_BA)
+        self.assertNotEqual(ciphertext_AB, ciphertext_BA)
+        self.assertNotEqual(cleartext_AB, ciphertext_AB)
+        self.assertNotEqual(cleartext_BA, ciphertext_BA)
 
-        # encrypting
-        encrypted = encryption_Curve25519_PyNaCl.encrypt(message,
-                secret_key_Alice, public_key_Bob)
+    def test_sign_encrypt_sign_symmetric_and_reverse(self):
+        message = "This is my message."
 
-        # decrypting
-        decrypted_BA = encryption_Curve25519_PyNaCl.decrypt(encrypted,
-                secret_key_Bob, public_key_Alice)
+        symmetric_encryption_key = cr.Salsa20.key_gen()
+        signing_key, verifying_key = cr.EdDSA.key_gen()
 
-        decrypted_AB = encryption_Curve25519_PyNaCl.decrypt(encrypted,
-                secret_key_Alice, public_key_Bob)
+        ciphertext = cr.sign_encrypt_sign_symmetric(signing_key,
+                symmetric_encryption_key, message)
+        cleartext = cr.verify_decrypt_verify_symmetric(verifying_key,
+                symmetric_encryption_key, ciphertext)
 
-        self.assertNotEqual(message, encrypted)
-        self.assertEqual(message, decrypted_BA)
-        self.assertEqual(message, decrypted_AB)
-
-    def test_to_hex(self):
-        from PQencryption import utilities
-        string = "Hex me."
-        hexed = utilities.to_hex(string)
-        self.assertEqual(hexed, "486578206d652e")
-
-    def test_from_hex(self):
-        from PQencryption import utilities
-        string = "486578206d652e"
-        de_hexed = utilities.from_hex(string)
-        self.assertEqual(de_hexed, "Hex me.")
+        self.assertEqual(message, cleartext)
+        self.assertNotEqual(message, ciphertext)
+        self.assertNotEqual(cleartext, ciphertext)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

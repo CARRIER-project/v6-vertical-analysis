@@ -46,108 +46,144 @@ Software:
 1. **Install base containers:** in all data stations (data parties and Trusted Secure Environment), a basic container needs to to installed. In your terminal: 
 
    ```shell
-   docker pull sophia921025/datasharing_base:v0.1
+   docker pull sophia921025/datasharing_base:v1.0
    ```
 
    
 
-2. **Get an overview of data:** At each data party station, create a folder, put ***data file*** and ***request.yaml*** into this folder. Configure ***request.yaml*** based on the overview of data you need. In the folder which contains ***data file*** and ***request.yaml***, Mac/Linux run: (please change the third line "data_party_1.csv" to the name of your own data file.)
+2. **Get an overview of data:** At each data party (*/CBS/input/* or */DMS/input/*). Configure ***request.yaml*** based on the overview of data you need. In the folder which contains ***data file*** and ***request.yaml***, Mac/Linux run: (You can keep everything as default for testing purpose.)
 
    ```shell
    docker run --rm \
-   -v "$(pwd)/input/request.yaml:/inputVolume/request.yaml" \
-   -v "$(pwd)/input/data_party_1.csv:/data_party_1.csv" \
-   -v "$(pwd)/output:/output" sophia921025/datasharing_overview:local0.1
-   ```
-
-   Windows run (please change the third line "data_party_1.csv" to the name of your own data file.)
-
-   ```shell
-   docker run --rm \
-   -v "%cd%/input/request.yaml:/inputVolume/request.yaml" \ 
-   -v "%cd%/input/data_party_1.csv:/data_party_1.csv" \ 
-   -v "%cd%/output:/output" sophia921025/datasharing_overview:local0.1
+   -v "$(pwd)/input:/inputVolume" \
+   -v "$(pwd)/input/20200308_cbs.csv:/data_file.csv" \
+   -v "$(pwd)/output:/output" sophia921025/datasharing_overview:v1.0
    ```
 
    
 
-3. Generate public-priavte keys for encryption and verficiation keys transferring. 
+3. All parties generate keys for communication and identification
 
-   ```shell
-   docker run --rm \
-   -v "$(pwd)/input/ppkeys_input.yaml:/inputVolume/ppkeys_input.yaml" \
-   -v "$(pwd)/output:/output" sophia921025/datasharing_ppkeys:local0.1
-   ```
+   - At TSE side - Generate Quantum safe and Quantum vulnerable public-priate key pairs for each party:
+
+     - Configure the *genKeys_input.yaml* *(./TSE/input/)*, set **party_name: cbs** and back to *TSE* folder run:
+
+       ```shell
+       docker run --rm -it \
+       -v "$(pwd)/input:/inputVolume" \
+       -v "$(pwd)/output:/output" sophia921025/datasharing_ppkeys:v1.0
+       ```
+
+     - Then, change the **party_name: dms**  in *genKeys_input.yaml* and run the command lines above again. 
+
+     - You will get 8 key files in total in the */TSE/output* folder (4 key files for each party) (DO NOT CHANGE THE KEY FILE NAME!)
+
+     
+
+   - At data party - Generate Signing-verifying key pair and Quantum vulnerable public-private key pairs.
+
+     - Configure the *genKeys_input.yaml* *(./CBS/input/)*, set **party_name: cbs** and back to *CBS* folder run:
+
+       ```shell
+       docker run --rm -it \
+       -v "$(pwd)/input:/inputVolume" \
+       -v "$(pwd)/output:/output" sophia921025/datasharing_svkeys:v1.0
+       ```
+
+       You will find 4 key files in the */CBS/output* folder
+
+     - Configure the *genKeys_input.yaml* *(./DMS/input/)*, set **party_name: dms** and back to *DMS* folder and run the same command lines above. 
+
+       You will find 4 keys files in the */DMS/output* folder
+
+
+
+4. Key exchange - TSE needs to give Quantum Safe Public keys, Quantum vulnerable Public keys to each data party, and receive data parties' verifying keys and data parties' Quantum vulnerable public keys. So steps are below:
+   - At TSE site: from */TSE/output* folder move all files starting with "*SECRET_xxxx.key*" (4 files)to */TSE/input* folder (this means keys will be used for next steps)
+   - At TSE site: from */TSE/output* folder move "*Public_xxx_cbs*.key" (2 files) to */CBS/input/* folder
+   - At TSE site: from */TSE/output* folder move "*Public_xxx_dms.key" (2 files) to */DMS/input/* folder
+   - At CBS site: from */CBS/output* folder move "*SECRET_xxx_cbs.key" (2 files) to */CBS/input/* folder
+   - At CBS site: from */CBS/output* folder move "*Public_xxx_cbs.key" (2 files) to */TSE/input/* folder
+   - At DMS site: from */DMS/output* folder move "*SECRET_xxx_dms.key" (2 files) to */DMS/input/* folder
+   - At DMS site: from */DMS/output* folder move "*Public_xxx_dms.key" (2 files) to */TSE/input/* folder
+
+
+
+5. Pseudonymization and encryption of data: to pseudonymize the personal identifiers (PI) for linking multiple datasets, and encrypt the data files (pseudonymized PI + actual data). 
+
+   - At CBS site: configure *encrypt_input.yaml* (./CBS/input/) (you can use the default setting) and then go back to *CBS* folder, run
+
+     ```shell
+     docker run --rm -it \
+     -v "$(pwd)/input:/inputVolume" \
+     -v "$(pwd)/input/20200312_simu_cbs.csv:/data_file.csv" \
+     -v "$(pwd)/output:/output" sophia921025/datasharing_encdata:v1.0
+     ```
+
+     You will find one "xxxxx.enc" file and one *cbs_data_keys.json* file in */CBS/output* folder
+
+   - Send/Move this "xxxxx.enc" file to */TSE/input/* folder
+
+   - At DMS site: configure *encrypt_input.yaml* (./DMS/input/) (you can use the default setting) and then go back to *DMS* folder, run 
+
+     ```shell
+     docker run --rm -it \
+     -v "$(pwd)/input:/inputVolume" \
+     -v "$(pwd)/input/20200312_simu_dms.csv:/data_file.csv" \
+     -v "$(pwd)/output:/output" sophia921025/datasharing_encdata:v1.0
+     ```
+
+     You will get one "xxxxx.enc" file and one *dms_data_keys.json* file in */DMS/output* folder
+
+   - Send/Move this "xxxxx.enc" file to */TSE/input/* folder too
 
    
 
-4. Pseudonymization and encryption**: to pseudonymize the personal identifiers (PI) for linking multiple datasets, and encrypt the data files (pseudonymized PI + actual data). Go to the folder which contains ***data file*** and ***encrypt_input.yaml***. Please configure ***encrypt_input.yaml*** first. Then in the terminal (Mac/Linux): (please change the second line "data_party_1.csv" to the name of your own data file.)
+   6. Sign models: researchers should send their analysis model to all data parties. Data parties check the models and sign the models and send them to TSE. 
 
-   ```shell
-   docker run --rm \
-   -v "$(pwd)/input/data_party_1.csv:/data_party_1.csv" \
-   -v "$(pwd)/input/publicKey_dms.pem:/publicKey.pem" \
-   -v "$(pwd)/input/encrypt_input.yaml:/inputVolume/encrypt_input.yaml" \
-   -v "$(pwd)/output:/output" sophia921025/datasharing_encdata:local0.1
-   ```
+      - At CBS site: configure *sign_model_input.yaml* (./CBS/input/) (you can use the default setting) and then go back to *CBS* folder, run
 
-   Windows (please change the second line "data_party_1.csv" to the name of your own data file.):
+        ```shell
+        docker run --rm -it \
+        -v "$(pwd)/input:/inputVolume" \
+        -v "$(pwd)/output:/output" sophia921025/datasharing_signmodel:v1.0
+        ```
 
-   ```shell
-   docker run --rm \
-   -v "%cd%/input/data_party_1.csv:/data_party_1.csv" \
-   -v "%cd%/input/encrypt_input.yaml:/inputVolume/encrypt_input.yaml" \
-   -v "%cd%/output:/output" sophia921025/datasharing_encdata:local0.1
-   ```
+        You will see two "cbs_xxxx.py.enc" files in the */CBS/output/* folder
 
-   
+      - Send/Move these two "cbs_xxxx.py.enc" files to */TSE/input/* folder
 
-After successful execution, your encrypted data file and key file (keys.json) will be stored locally/to the server (e.g., trusted third party, trusted secure environment).
+      - At DMS site: configure *sign_model_input.yaml* (./DMS/input/) (you can use the default setting) and then go back to *DMS* folder, run the command lines above. You will see two "dms_xxxx.py.enc" files in the */DMS/output/* folder
 
-5. Sign your model file (python script) by all data parties. Create a folder where contains ***your_model.py*** and ***encrypt_input.yaml*** (need to be configured). Then in the terminal, Mac/Linux (please change the second line "your_model.py" to the name of your own model file): 
-
-   ```shell
-   docker run --rm \
-   -v "$(pwd)/input/MLmodel_test.py:/MLmodel_test.py" \
-   -v "$(pwd)/input/sign_model_input.yaml:/inputVolume/sign_model_input.yaml" \
-   -v "$(pwd)/output:/output" datasharing_signmodel:local0.1
-   ```
-
-   Windows (please change the second line "your_model.py" to the name of your own model file): 
-
-   ```shell
-   docker run --rm \
-   -v "%cd%/input/your_model.py:/your_model.py" \
-   -v "%cd%/input/encrypt_input.yaml:/inputVolume/encrypt_input.yaml" \
-   -v "%cd%/output:/output" sophia921025/datasharing_signmodel:local0.1
-   ```
+      - Send/Move these two "dms_xxxx.py.enc" files to */TSE/input/* folder
 
    
 
-6. At **Trusted Secure Environment (TSE)**, create a folder, put ***encrypted data files*** from data parties, ***security_input.yaml***, and ***analysis_input.yaml***, and your ***analysis python script*** (ML models) into this folder. Configure ***security_input.yaml*** based on the keys from data parties, and ***analysis_input.yaml*** based on your analysis requirements. In your terminal:
+   7. Matching and analysis at TSE: at this moment, you should have 3 yaml files, 6 enc files, 8 key files in the */TSE/input/* folder. 
 
-   Mac/Linux:
+      - Configure *security_input.yaml* *(/TSE/input/)*: the things you need to change are:
 
-   ```shell
-   docker run --rm \
-   -v "$(pwd)/input:/input" \
-   -v "$(pwd)/output:/output" \
-   -v "$(pwd)/input/security_input.yaml:/inputVolume/security_input.yaml" \
-   -v "$(pwd)/input/analysis_input.yaml:/inputVolume/analysis_input.yaml" \
-   sophia921025/datasharing_tse:v0.1
-   ```
+        ```shell
+        dmsfileUUID: "xxxxxx"
+        dmsencryptKey: "yyyyyy"
+        
+        cbsfileUUID: "zzzzzzz"
+        cbsencryptKey: "vvvvvvv"
+        ```
 
-   Windows:
+      - You can find **dmsfileUUID** and **dmsencryptKey** in the */DMS/output/dms_data_keys.json*, **cbsfileUUID** and **cbsencryptKey** can be found in the */CBS/output/cbs_data_keys.json* You can leave the rest as default for testing purpose.
 
-   ```shell
-   docker run --rm \
-   -v "%cd%/input:/input" \
-   -v "%cd%/output:/output" \
-   -v "%cd%/input/security_input.yaml:/inputVolume/security_input.yaml" \
-   sophia921025/datasharing_tse:v0.1
-   ```
+      - Configure *analysis_input.yaml* *(/TSE/input/)*: You can leave all inputs as default for testing purpose for now
 
-   
+      - In the TSE folder, run 
+
+        ```shell
+        docker run --rm -it \
+        -v "$(pwd)/input:/inputVolume" \
+        -v "$(pwd)/output:/output" sophia921025/datasharing_tse:v1.0
+        ```
+
+        
 
 If Docker container runs properly, you will see execution logs as below. In the end, all results and logging histories (***ppds.log***) are stored in the ***output*** folder. To avoid data leakage from error shooting, if errors occur during executions, the error messages will saved in the ***ppds.log*** instead of printing out on the screen.
 

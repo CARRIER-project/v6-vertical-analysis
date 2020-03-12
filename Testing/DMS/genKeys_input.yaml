@@ -1,0 +1,11 @@
+### Please provide information to generate public-private keys ###
+# The name of your organization (has to start with letters)#
+party_name: dms
+
+# Save the encrypted file locally, then set "local_save" as true # 
+# Set "receiver_address" as false #
+local_save: true 
+
+# Send the encrypted file to a server (URL), then set "receiver_address" as true #
+# Set "local_save" as false
+receiver_address: false
