@@ -4,6 +4,7 @@
 *.csv
 *.enc
 .DS_Store
+.Rhistory
 _PRIVATE_signing_key_CBS
 _PRIVATE_symmetric_key_CBS
 new_dms_test_enc.csv
