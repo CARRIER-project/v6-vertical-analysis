@@ -10,8 +10,6 @@ RUN mkdir /inputVolume
 
 RUN mkdir /output
 
-COPY run.py run.py
-
 RUN pip install \
   'mock==3.0.5' \
   'pynacl==1.3.0' \
@@ -32,4 +30,7 @@ ADD PQcrypto/PQencryption/ /usr/local/lib/python3.6/site-packages/PQencryption/
 ADD redacted_logging /usr/local/lib/python3.6/site-packages/redacted_logging/
 ADD config.ini /
 
-CMD ["python", "run.py"]
+COPY hello_world.py hello_world.py
+COPY run.py run.py
+
+CMD ["python3", "run.py"]
