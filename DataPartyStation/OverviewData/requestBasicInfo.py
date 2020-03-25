@@ -2,11 +2,16 @@
 # -*- coding: utf-8 -*-
 
 """
-TODO: Maybe more description what happens in this script.
+TODO: This script is to generate an (statistical) overview about the data.
+Users need to configure the request.yaml to indicate what basic information they want to know about the data.
+Until 25-03-2020, the following functions has been implemented in this script:
+1. Basic description of data (from pandas.dataframe.desribe)
+2. Missing values and percentage of each variables
+3. Correlation Matrix (plot)
+4. Histogram distributed plot
+5. Box distribution plot
+6. Relations plot between different variables (numerical-numercial features, categorical-numerical features)
 
-Read healthcare cost data from vektis
-https://www.vektis.nl/intelligence/open-data
-Please read the data description before using the data.
 """
 
 import ntpath
@@ -14,7 +19,7 @@ from collections import Counter
 import yaml
 import pyreadstat
 import pandas as pd
-import func
+import BasicInfo_Subfunctions
 import redacted_logging as rlog
 
 
@@ -71,7 +76,9 @@ def get_data_from_file(file_path, file_sep, logger):
 def main():
     """main function
 
-    [TODO:description]
+    The main function will read the configuration file (request.yaml) and obtain the requeired parameters. 
+    After reading the data file, the varilables will be selected by users input.
+    Execute the functions of generating basic description of data, checking cokpleteness, plotting correlation metrix, distribution plots.
     """
     logger = rlog.get_logger(__name__)
     input_yaml_file_name = "/inputVolume/request.yaml"
@@ -106,15 +113,15 @@ def main():
 
     # Check missing values in the dataset
     if input_yaml['check_missing']:
-        func.check_missing(data_frame, column_names, file_name)
+        BasicInfo_Subfunctions.check_missing(data_frame, column_names, file_name)
 
     # Get the basic description about the dataset
     if input_yaml['data_description']:
-        func.data_describe(data_frame, column_names, file_name)
+        BasicInfo_Subfunctions.data_describe(data_frame, column_names, file_name)
 
     # Function for correlation matrix
     if input_yaml['correlation_matrix']:
-        func.corr_Matrix(data_frame[column_names], file_name)
+        BasicInfo_Subfunctions.corr_Matrix(data_frame[column_names], file_name)
 
     # Separate features to numerical and categorical
     numerical_features = []
@@ -130,7 +137,7 @@ def main():
         if input_yaml['distribution_feature'] == 'ALL':
             for numerical_feature in numerical_features:
                 try:
-                    func.dist_Plot(data_frame[numerical_features],
+                    BasicInfo_Subfunctions.dist_Plot(data_frame[numerical_features],
                                    numerical_feature, file_name)
                 except ???:  # TODO: what error is this
                     if numerical_feature not in categorical_features:
@@ -140,7 +147,7 @@ def main():
 
             for categorical_feature in categorical_features:
                 try:
-                    func.cate_Dist(data_frame[categorical_features],
+                    BasicInfo_Subfunctions.cate_Dist(data_frame[categorical_features],
                                    categorical_feature, file_name)
                 except ???:  # TODO: what error is this
                     if categorical_feature not in numerical_features:
@@ -152,7 +159,7 @@ def main():
             for distribution_feature in input_yaml['distribution_feature']:
                 if distribution_feature in numerical_features:
                     try:
-                        func.dist_Plot(data_frame[numerical_features],
+                        BasicInfo_Subfunctions.dist_Plot(data_frame[numerical_features],
                                        distribution_feature, file_name)
                     except ???:  # TODO: what error is this
                         logger.error(distribution_feature, " -- Data type " +
@@ -161,7 +168,7 @@ def main():
 
                 elif distribution_feature in categorical_features:
                     try:
-                        func.cate_Dist(data_frame[categorical_features],
+                        BasicInfo_Subfunctions.cate_Dist(data_frame[categorical_features],
                                        distribution_feature, file_name)
                     except ???:  # TODO: what error is this
                         logger.error(distribution_feature, " -- Data type " +
@@ -170,24 +177,23 @@ def main():
 
     # Function for Cat-Num plot
     if input_yaml["Cat_Num_plot"] and input_yaml["Cat_Num_feature"]:
-        # print(input_yaml['Cat_Num_feature'])
         # TODO: Logging instead of print? Or leave out completely?
         for categorical_numerical_feature in input_yaml['Cat_Num_feature']:
-            func.plot_catNum(data_frame, categorical_numerical_feature,
+            BasicInfo_Subfunctions.plot_catNum(data_frame, categorical_numerical_feature,
                              file_name, categorical_features)
 
     # Function for Box plot
     # TODO: Can these go wrong? Do we need try except?
     if input_yaml["Box_plot"] and input_yaml["Box_plot_feature"]:
         for box_plot_feature in input_yaml['Box_plot_feature']:
-            func.box_Plot(data_frame, box_plot_feature,
+            BasicInfo_Subfunctions.box_Plot(data_frame, box_plot_feature,
                           file_name, categorical_features)
 
     # Function for Num-Num plot
     # TODO: Can these go wrong? Do we need try except?
     if input_yaml["Num_Num_Plot"] and input_yaml["Num_Num_feature"]:
         for numerical_numerical_feature in input_yaml['Num_Num_feature']:
-            func.plot_numNum(data_frame, numerical_numerical_feature,
+            BasicInfo_Subfunctions.plot_numNum(data_frame, numerical_numerical_feature,
                              file_name, categorical_features)
 
 
