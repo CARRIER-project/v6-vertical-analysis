@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-TODO: This script is to generate an (statistical) overview about the data.
+This script is to generate an (statistical) overview about the data.
 Users need to configure the request.yaml to indicate what basic information they want to know about the data.
 Until 25-03-2020, the following functions has been implemented in this script:
 1. Basic description of data (from pandas.dataframe.desribe)
@@ -139,21 +139,24 @@ def main():
                 try:
                     BasicInfo_Subfunctions.dist_Plot(data_frame[numerical_features],
                                    numerical_feature, file_name)
-                except ???:  # TODO: what error is this
+                except: 
                     if numerical_feature not in categorical_features:
                         logger.error(numerical_feature, " -- Data type " +
                                      "does not support numerical " +
                                      "distribution plot")
+                    raise
+
 
             for categorical_feature in categorical_features:
                 try:
                     BasicInfo_Subfunctions.cate_Dist(data_frame[categorical_features],
                                    categorical_feature, file_name)
-                except ???:  # TODO: what error is this
+                except:
                     if categorical_feature not in numerical_features:
                         logger.error(categorical_feature, " -- Data type " +
                                      "does not support categorical " +
                                      "distribution plot")
+                    raise
 
         else:
             for distribution_feature in input_yaml['distribution_feature']:
@@ -161,40 +164,51 @@ def main():
                     try:
                         BasicInfo_Subfunctions.dist_Plot(data_frame[numerical_features],
                                        distribution_feature, file_name)
-                    except ???:  # TODO: what error is this
+                    except:
                         logger.error(distribution_feature, " -- Data type " +
                                      "does not support numerical " +
                                      "distribution plot")
+                        raise
 
                 elif distribution_feature in categorical_features:
                     try:
                         BasicInfo_Subfunctions.cate_Dist(data_frame[categorical_features],
                                        distribution_feature, file_name)
-                    except ???:  # TODO: what error is this
+                    except:
                         logger.error(distribution_feature, " -- Data type " +
                                      "does not support categorical " +
                                      "distribution plot")
+                        raise
 
     # Function for Cat-Num plot
     if input_yaml["Cat_Num_plot"] and input_yaml["Cat_Num_feature"]:
-        # TODO: Logging instead of print? Or leave out completely?
         for categorical_numerical_feature in input_yaml['Cat_Num_feature']:
             BasicInfo_Subfunctions.plot_catNum(data_frame, categorical_numerical_feature,
                              file_name, categorical_features)
 
     # Function for Box plot
-    # TODO: Can these go wrong? Do we need try except?
     if input_yaml["Box_plot"] and input_yaml["Box_plot_feature"]:
         for box_plot_feature in input_yaml['Box_plot_feature']:
-            BasicInfo_Subfunctions.box_Plot(data_frame, box_plot_feature,
-                          file_name, categorical_features)
+            try:
+                BasicInfo_Subfunctions.box_Plot(data_frame, box_plot_feature,
+                            file_name, categorical_features)
+            except: ############
+                logger.error(box_plot_feature, " -- Data type " +
+                                     "does not support categorical " +
+                                     "distribution plot")
+                raise
 
     # Function for Num-Num plot
-    # TODO: Can these go wrong? Do we need try except?
     if input_yaml["Num_Num_Plot"] and input_yaml["Num_Num_feature"]:
         for numerical_numerical_feature in input_yaml['Num_Num_feature']:
-            BasicInfo_Subfunctions.plot_numNum(data_frame, numerical_numerical_feature,
-                             file_name, categorical_features)
+            try:
+                BasicInfo_Subfunctions.plot_numNum(data_frame, numerical_numerical_feature,
+                                file_name, categorical_features)
+            except:############
+                logger.error(box_plot_feature, " -- Data type " +
+                                     "does not support categorical " +
+                                     "distribution plot")
+                raise
 
 
 if __name__ == "__main__":

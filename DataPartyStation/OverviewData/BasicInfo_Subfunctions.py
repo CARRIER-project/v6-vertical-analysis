@@ -15,14 +15,11 @@ This script includes the implementation of the following functions
 
 import os
 import sys
-import errno
 import numpy as np
-from math import pi
 import pandas as pd
 import seaborn as sns
 from collections import Counter
 import matplotlib.pyplot as plt
-from bokeh.core.properties import value
 from bokeh.transform import factor_cmap
 from bokeh.models import ColumnDataSource
 from bokeh.plotting import figure,save
@@ -43,10 +40,10 @@ def check_missing(data_frame, column_names, file_name):
     Args:
         data_frame (pandas.DataFrame): the dataset with selected features.
         column_names (list) : the column names of data_frame
-        file_name: the name of the input data file
+        file_name(str): the name of the input data file
 
     Returns:
-        No return variables but generate "utput/*file_name*_missings.csv"
+        No return variables but generate "output/*file_name*_missings.csv"
     """
     
     ##### Search missing valves #####
