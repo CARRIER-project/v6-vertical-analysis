@@ -1,5 +1,5 @@
 FROM datasharing_base:v1.0
 
-COPY SigVerKey.py SigVerKey.py
+COPY PubPriKey.py PubPriKey.py
 
-CMD ["python", "SigVerKey.py"]
+CMD ["python", "PubPriKey.py"]

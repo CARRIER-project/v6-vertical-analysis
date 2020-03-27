@@ -31,6 +31,8 @@ ADD redacted_logging /usr/local/lib/python3.6/site-packages/redacted_logging/
 ADD config.ini /
 
 COPY hello_world.py hello_world.py
+
+
 COPY run.py run.py
 
 CMD ["python3", "run.py"]

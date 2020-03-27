@@ -1,0 +1,87 @@
+#############################################################
+### Configure this file to get an overview of the dataset###
+# All keys need to be filled as requried: 
+# 1. data_file (str): * Path to the data file * 
+# 2. delimiter (str): * the delimiter in your data file *
+# 3. selected_features (list or str): * Give the exact columns names you want to include separating in single row 
+#                       or "ALL" for using all features *
+# 4. excluded_features (list or str): * Give the exact columns names you want to exclude (normally identifier features) *
+# 
+# 5. check_missing (boolean): * true or false *
+# 6. data_description (boolean): * true or false *
+# 7. correlation_matrix (boolean): * true or false *
+#
+# 8. distribution_plot (boolean): * true or false *
+# 9. distribution_feature (list or boolean): * if distribution_plot is true, then give the exact columns names you want to plot *
+#                                            * if distribution_plot is false, here is also false *
+# 
+# 10. Box_plot (boolean): * true or false *
+# 11. Box_plot_feature (list or boolean): * if Box_plot is true, then give the exact columns names you want to plot *
+#                                         * if Box_plot is false, here is also false *
+# 
+# 12. Cat_Num_plot (boolean): * true or false *
+# 13. Cat_Num_feature (list or boolean): * if Cat_Num_plot is true, then give the exact columns names you want to plot *
+#                                        * if Cat_Num_plot is false, here is also false *
+# 
+# 14. Num_Num_Plot (boolean): * true or false *
+# 15. Num_Num_feature (list or boolean): * if Num_Num_Plot is true, then give the exact columns names you want to plot *
+#                                        * if Num_Num_Plot is false, here is also false *
+#############################################################
+
+
+# Give the file path of your data (only support csv, sav)#
+data_file: data_file.csv
+
+# The delimiter of your data file #
+delimiter: ','
+
+# Give the column name of the features you want to have an overview #
+# If you input ALL, then all featuers will be included excluding the excluded_features#
+selected_features: ALL
+# If you do not exclude any features, please set it as false #
+# If selected_feature is not ALL, excluded_features will be not executed #
+excluded_features: 
+    - GBAGeboorteJaar
+    - GBAGeboorteMaand
+    - GBAGeboorteDag
+    - GBAGeslacht
+    - GBAPostcode
+    - GBAHuisnummer
+    - GBAToev
+    
+# Missing values in the selected featues (true or false) #
+check_missing: true
+
+# Data description from pandas package (true or false) #
+data_description: true
+
+# Plot correlation matrix figure (true or false) #
+correlation_matrix: true
+
+# Plot distribution figure (true or false) #
+distribution_plot: true
+# If true, which features (column names). ALL means all selected_features will be plotted #
+distribution_feature: ALL
+
+### The following plottings support max 3 features each. ###
+### First: x-axis, Second: y-axis, Third: target feature ###
+### The third one (target feature) should be caterical ###
+# Box plot (true or false) #
+Box_plot: false
+# If True, which features (column names) #
+Box_plot_feature: false
+
+
+### Plot for categorical-numerical features (true or false) ###
+### First: x-axis (caterical), Second: y-axis (numerical) ###
+### Third: target feature (caterical) ###
+Cat_Num_plot: false
+# If True, which features (column names) #
+Cat_Num_feature: false
+
+### Plot for numerical-numerical features (true or false) #
+### First: x-axis (numerical), Second: y-axis (numerical) ###
+### Third: target feature (caterical) ###
+Num_Num_Plot: false
+# If True, which features (column names) #
+Num_Num_feature: false
