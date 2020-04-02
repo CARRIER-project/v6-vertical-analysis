@@ -1,7 +1,6 @@
 *.pyc
 *.swp
 *.sav
-*.csv
 *.enc
 .DS_Store
 .Rhistory

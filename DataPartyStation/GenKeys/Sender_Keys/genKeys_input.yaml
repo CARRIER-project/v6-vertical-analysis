@@ -1,8 +1,0 @@
-#############################################################
-### Please provide information to generate public-private keys ###
-# All keys need to be filled as requried: 
-# party_name (str): * Input the recognizable name to this party * 
-#############################################################
-
-# The name of your organization (has to start with letters)#
-party_name: CBS

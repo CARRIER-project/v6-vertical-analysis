@@ -59,12 +59,12 @@ Software:
    
    
    
-3. Get an overview of data:** At each data party (*/CBS/input/* or */DMS/input/*). Configure ***request.yaml*** based on the overview of data you need. In the folder which contains ***data file*** and ***request.yaml***, Mac/Linux run: (You can keep everything as default for testing purpose.)
+3. Get an overview of data:** At each data party (*/CBS/input/* or */DMS/input/*). Configure ***request.yaml*** based on the overview of data you need. In the folder which contains ***data file*** and ***request.yaml***, Mac/Linux run: (You can keep everything as default for testing purpose.) "*/input/20200402_sample_cbs.csv*" is a random sample from Dutch Healthcare cost open data [Link]. 
 
    ```shell
    docker run --rm -it -e RUN="overview_request" \
    -v "$(pwd)/input:/inputVolume" \
-   -v "$(pwd)/input/20200327_simu_cbs.csv:/data_file.csv" \
+   -v "$(pwd)/input/20200402_sample_cbs.csv:/data_file.csv" \
    -v "$(pwd)/output:/output" datasharing_exe:v2.0
    ```
 
@@ -124,7 +124,7 @@ Software:
      ```shell
      docker run --rm -it -e RUN="salt_hashing encrypt_data" \
      -v "$(pwd)/input:/inputVolume" \
-     -v "$(pwd)/input/20200327_simu_cbs.csv:/data_file.csv" \
+     -v "$(pwd)/input/20200402_sample_cbs.csv:/data_file.csv" \
      -v "$(pwd)/output:/output" datasharing_exe:v2.0
      ```
 
@@ -132,12 +132,12 @@ Software:
 
    - Send/Move this "xxxxx.enc" file to */TSE/input/* folder
 
-   - At DMS site: configure *encrypt_input.yaml* (./DMS/input/) (you can use the default setting) and then go back to *DMS* folder, run 
+   - At DMS site: configure *encrypt_input.yaml* (./DMS/input/) (you can use the default setting). ("*/input/20200402_random_dms.csv*" is perturbed data (added randoms to all values and shuffle the datasets) from the Maastricht Study.) Then go back to *DMS* folder, run 
 
      ```shell
      docker run --rm -it -e RUN="salt_hashing encrypt_data" \
      -v "$(pwd)/input:/inputVolume" \
-     -v "$(pwd)/input/20200327_simu_dms.csv:/data_file.csv" \
+     -v "$(pwd)/input/20200402_random_dms.csv:/data_file.csv" \
      -v "$(pwd)/output:/output" datasharing_exe:v2.0
      ```
 
