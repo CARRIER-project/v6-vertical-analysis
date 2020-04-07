@@ -6,4 +6,4 @@ docker run \
   -e RUN="generate_sender_keys" \
   -v "$(pwd)/input:/inputVolume" \
   -v "$(pwd)/output:/output" \
-  datasharing_exe:v2.0
+  datasharing:v2.0

@@ -9,4 +9,4 @@ docker run \
   -v "$(pwd)/input:/inputVolume" \
   -v "$(pwd)/input/$DATA_FILE:/data_file.csv" \
   -v "$(pwd)/output:/output" \
-  datasharing_exe:v2.0
+  datasharing:v2.0
