@@ -2,6 +2,7 @@
 *.swp
 *.sav
 *.enc
+*.key
 .DS_Store
 .Rhistory
 _PRIVATE_signing_key_CBS
