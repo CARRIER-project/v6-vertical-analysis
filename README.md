@@ -49,7 +49,7 @@ Software:
    ./build_container.sh
    ```
 
-2. Get an overview of data:** At each data party (*/CBS/input/* or */DMS/input/*). Configure ***request.yaml*** based on the overview of data you need. In the folder which contains ***data file*** and ***request.yaml***, Mac/Linux run: (You can keep everything as default for testing purpose.) "*/input/20200402_sample_cbs.csv*" is a random sample from Dutch Healthcare cost open data [Link]. 
+2. **Get an overview of data:** From this step, all actions will happen under the *Testing_folder*. At each data party (*Testing_folder/CBS/input/* or */DMS/input/*). Configure ***request.yaml*** based on the overview of data you need. In the folder which contains ***data file*** and ***request.yaml***, Mac/Linux run: (You can keep everything as default for testing purpose.) "*/input/20200402_sample_cbs.csv*" is a random sample from Dutch Healthcare cost [open data] (https://www.vektis.nl/open-data). 
 
   If needed, edit `overview.sh` in the folders `CBS` and `DMS` and change the `DATA_FILE` to point to your sample file. Otherwise, leave it at the default for the sample data (`20200402_sample_cbs.csv` for CBS and `20200402_random_dms.csv` for DMS). Save and execute the script in both folders.
 
@@ -58,9 +58,9 @@ Software:
    ```
 
 
-3. All parties generate keys for communication and identification
+3. **All parties generate keys** for communication and identification
 
-- At TSE side - Generate Quantum safe and Quantum vulnerable public-priate key pairs for each party:
+- At TSE side - Generate Quantum safe and Classic public-priate key pairs for each party. You need to think about a password for you identity verification (example password: DataSharing!!!20200202) :
 
   - Configure the *genKeys_input.yaml* *(./TSE/input/)*, set **party_name: CBS** and back to *TSE* folder run:
 
@@ -70,9 +70,9 @@ Software:
 
   - Then, change the **party_name: DMS**  in *genKeys_input.yaml* and run the command lines above again. 
 
-  - You will get 8 key files in total in the */TSE/output* folder (4 key files for each party) (DO NOT CHANGE THE KEY FILE NAME!)
+  - You will get 8 key files in total in the *./TSE/output* folder (4 key files for each party) (DO NOT CHANGE THE KEY FILE NAME!)
 
-- At data party - Generate Signing-verifying key pair and Quantum vulnerable public-private key pairs.
+- At data party - Generate Signing-verifying key pair and Classic public-private key pairs.
 
   - Configure the *genKeys_input.yaml* *(./CBS/input/)*, set **party_name: CBS** and back to *CBS* folder run:
 
@@ -80,7 +80,7 @@ Software:
     ./gen_sender_keys.sh
     ```
 
-   You will find 4 key files in the */CBS/output* folder
+   You will find 4 key files in the *./CBS/output* folder
 
   - Configure the *genKeys_input.yaml* *(./DMS/input/)*, set **party_name: DMS** and back to *DMS* folder and run the same command above:
 
@@ -88,17 +88,17 @@ Software:
     ./gen_sender_keys.sh
     ```
 
-    You will find 4 keys files in the */DMS/output* folder
+    You will find 4 keys files in the *./DMS/output* folder
 
 
-4. Key exchange - TSE needs to give Quantum Safe Public keys, Quantum vulnerable Public keys to each data party, and receive data parties' verifying keys and data parties' Quantum vulnerable public keys. So steps are below:
-   - At TSE site: from */TSE/output* folder move all files starting with "*SECRET_xxxx.key*" (4 files)to */TSE/input* folder (this means keys will be used for next steps)
-   - At TSE site: from */TSE/output* folder move "*Public_xxx_CBS.key*" (2 files) to */CBS/input/* folder
-   - At TSE site: from */TSE/output* folder move "*Public_xxx_DMS.key*" (2 files) to */DMS/input/* folder
-   - At CBS site: from */CBS/output* folder move "*SECRET_xxx_CBS.key*" (2 files) to */CBS/input/* folder
-   - At CBS site: from */CBS/output* folder move "*Public_xxx_CBS.key*" (2 files) to */TSE/input/* folder
-   - At DMS site: from */DMS/output* folder move "*SECRET_xxx_DMS.key*" (2 files) to */DMS/input/* folder
-   - At DMS site: from */DMS/output* folder move "*Public_xxx_DMS.key*" (2 files) to */TSE/input/* folder
+4. Key exchange - TSE needs to give Quantum Safe Public keys, Classic Public keys to each data party, and receive data parties' verifying keys and data parties' Classic public keys. So steps are below:
+   - At TSE site: from *./TSE/output* folder move all files starting with "*SECRET_xxxx.key*" (4 files)to *./TSE/input* folder (this means keys will be used for next steps)
+   - At TSE site: from *./TSE/output* folder move "*Public_xxx_CBS.key*" (2 files) to *./CBS/input/* folder
+   - At TSE site: from *./TSE/output* folder move "*Public_xxx_DMS.key*" (2 files) to *./DMS/input/* folder
+   - At CBS site: from *./CBS/output* folder move "*SECRET_xxx_CBS.key*" (2 files) to *./CBS/input/* folder
+   - At CBS site: from *./CBS/output* folder move "*Public_xxx_CBS.key*" (2 files) to *./TSE/input/* folder
+   - At DMS site: from *./DMS/output* folder move "*SECRET_xxx_DMS.key*" (2 files) to *./DMS/input/* folder
+   - At DMS site: from *./DMS/output* folder move "*Public_xxx_DMS.key*" (2 files) to *./TSE/input/* folder
 
 
 5. Pseudonymization and encryption of data: to pseudonymize the personal identifiers (PI) for linking multiple datasets, and encrypt the data files (pseudonymized PI + actual data). 
@@ -109,9 +109,9 @@ Software:
      ./hash_encrypt.sh
      ```
 
-     You will find one "xxxxx.enc" file and one *cbs_data_keys.json* file in */CBS/output* folder
+     You will find one "xxxxx.enc" file and one *cbs_data_keys.json* file in *./CBS/output* folder
 
-   - Send/Move this "xxxxx.enc" file to */TSE/input/* folder
+   - Send/Move this "xxxxx.enc" file to *./TSE/input/* folder
 
    - At DMS site: configure *encrypt_input.yaml* (./DMS/input/) (you can use the default setting). ("*/input/20200402_random_dms.csv*" is perturbed data (added randoms to all values and shuffle the datasets) from the Maastricht Study.) Then go back to *DMS* folder. Edit the script `hash_encrypt.sh` to have `DATA_FILE` point to your data file, or leave it at `20200402_random_dms.csv` for the default test data. Execute the script:
 
@@ -122,7 +122,7 @@ Software:
 
      You will get one "xxxxx.enc" file and one *dms_data_keys.json* file in */DMS/output* folder
 
-   - Send/Move this "xxxxx.enc" file to */TSE/input/* folder too
+   - Send/Move this "xxxxx.enc" file to *./TSE/input/* folder too
 
 
 6. Sign models: researchers should send their analysis model to all data parties. Data parties check the models and sign the models and send them to TSE. 
@@ -133,9 +133,9 @@ Software:
     ./sign_model.sh
     ```
 
-    You will see two "CBS_xxxx.py.enc" files in the */CBS/output/* folder
+    You will see two "CBS_xxxx.py.enc" files in the *./CBS/output/* folder
 
-  - Send/Move these two "CBS_xxxx.py.enc" files to */TSE/input/* folder
+  - Send/Move these two "CBS_xxxx.py.enc" files to *./TSE/input/* folder
 
   - At DMS site: configure *sign_model_input.yaml* (./DMS/input/) (you can use the default setting) and then go back to *DMS* folder, run the command lines above:
 
@@ -143,15 +143,15 @@ Software:
     ./sign_model.sh
     ```
 
-    You will see two "DMS_xxxx.py.enc" files in the */DMS/output/* folder
+    You will see two "DMS_xxxx.py.enc" files in the *./DMS/output/* folder
 
-  - Send/Move these two "DMS_xxxx.py.enc" files to */TSE/input/* folder
+  - Send/Move these two "DMS_xxxx.py.enc" files to *./TSE/input/* folder
 
 
 
-7. Matching and analysis at TSE: at this moment, you should have 3 yaml files, 6 enc files, 8 key files in the */TSE/input/* folder. 
+7. Matching and analysis at TSE: at this moment, you should have 3 yaml files, 6 enc files, 8 key files in the *./TSE/input/* folder. 
 
-  - Configure *security_input.yaml* *(/TSE/input/)*: the things you need to change are:
+  - Configure *security_input.yaml* *(./TSE/input/)*: the things you need to change are:
 
     ```shell
     dmsfileUUID: "xxxxxx"
@@ -161,9 +161,9 @@ Software:
     cbsencryptKey: "vvvvvvv"
     ```
 
-  - You can find **DMSfileUUID** and **DMSencryptKey** in the */DMS/output/dms_data_keys.json*, **CBSfileUUID** and **CBSencryptKey** can be found in the */CBS/output/cbs_data_keys.json* You can leave the rest as default for testing purpose.
+  - You can find **DMSfileUUID** and **DMSencryptKey** in the *./DMS/output/dms_data_keys.json*, **CBSfileUUID** and **CBSencryptKey** can be found in the *./CBS/output/cbs_data_keys.json* You can leave the rest as default for testing purpose.
 
-  - Configure *analysis_input.yaml* *(/TSE/input/)*: You can leave all inputs as default for testing purpose for now
+  - Configure *analysis_input.yaml* *(./TSE/input/)*: You can leave all inputs as default for testing purpose for now
 
   - In the TSE folder, run 
 
