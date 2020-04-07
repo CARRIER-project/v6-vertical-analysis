@@ -30,8 +30,7 @@ ADD PQcrypto/PQencryption/ /usr/local/lib/python3.6/site-packages/PQencryption/
 ADD redacted_logging /usr/local/lib/python3.6/site-packages/redacted_logging/
 ADD config.ini /
 
-COPY hello_world.py hello_world.py
-
+ADD scripts /scripts
 
 COPY run.py run.py
 

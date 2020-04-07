@@ -10,6 +10,7 @@ variable as space-separated filenames without the `.py` ending.
 
 import os
 import sys
+import importlib
 import redacted_logging as rlog
 
 
@@ -60,15 +61,22 @@ def main():
     except KeyError:
         logger.error("No environment variable 'RUN' set. Please run docker "
                      "with '-e RUN=\"script_1 script_2 script_...\"'.")
+        raise
+
+    modules = []
 
     for script in script_list:
         try:
-            module = __import__(script, fromlist=["main"])
-            module.main()
+            module = importlib.import_module("scripts." + script)
+            modules.append(module)
         except ModuleNotFoundError:
             logger.error("No script named '" + script + "' supplied by the " +
                          "container. Please consult the README.md for valid " +
                          "options.")
+            raise
+
+    for module in modules:
+        module.main()
 
 
 if __name__ == "__main__":
