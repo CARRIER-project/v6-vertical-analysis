@@ -49,7 +49,7 @@ Software:
    ./build_container.sh
    ```
 
-2. **Get an overview of data:** From this step, all actions will happen under the *Testing_folder*. At each data party (*Testing_folder/CBS/input/* or */DMS/input/*). Configure ***request.yaml*** based on the overview of data you need. In the folder which contains ***data file*** and ***request.yaml***, Mac/Linux run: (You can keep everything as default for testing purpose.) "*/input/20200402_sample_cbs.csv*" is a random sample from Dutch Healthcare cost [open data] (https://www.vektis.nl/open-data). 
+2. **Get an overview of data:** From this step, all actions will happen under the *Testing_folder*. At each data party (*Testing_folder/CBS/input/* or */DMS/input/*). Configure ***request.yaml*** based on the overview of data you need. In the folder which contains ***data file*** and ***request.yaml***, Mac/Linux run: (You can keep everything as default for testing purpose.) "*/input/20200402_sample_cbs.csv*" is a random sample from Dutch Healthcare cost [open data](https://www.vektis.nl/open-data). 
 
   If needed, edit `overview.sh` in the folders `CBS` and `DMS` and change the `DATA_FILE` to point to your sample file. Otherwise, leave it at the default for the sample data (`20200402_sample_cbs.csv` for CBS and `20200402_random_dms.csv` for DMS). Save and execute the script in both folders.
 
