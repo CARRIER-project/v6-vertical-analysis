@@ -25,7 +25,7 @@ from .salsa20 import Salsa20, Salsa20Key
 from .utilities import _get_password, repeat_import_export
 
 key_length = 32
-key_name = "SECRET_AES_256_Key"
+key_name = "SECRET_AES_256_Classic_Symmetric_Encryption_Key"
 key_description = key_name + " for AES 256 symmetric block encryption"
 
 class AES256(object):

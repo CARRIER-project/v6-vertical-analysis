@@ -189,7 +189,7 @@ def repeat_import_export(function):
             except ValueError as error:
                 attempts += 1
                 print()
-                print("Can't export key:")
+                print("Password input unsuccessful:")
                 print(error)
                 print()
                 if attempts > max_number_of_attempts:

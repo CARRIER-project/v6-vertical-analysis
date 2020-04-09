@@ -21,10 +21,10 @@ from .utilities import _get_password, repeat_import_export
 from .sha512 import hash512
 from .Key import _Key
 
-secret_key_name = "SECRET_EdDSA_Key"
+secret_key_name = "SECRET_EdDSA_Classic_Asymmetric_Signing_Key"
 secret_key_description = secret_key_name + " for EdDSA asymmetric signing"
 
-public_key_name = "Public_EdDSA_Key"
+public_key_name = "Public_EdDSA_Classic_Asymmetric_Verifying_Key"
 public_key_description = public_key_name + " for EdDSA asymmetric signing"
 
 

@@ -26,11 +26,11 @@ from .sha512 import hash512
 from .Key import _Key
 
 
-secret_key_name = "SECRET_McBits_Key"
+secret_key_name = "SECRET_McBits_Quantum-safe_Asymmetric_Decryption_Key"
 secret_key_description = secret_key_name + " for McBits asymmetric quantum-" \
         "computer-safe encryption"
 
-public_key_name = "Public_McBits_Key"
+public_key_name = "Public_McBits_Quantum-safe_Asymmetric_Encryption_Key"
 public_key_description = public_key_name + " for McBits asymmetric quantum-" \
         "computer-safe encryption"
 

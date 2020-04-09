@@ -22,10 +22,10 @@ from .utilities import _get_password, repeat_import_export
 from .sha512 import hash512
 from .Key import _Key
 
-secret_key_name = "SECRET_Diffie_Hellman_Key"
+secret_key_name = "SECRET_Diffie_Hellman_Classic_Asymmetric_Decryption_Key"
 secret_key_description = secret_key_name + " for DH pubkey encryption"
 
-public_key_name = "Public_Diffie_Hellman_Key"
+public_key_name = "Public_Diffie_Hellman_Classic_Asymmetric_Encryption_Key"
 public_key_description = public_key_name +  " for DH pubkey encryption"
 
 

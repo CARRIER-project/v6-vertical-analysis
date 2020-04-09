@@ -25,7 +25,7 @@ from .utilities import _get_password, repeat_import_export
 
 
 key_length = 32  # corresponds to 256 bits
-key_name = "SECRET_Salsa20_Key"
+key_name = "SECRET_Salsa20_Classic_Symmetric_Encryption_Key"
 key_description = key_name + " for Salsa20 256 symmetric streaming encryption"
 
 class Salsa20(object):
