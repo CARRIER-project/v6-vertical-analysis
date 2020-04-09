@@ -7,7 +7,7 @@ Not to be used on its own.
 import os
 import gc
 import nacl.encoding
-from .utilities import _get_password
+from .utilities import _get_password, repeat_import_export
 from .sha512 import hash512
 
 class _Key(object):
@@ -40,6 +40,7 @@ class _Key(object):
             raise ValueError('Invalid key length, must be '
                     + str(key_length) + ' bits.')
 
+    @repeat_import_export
     def export_key(self, path, owner, force=False, silent=False):
         from .salsa20 import Salsa20, Salsa20Key
         file_name = self.name + "_" + owner + ".key"

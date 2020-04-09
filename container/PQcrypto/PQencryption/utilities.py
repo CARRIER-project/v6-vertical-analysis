@@ -10,6 +10,7 @@ import getpass
 import gc  # garbage collector
 import re
 import os
+from functools import wraps
 
 def _check_password(password):
     """ Checks if the password meets the required criteria.
@@ -163,6 +164,42 @@ def import_key(file_name_with_path, silent=False):
         return key
     else:
         raise IOError("Could not import key.")
+
+def repeat_import_export(function):
+    """Repeats a key-import or -export function in case of password errors.
+
+    Args:
+        function: The import or export function to repeat.
+        number_of_attempts: How often should we try before giving up?
+    Returns:
+        The result of the function.
+    Raises:
+        ValueError: If 'function' fails more often than
+            'max_number_of_attempts'.
+    """
+
+    max_number_of_attempts = 3
+
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        attempts = 1
+        while attempts <= max_number_of_attempts:
+            try:
+                return function(*args, **kwargs)
+            except ValueError as error:
+                attempts += 1
+                print()
+                print("Can't export key:")
+                print(error)
+                print()
+                if attempts > max_number_of_attempts:
+                    raise
+                print(f"{attempts} attempt of {max_number_of_attempts}. " +
+                      "Please try again.")
+                print()
+
+    return wrapper
+
 
 def sign_encrypt_sign_pubkey(signing_key, quantum_safe_public_key,
         classic_secret_key, classic_public_key, message):

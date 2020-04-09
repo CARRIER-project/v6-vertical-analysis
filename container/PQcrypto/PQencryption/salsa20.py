@@ -21,7 +21,7 @@ import nacl.utils
 import nacl.encoding
 from .Key import _Key
 from .sha512 import hash512
-from .utilities import _get_password
+from .utilities import _get_password, repeat_import_export
 
 
 key_length = 32  # corresponds to 256 bits
@@ -100,6 +100,7 @@ class Salsa20Key(_Key):
             return True
 
     @staticmethod
+    @repeat_import_export
     def import_key(file_name_with_path, silent=False):
         with open(file_name_with_path) as f:
             header = f.readline().rstrip()

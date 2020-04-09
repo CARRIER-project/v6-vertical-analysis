@@ -435,7 +435,7 @@ if __name__ == "__main__":
 
 #    example_generate_keys()
 
-#    example_export_import_keys()
+    example_export_import_keys()
 
 #    example_quantum_vulnerable_signing()
 

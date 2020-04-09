@@ -22,7 +22,7 @@ from Crypto.Cipher import AES
 from .Key import _Key
 from .sha512 import hash512
 from .salsa20 import Salsa20, Salsa20Key
-from .utilities import _get_password
+from .utilities import _get_password, repeat_import_export
 
 key_length = 32
 key_name = "SECRET_AES_256_Key"
@@ -135,6 +135,7 @@ class AES256Key(_Key):
             return True
 
     @staticmethod
+    @repeat_import_export
     def import_key(file_name_with_path, silent=False):
         """ Creates a key object from a key file.
 

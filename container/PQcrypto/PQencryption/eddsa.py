@@ -17,7 +17,7 @@ from __future__ import print_function  # make print python3 compatible
 import nacl.signing
 import nacl.encoding
 from .salsa20 import Salsa20, Salsa20Key
-from .utilities import _get_password
+from .utilities import _get_password, repeat_import_export
 from .sha512 import hash512
 from .Key import _Key
 
@@ -132,6 +132,7 @@ class EdDSASigningKey(_EdDSAKey):
         self.verify_key = EdDSAVerifyKey(self.key.verify_key)
 
     @staticmethod
+    @repeat_import_export
     def import_key(file_name_with_path, silent=False):
         """ Creates a signing key object from a key file.
 
