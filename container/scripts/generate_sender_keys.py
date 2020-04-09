@@ -36,7 +36,7 @@ def main():
 
     # Sign-verify key generation
     keyset_sign_verify = cr.EdDSA.key_gen()
-    logger.debug("Export EdDSA keys ... ...")
+    logger.info("Export EdDSA keys ... ...")
     for key_object in keyset_sign_verify:
         start_key_export = time.time()
         key_object.export_key(KEY_OUTPUT_PATH, party_name,
@@ -46,7 +46,7 @@ def main():
 
     # Quantum vulnerable public-private key generation
     keyset_quantum_vulnerable_pub_priv = cr.DiffieHellman.key_gen()
-    logger.debug("Export DiffieHellman keys ... ...")
+    logger.info("Export DiffieHellman keys ... ...")
     for key_object in keyset_quantum_vulnerable_pub_priv:
         start_key_export = time.time()
         key_object.export_key(KEY_OUTPUT_PATH, party_name,

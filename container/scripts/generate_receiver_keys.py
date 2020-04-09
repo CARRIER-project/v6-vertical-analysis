@@ -36,8 +36,8 @@ def main():
 
     # Quantum safe public-private key generation
     keyset_quantum_safe_sign_verify = cr.McBits.key_gen()
-    logger.debug("Exporting McBits keys to folder " +
-                 "'{KEY_OUTPUT_PATH}'.")
+    logger.info("Exporting McBits keys to folder " +
+                "'{KEY_OUTPUT_PATH}'.")
     for key_object in keyset_quantum_safe_sign_verify:
         start_key_export = time.time()
         key_object.export_key(KEY_OUTPUT_PATH, party_name,
@@ -47,8 +47,8 @@ def main():
 
     # Quantum vulnerable public-private key generation
     keyset_quantum_vulnerable_pub_priv = cr.DiffieHellman.key_gen()
-    logger.debug("Export Diffie Hellman keys to folder " +
-                 "'{KEY_OUTPUT_PATH}'.")
+    logger.info("Export Diffie Hellman keys to folder " +
+                "'{KEY_OUTPUT_PATH}'.")
     for key_object in keyset_quantum_vulnerable_pub_priv:
         start_key_export = time.time()
         key_object.export_key(KEY_OUTPUT_PATH, party_name,
