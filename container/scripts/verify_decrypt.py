@@ -234,8 +234,19 @@ def main():
         path = '/inputVolume/'
         try:
             verifying_key = cr.import_key(path + keys_dict["%sverifying_key" %(each_party)], silent=False)
+            
+            logger.info("*** Please input your password for Quantum Safe Secret Key: ***")
+            start_key_export = time.time()
             quantum_safe_secret_key = cr.import_key(path + keys_dict["%squantum_safe_secret_key" %(each_party)], silent=False)
+            end_key_export = time.time()
+            key_export_time += end_key_export - start_key_export
+
+            start_key_export = time.time()
+            logger.info("*** Please input your password for Classic Secret Key: ***")
             classic_secret_key = cr.import_key(path + keys_dict["%sclassic_secret_key" %(each_party)], silent=False)
+            end_key_export = time.time()
+            key_export_time += end_key_export - start_key_export
+            
             classic_public_key = cr.import_key(path + keys_dict["%sclassic_public_key" %(each_party)], silent=False)
         except:
             logger.error("Failed to import verifying and public-priavte key. Please chekc if keys are in the input folder and give the correct names in the security_input.yaml file.")
@@ -277,7 +288,9 @@ def main():
         logger.error("Model verification failed!")
         raise
 
-    logger.info("Verification and decryption took {runtime:.4f}s to run".format(runtime=(time.time() - start_time)))
+    end_time = time.time()
+    run_time = end_time - start_time - key_export_time
+    logger.info("Verification and decryption took {runtime:.4f}s to run (excluding key exports)".format(runtime=run_time)
 
 
 if __name__ == "__main__":

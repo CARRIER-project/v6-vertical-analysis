@@ -72,13 +72,23 @@ def import_keys_from_yaml(inputYAML, logger):
 
         path = '/inputVolume/'
         # read signing key from itself
+        logger.info("*** Please input your password for Signing Key: ***")
+        start_key_export = time.time()
         signing_key = cr.import_key(path + signing_key_yaml, silent=False) 
+        end_key_export = time.time()
+        key_export_time += end_key_export - start_key_export
+
         # read quantum safe public key from tse
         quantum_safe_public_key = cr.import_key(path + quantum_safe_public_key_yaml, silent=False) 
         # read quantum vulnerable public key from tse
         classic_public_key_tse = cr.import_key(path + classic_public_key_tse_yaml, silent=False) 
+
         # read quantum vulnerable private key from itself
+        logger.info("*** Please input your password for Classic Secret Key: ***")
+        start_key_export = time.time()
         classic_secret_key = cr.import_key(path + classic_private_key_yaml, silent=False) 
+        end_key_export = time.time()
+        key_export_time += end_key_export - start_key_export
     except KeyError:
         logger.error("YAML file not valid. Please consult the example " +
                         "'encrypt_input.yaml' file and edit in your settings.")
@@ -86,7 +96,7 @@ def import_keys_from_yaml(inputYAML, logger):
         logger.error("Failed to create or import encryption keys !")
         raise
 
-    return signing_key, quantum_safe_public_key, classic_public_key_tse, classic_secret_key, encryption_key, encryptionKeyBase64
+    return signing_key, quantum_safe_public_key, classic_public_key_tse, classic_secret_key, encryption_key, encryptionKeyBase64, key_export_time
 
 
 def save_encrypted_data_file(signed_encrypted_signed_message, local_save, receiver_address, fileStr, logger):
@@ -152,7 +162,7 @@ def main():
     inputYAML = load_yaml_file(input_yaml_file_name, logger)
 
     ### import encryption keys ###
-    signing_key, quantum_safe_public_key, classic_public_key_tse, classic_secret_key, encryption_key, encryptionKeyBase64 = import_keys_from_yaml(inputYAML, logger)
+    signing_key, quantum_safe_public_key, classic_public_key_tse, classic_secret_key, encryption_key, encryptionKeyBase64, key_export_time = import_keys_from_yaml(inputYAML, logger)
 
     try:
         party_name = inputYAML['party_name']
@@ -193,7 +203,10 @@ def main():
         json.dump(result, fp)
     logger.info("Your data keys are stored in output folder")
 
-    logger.info("Data encryption program took {runtime:.4f}s to run".format(runtime=time.time() - start_time))
+    end_time = time.time()
+    run_time = end_time - start_time - key_export_time
+
+    logger.info("Data encryption program took {runtime:.4f}s to run (excluding key exports)".format(runtime=run_time))
 
 if __name__ == "__main__":
     main()

@@ -125,13 +125,22 @@ def main():
         ### Import signing key for model files ###
         try:
             path = '/inputVolume/'
+
+            logger.info("*** Please input your password for Signing Key: ***")
+            start_key_export = time.time()
             signing_key = cr.import_key(path + signing_key_yaml, silent=False)
+            end_key_export = time.time()
+            key_export_time += end_key_export - start_key_export
+
             signing_cipher = EdDSA(signing_key)
             
             signed_models = signing_cipher.sign(myModel)
             save_signed_model_file(signed_models, local_save, receiver_address, party_name, model, logger)
 
-            logger.info("Siging model files took {runtime:.4f}s to run".format(runtime=time.time() - start_time))
+            end_time = time.time()
+            run_time = end_time - start_time - key_export_time
+
+            logger.info("Siging model files took {runtime:.4f}s to run (excluding key exports)".format(runtime=run_time))
         except:
             logger.error("Signing model file {modelName} failed. ".format(modelName=str(model)))
             raise
