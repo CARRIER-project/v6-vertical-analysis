@@ -112,6 +112,7 @@ def main():
 
     verKey_list = []
 
+    key_export_time = 0
     for model in model_files:
         try:
             # Read model files #
@@ -139,11 +140,11 @@ def main():
 
             end_time = time.time()
             run_time = end_time - start_time - key_export_time
-
-            logger.info("Siging model files took {runtime:.4f}s to run (excluding key exports)".format(runtime=run_time))
         except:
             logger.error("Signing model file {modelName} failed. ".format(modelName=str(model)))
             raise
+    
+    logger.info("Siging model files took {runtime:.4f}s to run (excluding key exports)".format(runtime=run_time))
 
 if __name__ == "__main__":
     main()

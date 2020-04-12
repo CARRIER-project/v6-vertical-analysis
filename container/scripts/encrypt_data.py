@@ -72,6 +72,7 @@ def import_keys_from_yaml(inputYAML, logger):
 
         path = '/inputVolume/'
         # read signing key from itself
+        key_export_time = 0
         logger.info("*** Please input your password for Signing Key: ***")
         start_key_export = time.time()
         signing_key = cr.import_key(path + signing_key_yaml, silent=False) 
@@ -162,6 +163,7 @@ def main():
     inputYAML = load_yaml_file(input_yaml_file_name, logger)
 
     ### import encryption keys ###
+    
     signing_key, quantum_safe_public_key, classic_public_key_tse, classic_secret_key, encryption_key, encryptionKeyBase64, key_export_time = import_keys_from_yaml(inputYAML, logger)
 
     try:

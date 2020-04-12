@@ -181,7 +181,7 @@ def verify_model(verifying_key_list, modelFile_list, newFile, logger):
             raise
     
     if all(each_model == verified_models[0] for each_model in verified_models):
-        logger.info("Signed models has been verified successfully!")
+        logger.debug("%s Signed models has been verified successfully!" %newFile)
     else:
         logger.error("Signed models from all parties are not the same!")
         sys.exit("Execution interrupted!")
@@ -228,6 +228,7 @@ def main():
 
 
     #run decryption and verification on data
+    key_export_time = 0
     for each_party in parties:
         logger.debug('Verifying %s' %each_party)
 
@@ -235,14 +236,14 @@ def main():
         try:
             verifying_key = cr.import_key(path + keys_dict["%sverifying_key" %(each_party)], silent=False)
             
-            logger.info("*** Please input your password for Quantum Safe Secret Key: ***")
+            logger.info("*** Please input your password for Quantum Safe Secret Key of %s: " %(each_party))
             start_key_export = time.time()
             quantum_safe_secret_key = cr.import_key(path + keys_dict["%squantum_safe_secret_key" %(each_party)], silent=False)
             end_key_export = time.time()
             key_export_time += end_key_export - start_key_export
 
             start_key_export = time.time()
-            logger.info("*** Please input your password for Classic Secret Key: ***")
+            logger.info("*** Please input your password for Classic Secret Key of %s: " %(each_party))
             classic_secret_key = cr.import_key(path + keys_dict["%sclassic_secret_key" %(each_party)], silent=False)
             end_key_export = time.time()
             key_export_time += end_key_export - start_key_export
@@ -282,7 +283,7 @@ def main():
 
     try:
         for key_item in modelKeys.keys():
-            verify_model(modelKeys[key_item], modelFileNames[key_item], "/MLmodel.py", logger)
+            verify_model(modelKeys[key_item], modelFileNames[key_item], "/scripts/MLmodel.py", logger)
         logger.info("Your model is verified successfully. ")
     except:
         logger.error("Model verification failed!")
@@ -290,7 +291,7 @@ def main():
 
     end_time = time.time()
     run_time = end_time - start_time - key_export_time
-    logger.info("Verification and decryption took {runtime:.4f}s to run (excluding key exports)".format(runtime=run_time)
+    logger.info("Verification and decryption took {runtime:.4f}s to run (excluding key exports)".format(runtime=run_time))
 
 
 if __name__ == "__main__":

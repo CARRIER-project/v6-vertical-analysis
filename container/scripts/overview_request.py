@@ -19,7 +19,7 @@ from collections import Counter
 import yaml
 import pyreadstat
 import pandas as pd
-import overview_subfunctions
+from scripts import overview_subfunctions
 import redacted_logging as rlog
 
 import warnings

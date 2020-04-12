@@ -19,8 +19,8 @@ import sys, yaml
 import numpy as np
 import pandas as pd
 from collections import Counter
-import analysis_subfunctions
-import MLmodel
+from scripts import analysis_subfunctions
+from scripts import MLmodel
 from sklearn.model_selection import cross_validate
 import redacted_logging as rlog
 
@@ -41,7 +41,7 @@ def load_yaml_file(file_name, logger):
     try:
         with open(file_name) as file:
             inputYAML = yaml.load(file, Loader=yaml.FullLoader)
-            logger.debug("Reading request.yaml file...")
+            logger.debug("Reading analysis_input.yaml file...")
     except yaml.parser.ParserError:
         logger.error(f"File {file} is not valid YAML.")
         raise
@@ -321,10 +321,10 @@ def main():
     execute the functions from the analysis model file, then generate the fail results. 
     
     """
-    ### Read yaml file ###
+    ### Read analysis yaml file ###
     logger = rlog.get_logger(__name__)
-    input_yaml_file_name = r'/inputVolume/analysis_input.yaml'
-    inputYAML = load_yaml_file(input_yaml_file_name, logger)
+    input_analysis_yaml_file_name = r'/inputVolume/analysis_input.yaml'
+    inputYAML = load_yaml_file(input_analysis_yaml_file_name, logger)
 
     ### Load data from container ###
     try:
@@ -356,7 +356,7 @@ def main():
     selected_data_frame, selected_columns = select_features(data_frame, selected_variables, excluded_variables, logger)
     
     ### For checking data types ###
-    selected_data_frame.dtypes.to_csv('/output/dataType', header=False)
+    selected_data_frame.dtypes.to_csv('/output/dataType.csv', header=False)
 
     # Convert to numeric, string will be converted to Nan
     if categorical_to_numerical:

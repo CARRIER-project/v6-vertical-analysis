@@ -12,7 +12,7 @@ import time, sys, yaml
 start_time = time.time()
 import pyreadstat
 import pandas as pd
-import check_format
+from scripts import check_format
 import PQencryption as cr
 import redacted_logging as rlog
 
