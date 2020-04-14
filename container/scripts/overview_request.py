@@ -13,7 +13,8 @@ Until 25-03-2020, the following functions has been implemented in this script:
 6. Relations plot between different variables (numerical-numercial features, categorical-numerical features)
 
 """
-
+import time
+start_time = time.time()
 import ntpath
 from collections import Counter
 import yaml
@@ -210,6 +211,10 @@ def main():
                                      "does not support categorical " +
                                      "distribution plot")
 
+
+    end_time = time.time()
+    run_time = end_time - start_time
+    logger.info("Data overview generation took {runtime:.4f}s to run.".format(runtime=run_time))
 
 if __name__ == "__main__":
     main()
