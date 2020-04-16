@@ -15,7 +15,7 @@ Until 25-03-2020, the following functions has been implemented in this script:
 """
 
 import os
-import numpy as npv
+import numpy as np
 import pandas as pd
 import seaborn as sns
 from scipy import stats
@@ -121,7 +121,7 @@ def corr_Matrix(data_frame, file_name):
     cmap = sns.diverging_palette(220, 10, as_cmap=True)
 
     # Draw the heatmap with the mask and correct aspect ratio
-    sns.heatmap(corr,  cmap=cmap, annot=False, mask=mask,#center=0,
+    sns.heatmap(corr,  cmap=cmap, annot=False, #mask=mask,#center=0,
                 square=True, linewidths=.5, cbar_kws={"shrink": 0.5})
     plt.title('Correlation Matrix in %s' % file_name)
 

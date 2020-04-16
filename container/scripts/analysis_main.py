@@ -70,15 +70,18 @@ def select_features(data_frame, selected_variables, excluded_variables, logger):
     """
 
     ### For checking data types ###
-    if selected_variables.lower() == "all":
-        selected_data_frame = data_frame
-        if not excluded_variables:
-            try:
-                selected_data_frame = selected_data_frame.drop(excluded_variables, axis=1)
-            except KeyError:
-                logger.error(f"One or more excluded features '{excluded_variables}' are not" +
-                               "found in the data.")
-        selected_columns = selected_data_frame.columns
+    if type(selected_variables) == str:
+        if selected_variables.lower() == "all":
+            selected_data_frame = data_frame
+            if excluded_variables:
+                try:
+                    selected_data_frame = selected_data_frame.drop(excluded_variables, axis=1)
+                except KeyError:
+                    logger.error(f"One or more excluded features '{excluded_variables}' are not" +
+                                "found in the data.")
+            selected_columns = list(selected_data_frame.columns)
+        else:
+            logger.debug("Please input 'all' or a list of feature names! ")
 
     else:
         try:
@@ -92,7 +95,7 @@ def select_features(data_frame, selected_variables, excluded_variables, logger):
 
 
 ### 1.Overview on combined data ###
-def overview_combined_data (combined_df, selected_columns, file_name, checkMissing, basicInfo, 
+def overview_combined_data (combined_df, selected_columns, plotting_features, file_name, checkMissing, basicInfo, 
                             CorrMatrix, dist_plot, control_variable, logger):
     """ Generate basic information of the dataset including basic statistics, missing values,
         correlation matrix, distribution plot.
@@ -126,45 +129,59 @@ def overview_combined_data (combined_df, selected_columns, file_name, checkMissi
         except:
             logger.warning("Failed to generate data basic info table, but the execution will be continued!")
 
+    ### Features to be plotted ###
+    if plotting_features == 'all':
+        plotting_features == selected_columns
+    elif plotting_features == False:
+        CorrMatrix = False
+        dist_plot = False
+    
     ### Function for correlation matrix ###
     if CorrMatrix:
+
         try:
-            analysis_subfunctions.corr_Matrix(combined_df[selected_columns], file_name)
+            analysis_subfunctions.corr_Matrix(combined_df[plotting_features], file_name)
 
             existFile = "output/%s_Corr.csv" %file_name
             if os.path.exists(existFile):
                 os.remove(existFile)
+        except IndexError:
+            logger.error("Plotting_features are not in the dataset. Please provide valid feature names!")
         except:
             logger.warning("Failed to plot correlation matrix, but the execution will be continued!")
 
     ### Function for distribution plot ###
     if dist_plot:
-        try: 
-            if not control_variable:
-                for column_item in range(0,len(selected_columns)):
-                    analysis_subfunctions.dist_Plot(combined_df,selected_columns[column_item],control_variable)
+        if not control_variable:
+            for column_item in range(0,len(plotting_features)):
+                try:
+                    analysis_subfunctions.dist_Plot(combined_df,plotting_features[column_item],control_variable)
+                except ValueError:
+                    logger.debug("%s - Calculated values for plotting contains errors!" %plotting_features[column_item])
+            logger.debug('Distribution plot is done')
+
+        elif control_variable in plotting_features:
+            list_value = list(Counter(combined_df[control_variable]).keys())
+
+            if len(list_value) < 8:
+                for i_value in list_value:
+                    ctrl_combined_df = combined_df[combined_df[control_variable]==i_value]
+                    for column_item in range(0,len(plotting_features)):
+                        if control_variable != plotting_features[column_item]:
+                            try:
+                                analysis_subfunctions.dist_Plot(ctrl_combined_df,plotting_features[column_item], str(control_variable+'_'+str(i_value)) )
+                            except ValueError:
+                                logger.debug("%s - Calculated values for plotting contains errors!" %plotting_features[column_item])
+            
                 logger.debug('Distribution plot is done')
-
-            elif control_variable in selected_columns:
-                list_value = list(Counter(combined_df[control_variable]).keys())
-
-                if len(list_value) < 8:
-                    for i_value in list_value:
-                        ctrl_combined_df = combined_df[combined_df[control_variable]==i_value]
-                        for column_item in range(0,len(selected_columns)):
-                            if control_variable != selected_columns[column_item]:
-                                analysis_subfunctions.dist_Plot(ctrl_combined_df,selected_columns[column_item], str(control_variable+'_'+str(i_value)) )
-                    logger.debug('Distribution plot is done')
-                else: 
-                    logger.error("Sorry, control variable has too many different values! Please choose categorical variable as control")
-                    sys.exit("Execution interrupted!")
-                
-            else:
-                logger.error("Please give one valid variable name or False to 'control_var'.")
+            else: 
+                logger.error("Sorry, control variable has too many different values! Please choose categorical variable as control")
                 sys.exit("Execution interrupted!")
+            
+        else:
+            logger.error("Please give one valid variable name or False to 'control_var'.")
+            sys.exit("Execution interrupted!")
 
-        except:
-            logger.warning("Failed to make distribution plots, but the execution will be continued!")
         
 
 
@@ -343,6 +360,7 @@ def main():
         control_variable = inputYAML['control_var']
         checkMissing = inputYAML['check_missing']
         basicInfo = inputYAML['basic_Information']
+        plotting_features = inputYAML['plotting_features']
         CorrMatrix = inputYAML['correlation_matrix']
         dist_plot = inputYAML["distribution_plot"]
         task = inputYAML['task'].lower()
@@ -376,22 +394,22 @@ def main():
 
 
     ### Main executions ###############
-    ### 1.Overview on combined data ###
-    overview_combined_data (combined_df, selected_columns, file_name, checkMissing, basicInfo, 
-                            CorrMatrix, dist_plot, control_variable, logger)
-    logger.info("Basic info took {runtime:.4f}s to run".format(runtime=(time.time() - start_time_step_0)))
-
-    
-    ### 2. Check if features, evaluaton methods are valid ###
-    start_time_step_1 = time.time()
+    ### 1. Check if features, evaluaton methods are valid ###
     model_name, training_features, target_feature = check_model_inputs(task, scoring, combined_df, logger)
-    
-  
+    logger.info("Pre-processing data took {runtime:.4f}s to run".format(runtime=(time.time() - start_time_step_0)))
+
+    ### 2.Overview on combined data ###
+    start_time_step_1 = time.time()
+    overview_combined_data (combined_df, selected_columns, plotting_features, file_name, checkMissing, basicInfo, 
+                            CorrMatrix, dist_plot, control_variable, logger)
+    logger.info("Basic info took {runtime:.4f}s to run".format(runtime=(time.time() - start_time_step_1)))
+
+
     ### 3. Run the model ###
-    
+    start_time_step_2 = time.time()
     training_process(combined_df, task, kFold, scoring, model_name, training_features, target_feature, logger)
 
-    logger.info("In total, all models training took {runtime:.4f} to run. ".format(runtime=(time.time() - start_time_step_1)))
+    logger.info("In total, all models training took {runtime:.4f} to run. ".format(runtime=(time.time() - start_time_step_2)))
     logger.info("The whole analysis process took {runtime:.4f} to run. ".format(runtime=(time.time() - start_time_step_0)))
 
 
