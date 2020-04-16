@@ -19,6 +19,9 @@ check_missing: true
 ### Obtain the overview of the combined dataset (true or false) ###
 basic_Information: true
 
+### Which features will be plotted ###
+plotting_features: all
+
 ### Plot correlation matrix figure (true or false) ###
 correlation_matrix: true
 
