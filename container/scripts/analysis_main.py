@@ -131,7 +131,7 @@ def overview_combined_data (combined_df, selected_columns, plotting_features, fi
 
     ### Features to be plotted ###
     if plotting_features == 'all':
-        plotting_features == selected_columns
+        plotting_features = selected_columns
     elif plotting_features == False:
         CorrMatrix = False
         dist_plot = False
@@ -149,6 +149,7 @@ def overview_combined_data (combined_df, selected_columns, plotting_features, fi
             logger.error("Plotting_features are not in the dataset. Please provide valid feature names!")
         except:
             logger.warning("Failed to plot correlation matrix, but the execution will be continued!")
+
 
     ### Function for distribution plot ###
     if dist_plot:

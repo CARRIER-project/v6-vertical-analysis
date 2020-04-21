@@ -26,7 +26,7 @@ plotting_features: all
 correlation_matrix: true
 
 ### Plot distribution figure (true or false) ###
-distribution_plot: false 
+distribution_plot: true 
 # If set up controlled variables when you plot distribution figure #
 control_var: false
 
