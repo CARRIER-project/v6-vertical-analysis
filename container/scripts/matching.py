@@ -83,9 +83,9 @@ def matching_process(dataset_list):
                     no_match.append(i)
 
             # Report matches #   
-            logger.debug('Matching result - Exact {exNum}'.format(exNum=len(exact_match)))
-            logger.debug('Matching result - Multi {mulNum}'.format(mulNum=len(multi_match)))
-            logger.debug('Matching result - None {noNum}'.format(noNum=len(no_match)))
+            logger.info('Matching result - Exact {exNum}'.format(exNum=len(exact_match)))
+            logger.info('Matching result - Multi {mulNum}'.format(mulNum=len(multi_match)))
+            logger.info('Matching result - None {noNum}'.format(noNum=len(no_match)))
             logger.debug("Multi-matching array: {array} ".format(array=str(multi_match_number)))
 
             # Link and combine actual data with hashed personal identifiers #

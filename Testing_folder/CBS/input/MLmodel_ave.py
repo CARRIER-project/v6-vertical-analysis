@@ -119,13 +119,25 @@ def normalizeFeatures(combined_df, model_setting, model_name, training_features,
 
     ###### Remove missing values ######
     combined_df_selected = combined_df[training_features[i_model] + [target_feature[i_training]]]
-    miss_sum = pd.isnull(combined_df_selected).sum()
+
+    missing  = 0
+    misVariables = []
+    CheckNull = pd.isnull(combined_df_selected).sum()
+    column_names = list(CheckNull.keys())
+    for var in range(0, len(CheckNull)):
+        if CheckNull[var] != 0:
+            misVariables.append([column_names[var], CheckNull[var], round(CheckNull[var]/len(combined_df_selected ),3)])
+            missing = missing + 1
+    if missing != 0:
+        df_misVariables = pd.DataFrame.from_records(misVariables)
+        df_misVariables.columns = ['Variable', 'Missing', 'Percentage (%)']
+        sort_table = df_misVariables.sort_values(by=['Percentage (%)'], ascending=False)
+        
+        outputFile = 'output/missings_in_models/%s_%s_summary.csv' %(model_name[i_model], target_feature[i_training])
+        os.makedirs(os.path.dirname(outputFile), exist_ok=True)
+        sort_table.to_csv(outputFile)
+
     combined_df_selected = combined_df_selected[np.invert(pd.isnull(combined_df_selected).any(axis=1))]
-
-    outputFile = 'output/missing_values/%s_%s_summary.csv' %(model_name[i_model], target_feature[i_training])
-    os.makedirs(os.path.dirname(outputFile), exist_ok=True)
-    miss_sum.to_csv(outputFile)
-
     logger.info('After removing missings, {rows} rows left in training task of {model} {target}'.format(rows=len(combined_df_selected),model=model_name[i_model],target=target_feature[i_training]))
 
     ###### Normalization ######
