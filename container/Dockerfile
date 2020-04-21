@@ -20,7 +20,7 @@ RUN pip install \
   'scikit-learn==0.21.3' \
   'SPARQLWrapper==1.8.4' \
   'requests==2.22.0' \
-  'seaborn==0.9.0' \
+  'seaborn==0.10.0' \
   'bokeh==1.3.4' \
   'pyreadstat==0.2.9'\
   'scipy==1.4.1' \

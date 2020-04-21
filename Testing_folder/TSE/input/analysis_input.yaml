@@ -20,7 +20,53 @@ check_missing: true
 basic_Information: true
 
 ### Which features will be plotted ###
-plotting_features: all
+plotting_features: 
+    - N_DM_DUR_2
+    - N_GTS_WHO
+    - N_Diabetes_WHO_2
+    - N_DIABETES_2
+    - N_T2DM_new_diagn
+    - SEX
+    - Age
+    - N_Education_3cat
+    - Employment_status
+    - Occupational_category
+    - Income_equivalent
+    - n_smokingcat4
+    - WOZ
+    - N_ALCOHOL_CAT
+    - NIT_kcal
+    - medGRscore_TR
+    - height
+    - weight
+    - bmi
+    - N_CVD
+    - med_depression
+    - PHQ9_depr
+    - MINIcurrdepr
+    - MINIlifedepr
+    - N_HT
+    - TOTALPA
+    - MVPA
+    - MEAN_VALID_MIN_SLEEP_T
+    - MEAN_SED_MIN_WAKE_T
+    - MEAN_STAND_MIN_WAKE_T
+    - MEAN_STEP_MIN_WAKE_T
+    - waist
+    - hip
+    - Mobility_lim
+    - Ave_ZVWKHUISARTS
+    - Ave_ZVWKFARMACIE
+    - Ave_ZVWKZIEKENHUIS
+    - Ave_ZVWKPARAMEDISCH
+    - Ave_ZVWKHULPMIDDEL
+    - Ave_ZVWKZIEKENVERVOER
+    - Ave_ZVWKBUITENLAND
+    - Ave_ZVWKOVERIG
+    - Ave_ZVWKEERSTELIJNSPSYCHO
+    - Ave_ZVWKGGZ
+    - Ave_ZVWKWYKVERPLEGING
+    - Ave_ZVWKMULTIDISC
 
 ### Plot correlation matrix figure (true or false) ###
 correlation_matrix: true
@@ -30,11 +76,22 @@ distribution_plot: true
 # If set up controlled variables when you plot distribution figure #
 control_var: false
 
+### Plot pairplot (true or false) ###
+pairplot_plot: true 
+# If set up controlled variables when you plot distribution figure #
+pairplot_features: 
+    - N_Diabetes_WHO_2
+    - Age
+    - Income_equivalent
+    - NIT_kcal
+    - bmi
+pairplot_hue: N_Diabetes_WHO_2
+
 ### what task you wanna do (classification or regression) ###
 task: regression
 
 ### Give a name of this task ###
-taskName: Training_20200327
+taskName: Training_2020421
 
 ### Give the evalaution methods (the same as sklearn names)
 evaluation_methods: 

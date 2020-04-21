@@ -288,3 +288,30 @@ def splitDataTraining (task, model, features, target, test_size, scoring):
                 results['roc_auc_train'], results['roc_auc_test'] = [[roc_auc_score(y_train,model_train_pred)], [roc_auc_score(y_test,model_test_pred)]]
 
             return results
+
+
+###########################################
+# Function for pairplot #
+###########################################
+def numeric_pairplot(data_frame, plot_feature_names, hue_feature_name, file_name):
+    """Generate pairplot for the numeric features by using Seaborn
+
+    Args:
+        data_frame (pandas.DataFrame): the dataset with selected features.
+        plot_feature_names (list) : the column names of features to be plotted
+        hue_feature_name: the column name of controlled fetures
+        file_name: the name of the input data file
+
+    Returns:
+        No return variables but generate "*file_name*/%s_pairplot.csv"
+    """
+
+    sns.pairplot(data_frame[plot_feature_names],hue=hue_feature_name)
+
+    plt.title('Pairplot for selected numerical features')
+
+    filename = 'output/%s_pairplot.png' %file_name
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
+    plt.savefig(filename)
+    logger.debug("Pairplot is done! \n")
+    plt.clf()

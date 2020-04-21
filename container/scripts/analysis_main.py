@@ -93,10 +93,10 @@ def select_features(data_frame, selected_variables, excluded_variables, logger):
     
     return selected_data_frame, selected_columns
 
-
+        
 ### 1.Overview on combined data ###
 def overview_combined_data (combined_df, selected_columns, plotting_features, file_name, checkMissing, basicInfo, 
-                            CorrMatrix, dist_plot, control_variable, logger):
+                            CorrMatrix, dist_plot, pairplot_plot, pairplot_features, pairplot_hue, control_variable, logger):
     """ Generate basic information of the dataset including basic statistics, missing values,
         correlation matrix, distribution plot.
 
@@ -182,6 +182,15 @@ def overview_combined_data (combined_df, selected_columns, plotting_features, fi
         else:
             logger.error("Please give one valid variable name or False to 'control_var'.")
             sys.exit("Execution interrupted!")
+
+    ### Function for pairplot ###
+    if pairplot_plot:
+        try:
+            analysis_subfunctions.numeric_pairplot(combined_df, pairplot_features, pairplot_hue, file_name)
+        except IndexError:
+            logger.error("Pairplot_features are not in the dataset. Please provide valid feature names!")
+        except:
+            logger.warning("Failed to plot Pairplot, but the execution will be continued!")
 
         
 
@@ -364,6 +373,9 @@ def main():
         plotting_features = inputYAML['plotting_features']
         CorrMatrix = inputYAML['correlation_matrix']
         dist_plot = inputYAML["distribution_plot"]
+        pairplot_plot = inputYAML["pairplot_plot"]
+        pairplot_features = inputYAML["pairplot_features"]
+        pairplot_hue = inputYAML["pairplot_hue"]
         task = inputYAML['task'].lower()
         kFold = inputYAML['k_fold/split_ratio']
         scoring = inputYAML['evaluation_methods']
@@ -402,7 +414,7 @@ def main():
     ### 2.Overview on combined data ###
     start_time_step_1 = time.time()
     overview_combined_data (combined_df, selected_columns, plotting_features, file_name, checkMissing, basicInfo, 
-                            CorrMatrix, dist_plot, control_variable, logger)
+                            CorrMatrix, dist_plot, pairplot_plot, pairplot_features, pairplot_hue, control_variable, logger)
     logger.info("Basic info took {runtime:.4f}s to run".format(runtime=(time.time() - start_time_step_1)))
 
 
