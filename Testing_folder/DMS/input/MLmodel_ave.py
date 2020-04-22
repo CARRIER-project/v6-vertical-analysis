@@ -5,6 +5,7 @@ import time
 start_time0 = time.time()
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from collections import Counter
 import redacted_logging as rlog
 logger = rlog.get_logger(__name__)
@@ -159,24 +160,44 @@ def normalizeFeatures(combined_df, model_setting, model_name, training_features,
 ######################################
 ### Define Machine learning Models ###
 ######################################
-def defineMLModels(model_name):
-    ### Configure models ###
-    define_models = {
-        'model_0': LinearRegression(normalize=True),
-        'model_1': LinearRegression(normalize=True),
-        'model_2': LinearRegression(normalize=True),
-        'model_3': LinearRegression(normalize=True),
-        'model_4': LinearRegression(normalize=True),
-        'model_5': LinearRegression(normalize=True),
-        'model_6': LinearRegression(normalize=True),
-        'model_7': LinearRegression(normalize=True),
-        'model_8': LinearRegression(normalize=True),
-        'model_9': LinearRegression(normalize=True),
-        'model_10': LinearRegression(normalize=True),
-    }
+def defineMLModels(model_name, kFold):
+    ## Configure models when kFold is not False ###
+    if kFold:
+        define_models = {
+            'model_0': LinearRegression(normalize=True),
+            'model_1': LinearRegression(normalize=True),
+            'model_2': LinearRegression(normalize=True),
+            'model_3': LinearRegression(normalize=True),
+            'model_4': LinearRegression(normalize=True),
+            'model_5': LinearRegression(normalize=True),
+            'model_6': LinearRegression(normalize=True),
+            'model_7': LinearRegression(normalize=True),
+            'model_8': LinearRegression(normalize=True),
+            'model_9': LinearRegression(normalize=True),
+            'model_10': LinearRegression(normalize=True)
+        }
+
+    else:
+        ### If you wanna use statmodels to learn associations (kFold is False)
+        define_models = {
+            'model_0': ['OLS', 'add_constant'],
+            'model_1': ['OLS', 'add_constant'],
+            'model_2': ['OLS', 'add_constant'],
+            'model_3': ['OLS', 'add_constant'],
+            'model_4': ['OLS', 'add_constant'],
+            'model_5': ['OLS', 'add_constant'],
+            'model_6': ['OLS', 'add_constant'],
+            'model_7': ['OLS', 'add_constant'],
+            'model_8': ['OLS', 'add_constant'],
+            'model_9': ['OLS', 'add_constant'],
+            'model_10': ['OLS', 'add_constant']
+        }
 
     model = define_models[model_name]
-    logger.info('Model parameters: {param}'.format(param=model.get_params()))
+    try:
+        logger.info('Model parameters (Scikit Learnt): {param}'.format(param=model.get_params()))
+    except:
+        logger.info('Model parameters (Statmodel): %s' %model[0])
 
     return model
 
@@ -185,7 +206,20 @@ def defineMLModels(model_name):
 ########## Output restuls ##########
 ####################################
 def writeOutput(kFold, model_name, m, results, result_list, training_features, target_name, save_file):
-    if len(result_list) == 0:
+    if not kFold:
+        ### Write results out to a png file ###
+        plt.rc('figure', figsize=(12, 7))
+        plt.text(0.01, 0.05, str(results), {'fontsize': 10}, fontproperties = 'monospace')
+        plt.axis('off')
+        plt.tight_layout()
+
+        filename = 'output/statmodels/%s_%s.png' %(target_name, model_name[m])
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        plt.savefig(filename)
+        logger.debug("%s - Statmodels result plot is done!" %model_name[m])
+        plt.clf()
+    
+    elif len(result_list) == 0:
         mean_scores = {}
         std_scores = {}
         mean_coef_ = {}
@@ -202,7 +236,7 @@ def writeOutput(kFold, model_name, m, results, result_list, training_features, t
             if save_file == True:
                 result_list[5].to_csv('output/onlyTraining_results.csv')
         
-        if kFold < 1:
+        elif kFold < 1:
             results.index = [model_name[m]+'_'+target_name]
             result_list[5] = pd.concat([result_list[5], results])
             if save_file == True:

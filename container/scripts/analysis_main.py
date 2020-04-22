@@ -296,7 +296,7 @@ def training_process(combined_df, task, kFold, scoring,
 
             ### read model parameter setting from the analysis model code file ###
         try:
-            model = MLmodel.defineMLModels(model_name[each_model])
+            model = MLmodel.defineMLModels(model_name[each_model], kFold)
         except:
             logger.error("Errors occur in the defineMLModels function in the analysis model. ")
             raise
@@ -313,28 +313,34 @@ def training_process(combined_df, task, kFold, scoring,
                 raise
 
             ### If use cross validation ###
-            if kFold <= 1 and kFold > 0:
-                results = analysis_subfunctions.splitDataTraining(task, model, features, target, kFold, scoring)
-                
+            if kFold:
+                if (kFold <= 1 and kFold > 0):
+                    results = analysis_subfunctions.splitDataTraining(task, model, features, target, kFold, scoring)
 
-            elif kFold > 2 and type(kFold)==int:
-                results = cross_validate(model, features, target, scoring=scoring, cv=kFold, error_score=np.nan, return_estimator=True, return_train_score=True)
+                elif kFold > 2 and type(kFold)==int:
+                    results = cross_validate(model, features, target, scoring=scoring, cv=kFold, error_score=np.nan, return_estimator=True, return_train_score=True)
 
+                else:
+                    logger.error("K-Fold has to be an integer (>=3) or 0-1 as a split ratio (testing/dataset) or False (the whole dataset will be trained by statmodels)")
+                    sys.exit("Execution interrupted!")
             else:
-                logger.error("K-Fold has to be an integer (>=3) or 1 (the whole dataset will be training set) or 0-1 as a split ratio (testing/dataset)")
-                sys.exit("Execution interrupted!")
+                results = analysis_subfunctions.splitDataTraining(task, model, features, target, kFold, scoring)
 
             ### Write output results ###
-            if count == (len(model_name) * num_training) - 1:
+            if (count == (len(model_name) * num_training) - 1):
                 save_file = True
             else:
                 save_file = False
-
+                
             try:
                 result_list = MLmodel.writeOutput(kFold, model_name, each_model, results, result_list, training_features, target_name, save_file)
             except:
                 logger.error("Error occurs in the writeOutput(...) function in the analysis code!")
                 raise
+
+
+
+            ###
 
             count = count + 1
 

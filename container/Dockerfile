@@ -24,7 +24,8 @@ RUN pip install \
   'bokeh==1.3.4' \
   'pyreadstat==0.2.9'\
   'scipy==1.4.1' \
-  'PyYAML==5.3'
+  'PyYAML==5.3' \
+  'statsmodels==0.11.1'
 
 ADD PQcrypto/PQencryption/ /usr/local/lib/python3.6/site-packages/PQencryption/
 ADD redacted_logging /usr/local/lib/python3.6/site-packages/redacted_logging/

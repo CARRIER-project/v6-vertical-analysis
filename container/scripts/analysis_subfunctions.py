@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-TODO: This script includes all sub-functions which are needed by the genenral analysis. 
+This script includes all sub-functions which are needed by the genenral analysis. 
 Until 25-03-2020, the following functions has been implemented in this script:
 1. Basic description of combined data (from pandas.dataframe.desribe)
 2. Missing values and percentage of each variables
@@ -19,6 +19,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from scipy import stats
+import statsmodels.api as sm
 from collections import Counter
 import matplotlib.pyplot as plt
 from bokeh.plotting import figure, save
@@ -219,75 +220,85 @@ def splitDataTraining (task, model, features, target, test_size, scoring):
         model (str): machine learning model name
         features (list): the features are included in the training model
         target (str): the column name of the target feature
-        test_size (float): the ratio of training and testing data
+        test_size (float or false): the ratio of training and testing data
         scoring (str/list): the names of evaluation methods from Scikit Learn
 
     Returns:
         training results
     """
+    if test_size:
+        if test_size == 1:
+            logger.info("The whole dataset will be used for training!")
+            try:
+                model.fit(features,target)
+                params = np.append(model.intercept_, model.coef_)
+                predictions = model.predict(features)
+            except:
+                logger.error("Training model failed!")
+                raise
+            
+            newX = pd.DataFrame({"Constant":np.ones(len(features))}).join(pd.DataFrame(features))
+            MSE = (sum((target-predictions)**2))/(len(newX)-len(newX.columns))
 
-    if test_size == 1:
-        logger.info("The whole dataset will be used for training!")
-        try:
-            model.fit(features,target)
-            params = np.append(model.intercept_, model.coef_)
-            predictions = model.predict(features)
-        except:
-            logger.error("Training model failed!")
-            raise
-        
-        newX = pd.DataFrame({"Constant":np.ones(len(features))}).join(pd.DataFrame(features))
-        MSE = (sum((target-predictions)**2))/(len(newX)-len(newX.columns))
+            var_b = MSE*(np.linalg.inv(np.dot(newX.T,newX)).diagonal())
+            sd_b = np.sqrt(var_b)
+            ts_b = params/ sd_b
 
-        var_b = MSE*(np.linalg.inv(np.dot(newX.T,newX)).diagonal())
-        sd_b = np.sqrt(var_b)
-        ts_b = params/ sd_b
+            p_values =[2*(1-stats.t.cdf(np.abs(i),(len(newX)-1))) for i in ts_b]
 
-        p_values =[2*(1-stats.t.cdf(np.abs(i),(len(newX)-1))) for i in ts_b]
+            sd_b = np.round(sd_b,3)
+            ts_b = np.round(ts_b,3)
+            p_values = np.round(p_values,3)
+            params = np.round(params,4)
 
-        sd_b = np.round(sd_b,3)
-        ts_b = np.round(ts_b,3)
-        p_values = np.round(p_values,3)
-        params = np.round(params,4)
+            results = pd.DataFrame()
+            results["Coefficients"],results["Standard Errors"],results["t values"],results["Probabilites"] = [params,sd_b,ts_b,p_values]
+            
+            return results
 
-        results = pd.DataFrame()
-        results["Coefficients"],results["Standard Errors"],results["t values"],results["Probabilites"] = [params,sd_b,ts_b,p_values]
-        
+        elif test_size < 1: 
+            try:
+                x_train,x_test,y_train,y_test = train_test_split(features, target, test_size=test_size,random_state = 1)
+                model.fit(x_train,y_train)
+                model_train_pred = model.predict(x_train)
+                model_test_pred = model.predict(x_test)
+            except:
+                logger.error("Training model failed!")
+                raise
+            
+            results = pd.DataFrame()
+            if task == "regression":
+                if "neg_mean_absolute_error" in scoring: 
+                    results['MAE_train'], results['MAE_test'] = [[mean_absolute_error(y_train,model_train_pred)],[mean_absolute_error(y_test,model_test_pred)]]
+                if "neg_mean_squared_error" in scoring: 
+                    results['MSE_train'], results['MSE_test'] = [[mean_squared_error(y_train,model_train_pred)], [mean_squared_error(y_test,model_test_pred)]]
+                if "neg_mean_squared_log_error" in scoring: 
+                    results['MSLE_train'], results['MSLE_test'] = [[mean_squared_log_error(y_train,model_train_pred)], [mean_squared_log_error(y_test,model_test_pred)]]
+                if "r2" in scoring: 
+                    results['r2_train'], results['r2_test'] = [[r2_score(y_train,model_train_pred)], [r2_score(y_test,model_test_pred)]]
+                return results
+
+            elif task == "classification":
+                if "precision" in scoring: 
+                    results['precision_train'], results['precision_test'] = [[precision_score(y_train,model_train_pred)], [precision_score(y_test,model_test_pred)]]
+                if "recall" in scoring: 
+                    results['recall_train'], results['recall_test'] = [[recall_score(y_train,model_train_pred)], [recall_score(y_test,model_test_pred)]]
+                if "f1" in scoring: 
+                    results['f1_train'], results['f1_test'] = [[f1_score(y_train,model_train_pred)], [f1_score(y_test,model_test_pred)]]
+                if "roc_auc" in scoring: 
+                    results['roc_auc_train'], results['roc_auc_test'] = [[roc_auc_score(y_train,model_train_pred)], [roc_auc_score(y_test,model_test_pred)]]
+
+                return results
+
+    else:
+        if len(model) > 1:
+            adjusted_features = getattr(sm, model[1])(features)
+        elif len(model) == 1:
+            adjusted_features = features
+
+        est = getattr(sm, model[0])
+        results = est(target, adjusted_features).fit().summary()
         return results
-
-    elif test_size < 1: 
-        try:
-            x_train,x_test,y_train,y_test = train_test_split(features, target, test_size=test_size,random_state = 1)
-            model.fit(x_train,y_train)
-            model_train_pred = model.predict(x_train)
-            model_test_pred = model.predict(x_test)
-        except:
-            logger.error("Training model failed!")
-            raise
-        
-        results = pd.DataFrame()
-        if task == "regression":
-            if "neg_mean_absolute_error" in scoring: 
-                results['MAE_train'], results['MAE_test'] = [[mean_absolute_error(y_train,model_train_pred)],[mean_absolute_error(y_test,model_test_pred)]]
-            if "neg_mean_squared_error" in scoring: 
-                results['MSE_train'], results['MSE_test'] = [[mean_squared_error(y_train,model_train_pred)], [mean_squared_error(y_test,model_test_pred)]]
-            if "neg_mean_squared_log_error" in scoring: 
-                results['MSLE_train'], results['MSLE_test'] = [[mean_squared_log_error(y_train,model_train_pred)], [mean_squared_log_error(y_test,model_test_pred)]]
-            if "r2" in scoring: 
-                results['r2_train'], results['r2_test'] = [[r2_score(y_train,model_train_pred)], [r2_score(y_test,model_test_pred)]]
-            return results
-
-        elif task == "classification":
-            if "precision" in scoring: 
-                results['precision_train'], results['precision_test'] = [[precision_score(y_train,model_train_pred)], [precision_score(y_test,model_test_pred)]]
-            if "recall" in scoring: 
-                results['recall_train'], results['recall_test'] = [[recall_score(y_train,model_train_pred)], [recall_score(y_test,model_test_pred)]]
-            if "f1" in scoring: 
-                results['f1_train'], results['f1_test'] = [[f1_score(y_train,model_train_pred)], [f1_score(y_test,model_test_pred)]]
-            if "roc_auc" in scoring: 
-                results['roc_auc_train'], results['roc_auc_test'] = [[roc_auc_score(y_train,model_train_pred)], [roc_auc_score(y_test,model_test_pred)]]
-
-            return results
 
 
 ###########################################
