@@ -307,7 +307,7 @@ def training_process(combined_df, task, kFold, scoring,
         for i_training in range(0, num_training):
             model_setting = [each_model, i_training]
             try: 
-                model_name, features, target, target_name = MLmodel.normalizeFeatures(combined_df, model_setting, model_name, training_features, target_feature)
+                features, target = MLmodel.normalizeFeatures(combined_df, model_setting, model_name, training_features, target_feature)
             except:
                 logger.error("Error occurs in the normalizeFeatures(...) function in the analysis code!")
                 raise
@@ -333,7 +333,7 @@ def training_process(combined_df, task, kFold, scoring,
                 save_file = False
                 
             try:
-                result_list = MLmodel.writeOutput(kFold, model_name, each_model, results, result_list, training_features, target_name, save_file)
+                result_list = MLmodel.writeOutput(kFold, model_name[each_model], results, result_list, training_features[each_model], target_feature[i_training], save_file)
             except:
                 logger.error("Error occurs in the writeOutput(...) function in the analysis code!")
                 raise
