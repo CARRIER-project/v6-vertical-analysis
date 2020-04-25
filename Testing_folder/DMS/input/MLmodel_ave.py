@@ -1,5 +1,15 @@
+"""
+This script is to define variables, models, and write out results.
+It should be provided by the researcher and signed by all data parties
+after checking the code. 
 
-########## Simple Linear Regression ##########
+Until 23-04-2020, this script includes:
+1. customize features (sum, avg, etc)
+2. define what features will be used in the model
+3. define models (linear/logistic regression, etc)
+4. normalize features (max-min normalization, robust scaler)
+5. write out the result 
+"""
 import os
 import time
 start_time0 = time.time()
@@ -27,10 +37,17 @@ from sklearn.metrics import classification_report, f1_score, precision_score, re
 
 logger = rlog.get_logger(__name__)
 
-def customize_features(sel_df):
+def customize_features(input_dataframe):
+    """ This function is to customize features such as calculate the sum, average of multiple features
+        Please note there should not be any printing/writting out in this function
+    Args:
+        input_dataframe (Pandas.DataFrame): Dataframe of original data
 
+    Returns:
+        input_dataframe (Pandas.DataFrame): Dataframe of original + customized data.
+    """
     ### input features which need to be operated ###
-    feature_sum = [
+    operated_feature = [
                     ["ZVWKHUISARTS_2010", "ZVWKHUISARTS_2011", "ZVWKHUISARTS_2012", "ZVWKHUISARTS_2013", 
                         "ZVWKHUISARTS_2014", "ZVWKHUISARTS_2015", "ZVWKHUISARTS_2016"],
 
@@ -59,6 +76,12 @@ def customize_features(sel_df):
                         "ZVWKEERSTELIJNSPSYCHO_2013"],
                     
                     ["ZVWKGGZ_2010", "ZVWKGGZ_2011", "ZVWKGGZ_2012", "ZVWKGGZ_2013"],
+
+                    ["ZVWKGENBASGGZ_2014", "ZVWKGENBASGGZ_2015", "ZVWKGENBASGGZ_2016"],
+
+                    ["ZVWKSPECGGZ_2014", "ZVWKSPECGGZ_2015", "ZVWKSPECGGZ_2016"],
+
+                    ["ZVWKGERIATRISCH_2013", "ZVWKGERIATRISCH_2014", "ZVWKGERIATRISCH_2015", "ZVWKGERIATRISCH_2016"],
                     
                     ["ZVWKWYKVERPLEGING_2014", "ZVWKWYKVERPLEGING_2015", "ZVWKWYKVERPLEGING_2016"],
 
@@ -66,25 +89,31 @@ def customize_features(sel_df):
                 ]
 
     ### Give names to new features ###
-    sum_name = ["Ave_ZVWKHUISARTS","Ave_ZVWKFARMACIE","Ave_ZVWKZIEKENHUIS","Ave_ZVWKPARAMEDISCH","Ave_ZVWKHULPMIDDEL",
-                    "Ave_ZVWKZIEKENVERVOER", "Ave_ZVWKBUITENLAND", "Ave_ZVWKOVERIG", "Ave_ZVWKEERSTELIJNSPSYCHO",
-                    "Ave_ZVWKGGZ", "Ave_ZVWKWYKVERPLEGING", "Ave_ZVWKMULTIDISC"]
+    customized_feature_names = ["Ave_ZVWKHUISARTS","Ave_ZVWKFARMACIE","Ave_ZVWKZIEKENHUIS","Ave_ZVWKPARAMEDISCH","Ave_ZVWKHULPMIDDEL",
+                                    "Ave_ZVWKZIEKENVERVOER", "Ave_ZVWKBUITENLAND", "Ave_ZVWKOVERIG", "Ave_ZVWKEERSTELIJNSPSYCHO",
+                                    "Ave_ZVWKGGZ", "Ave_ZVWKGENBASGGZ", "Ave_ZVWKSPECGGZ", "Ave_ZVWKGERIATRISCH", \
+                                    "Ave_ZVWKWYKVERPLEGING", "Ave_ZVWKMULTIDISC"]
 
     ### Sum up features do average ###
-    for i in range(0,len(feature_sum)):
-        if sum_name[i] == 'Ave_ZVWKEERSTELIJNSPSYCHO':
-            sel_df[sum_name[i]] = (sel_df[feature_sum[i]].sum(axis=1)) / 4
-        elif sum_name[i] == 'Ave_ZVWKGGZ':
-            sel_df[sum_name[i]] = (sel_df[feature_sum[i]].sum(axis=1)) / 4
-        elif sum_name[i] == 'Ave_ZVWKWYKVERPLEGING':
-            sel_df[sum_name[i]] = (sel_df[feature_sum[i]].sum(axis=1)) / 3
-        elif sum_name[i] == 'Ave_ZVWKMULTIDISC':
-            sel_df[sum_name[i]] = (sel_df[feature_sum[i]].sum(axis=1)) / 2
+    for i in range(0,len(operated_feature)):
+        if customized_feature_names[i] == 'Ave_ZVWKEERSTELIJNSPSYCHO': # this feature is only available for 4 years #
+            input_dataframe[customized_feature_names[i]] = (input_dataframe[operated_feature[i]].sum(axis=1)) / 4
+        elif customized_feature_names[i] == 'Ave_ZVWKGGZ': # this feature is only available for 4 years #
+            input_dataframe[customized_feature_names[i]] = (input_dataframe[operated_feature[i]].sum(axis=1)) / 4
+        elif customized_feature_names[i] == 'Ave_ZVWKGENBASGGZ': # this feature is only available for 3 years #
+            input_dataframe[customized_feature_names[i]] = (input_dataframe[operated_feature[i]].sum(axis=1)) / 3
+        elif customized_feature_names[i] == 'Ave_ZVWKSPECGGZ': # this feature is only available for 3 years #
+            input_dataframe[customized_feature_names[i]] = (input_dataframe[operated_feature[i]].sum(axis=1)) / 3
+        elif customized_feature_names[i] == 'Ave_ZVWKGERIATRISCH': # this feature is only available for 4 years #
+            input_dataframe[customized_feature_names[i]] = (input_dataframe[operated_feature[i]].sum(axis=1)) / 4
+        elif customized_feature_names[i] == 'Ave_ZVWKWYKVERPLEGING': # this feature is only available for 3 years #
+            input_dataframe[customized_feature_names[i]] = (input_dataframe[operated_feature[i]].sum(axis=1)) / 3
+        elif customized_feature_names[i] == 'Ave_ZVWKMULTIDISC': # this feature is only available for 2 years #
+            input_dataframe[customized_feature_names[i]] = (input_dataframe[operated_feature[i]].sum(axis=1)) / 2
         else:
-            sel_df[sum_name[i]] = (sel_df[feature_sum[i]].sum(axis=1)) / 7 
+            input_dataframe[customized_feature_names[i]] = (input_dataframe[operated_feature[i]].sum(axis=1)) / 7 
 
-    return sel_df
-
+    return input_dataframe
 
 
 ###############################
@@ -93,6 +122,17 @@ def customize_features(sel_df):
 
 ### Provide your Training and target features ###
 def defineFeatures():
+    """ This function is to define which features will be used as training features and target feature
+        Please note there should not be any printing/writting out in this function
+        Args:
+            No inputs.
+
+        Returns:
+            model_name (list): a list of model names (used to label different models)
+            training_features (list): a list of features for training the model (each model has a list of training features)
+            target_feature (list): a list of features as target (each model has one target feature)
+    """
+
     model_name = ['model_0', 'model_1', 'model_2', 'model_3', 'model_4', 'model_5', 'model_6', 'model_7', 'model_8', 'model_9', 'model_10']
 
     training_features = [["N_Diabetes_WHO_2"],
@@ -114,7 +154,18 @@ def defineFeatures():
     return model_name, training_features, target_feature
 
 def normalizeFeatures(combined_df, model_setting, model_name, training_features, target_feature):
+    """ This function is to normalize training features
+        Args:
+            combined_df (Pandas.DataFrame): DataFrame of original + customized features
+            model_setting (list): [index of which model, index of which target feature]
+            model_name (list): a list of model name
+            training_features(list): a list of column names of training features
+            target_feature(list): a list of column names of target feature
 
+        Returns:
+            features (Pandas.DataFrame): Normalized training features
+            target (list): normalized target feature
+    """
     i_model = model_setting[0]
     i_training = model_setting[1]
 
@@ -139,7 +190,7 @@ def normalizeFeatures(combined_df, model_setting, model_name, training_features,
         sort_table.to_csv(outputFile)
 
     combined_df_selected = combined_df_selected[np.invert(pd.isnull(combined_df_selected).any(axis=1))]
-    logger.info('After removing missings, {rows} rows left in training task of {model} {target}'.format(rows=len(combined_df_selected),model=model_name[i_model],target=target_feature[i_training]))
+    logger.debug('After removing missings, {rows} rows left in training task of {model} {target}'.format(rows=len(combined_df_selected),model=model_name[i_model],target=target_feature[i_training]))
 
     ###### Normalization ######
     logger.debug('Start Normalization ... ... ')
@@ -152,15 +203,26 @@ def normalizeFeatures(combined_df, model_setting, model_name, training_features,
     ##### Get training features and target #####
     features = combined_df_scaled[training_features[i_model]]
     target = combined_df_scaled[target_feature[i_training]]
-    target_name = target_feature[i_training]
 
-
-    return model_name, features, target, target_name
+    return features, target
 
 ######################################
 ### Define Machine learning Models ###
 ######################################
 def defineMLModels(model_name, kFold):
+    """ This function is to define training models using either Scikit learn(KFold!=False) 
+        or Statsmodels (KFold==False)
+        Args:
+            model_name (list): a list of model name
+            KFold(number): 
+                - False: The whole dataset will be trained to learn associations using Statsmodels
+                - 0-1: The whole dataset will be split into training and testing data (test_data_size this value)
+                - > 1: The whole dataset will use cross-validation with KFold
+
+        Returns:
+            model (list): a list of defined models
+    """
+
     ## Configure models when kFold is not False ###
     if kFold:
         define_models = {
@@ -195,9 +257,9 @@ def defineMLModels(model_name, kFold):
 
     model = define_models[model_name]
     try:
-        logger.info('Model parameters (Scikit Learnt): {param}'.format(param=model.get_params()))
+        logger.debug('Model parameters (Scikit Learnt): {param}'.format(param=model.get_params()))
     except:
-        logger.info('Model parameters (Statmodel): %s' %model[0])
+        logger.debug('Model parameters (Statmodel): %s' %model[0])
 
     return model
 
@@ -205,7 +267,29 @@ def defineMLModels(model_name, kFold):
 ####################################
 ########## Output restuls ##########
 ####################################
-def writeOutput(kFold, model_name, m, results, result_list, training_features, target_name, save_file):
+def writeOutput(kFold, single_model_name, results, result_list, single_training_feature_set, target_name, save_file):
+    """ This function is to write the result to files. Based on the different values of KFold, 
+        we write out different results
+
+        Args:
+            kFold (False or numbers): 
+                - False: results from statsmodel are stored as pictures
+                - 0-1: results are generated in one csv file 
+                - > 1: results are generated in multiple csv files cuz multiple evaluation methods
+            single_model_name (string): the given name of the model
+            results (list): the set of result from one single model
+            result_list (list): a list of sets of results from all models
+            single_training_feature_set (list): training features for this single model
+            target_name (string): target feature for this single model 
+            save_file (Boolean): if write the results to files (when all models are done, save_file will be True)
+            
+            KFold(number): 
+               
+
+        Returns:
+            result_list (list): a list of results (each model generates one set of results)
+    """
+
     if not kFold:
         ### Write results out to a png file ###
         plt.rc('figure', figsize=(12, 7))
@@ -213,10 +297,10 @@ def writeOutput(kFold, model_name, m, results, result_list, training_features, t
         plt.axis('off')
         plt.tight_layout()
 
-        filename = 'output/statmodels/%s_%s.png' %(target_name, model_name[m])
+        filename = 'output/statmodels/%s_%s.png' %(target_name, single_model_name)
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         plt.savefig(filename)
-        logger.debug("%s - Statmodels result plot is done!" %model_name[m])
+        logger.debug("%s - Statmodels result plot is done!" %single_model_name)
         plt.clf()
     
     elif len(result_list) == 0:
@@ -229,15 +313,15 @@ def writeOutput(kFold, model_name, m, results, result_list, training_features, t
         result_list = [mean_scores, std_scores, mean_coef_, std_coef_, mean_intercept, general_re]
     else:
         if kFold == 1:
-            index_name = ['_Intercept'] + training_features[m]
-            index_name = [model_name[m]+'_'+target_name+'_'+x for x in index_name]
+            index_name = ['_Intercept'] + single_training_feature_set
+            index_name = [single_model_name+'_'+target_name+'_'+x for x in index_name]
             results.index = index_name
             result_list[5] = pd.concat([result_list[5], results])
             if save_file == True:
                 result_list[5].to_csv('output/onlyTraining_results.csv')
         
         elif kFold < 1:
-            results.index = [model_name[m]+'_'+target_name]
+            results.index = [single_model_name+'_'+target_name]
             result_list[5] = pd.concat([result_list[5], results])
             if save_file == True:
                 result_list[5].to_csv('output/sliptTraining_results.csv')
@@ -248,8 +332,8 @@ def writeOutput(kFold, model_name, m, results, result_list, training_features, t
             temp_mean = temp_df.mean()
             temp_std = temp_df.std()
             ### mean and STD of the evaluation scores ###
-            result_list[0].update({model_name[m]+'_'+target_name:temp_mean}) # mean_scores
-            result_list[1].update({model_name[m]+'_'+target_name:temp_std})  # std_scores
+            result_list[0].update({single_model_name+'_'+target_name:temp_mean}) # mean_scores
+            result_list[1].update({single_model_name+'_'+target_name:temp_std})  # std_scores
 
             ### Save the coef_ and intercept ###
 
@@ -261,17 +345,17 @@ def writeOutput(kFold, model_name, m, results, result_list, training_features, t
             
             ### mean and STD of Coef_ ###
             coef_df = pd.DataFrame.from_dict(coef_)
-            coef_df.columns = training_features[m]
+            coef_df.columns = single_training_feature_set
             mean_coef_ = coef_df.mean()
             std_coef_ = coef_df.std()
-            result_list[2].update({model_name[m]+'_'+target_name:mean_coef_}) # mean_coef_
-            result_list[3].update({model_name[m]+'_'+target_name:std_coef_})  # std_coef_
+            result_list[2].update({single_model_name+'_'+target_name:mean_coef_}) # mean_coef_
+            result_list[3].update({single_model_name+'_'+target_name:std_coef_})  # std_coef_
 
             ### mean and STD of Intercept ###
             intercept_df = pd.DataFrame.from_dict(intercept_)
             meanSTD_intercept_ = pd.concat([intercept_df.mean(), intercept_df.std()],axis=1)
             meanSTD_intercept_.columns = ['mean_intercept','STD_intercept']
-            result_list[4].update({model_name[m]+'_'+target_name:meanSTD_intercept_}) # mean_coef_
+            result_list[4].update({single_model_name+'_'+target_name:meanSTD_intercept_}) # mean_coef_
 
             if save_file == True:
                 mean_score_df = pd.DataFrame.from_dict(result_list[0]).transpose() # mean_scores

@@ -17,7 +17,6 @@ signing_key: SECRET_EdDSA_Classic_Asymmetric_Signing_Key_DMS.key
 # Path to your model files (can be multiple) #
 model_files:
     - MLmodel_ave.py
-    - MLmodel_sum.py
 
 # Save the encrypted file locally, then set "local_save" as true # 
 # Set "receiver_address" as false #
