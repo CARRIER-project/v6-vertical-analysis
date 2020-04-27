@@ -395,13 +395,7 @@ def main():
     ### For checking data types ###
     selected_data_frame.dtypes.to_csv('/output/dataType.csv', header=False)
 
-    # Convert to numeric, string will be converted to Nan
-    if categorical_to_numerical:
-        selected_data_frame = selected_data_frame.apply(pd.to_numeric, errors='coerce')
-        logger.warning("All features are forced to numberic types. Strings become Nan. This might cause analysis mistakes.")
-
-
-    ### Customize features (sum) ###
+    ### Customize features ###
     if customize_feature:
         try:
             combined_df = MLmodel.customize_features(selected_data_frame)
@@ -410,6 +404,11 @@ def main():
             raise
     else:
         combined_df = selected_data_frame
+
+    # Convert to numeric, string will be converted to Nan
+    if categorical_to_numerical:
+        combined_df = combined_df.apply(pd.to_numeric, errors='coerce')
+        logger.warning("All features are forced to numberic types. Strings become Nan. This might cause analysis mistakes.")
 
 
     ### Main executions ###############
