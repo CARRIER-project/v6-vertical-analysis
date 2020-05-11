@@ -195,7 +195,7 @@ def overview_combined_data (combined_df, selected_columns, plotting_features, fi
 
 
 ### 2. Check if features, evaluaton methods are valid ###
-def check_model_inputs(task, scoring, combined_df, logger):
+def check_model_inputs(ml_model, task, scoring, combined_df, logger):
     """ Check if the model parameters are valid
 
     Args:
@@ -240,7 +240,7 @@ def check_model_inputs(task, scoring, combined_df, logger):
 
     logger.debug('Start checking if training and target features are in the dataset.')
 
-    model_name, training_features, target_feature = MLmodel.defineFeatures()
+    model_name, training_features, target_feature = ml_model.defineFeatures()
 
     if len(model_name) != len(training_features):
         logger.error("The number of sets of training features needs to be the same as the number of analysis models.")
@@ -267,7 +267,7 @@ def check_model_inputs(task, scoring, combined_df, logger):
 
 
 
-def training_process(combined_df, task, kFold, scoring, 
+def training_process(ml_model, combined_df, task, kFold, scoring, 
                     model_name, training_features, target_feature, logger):
 
     """ Train and evaluate the analysis model 
@@ -295,7 +295,7 @@ def training_process(combined_df, task, kFold, scoring,
 
             ### read model parameter setting from the analysis model code file ###
         try:
-            model = MLmodel.defineMLModels(model_name[each_model], kFold)
+            model = ml_model.defineMLModels(model_name[each_model], kFold)
         except:
             logger.error("Errors occur in the defineMLModels function in the analysis model. ")
             raise
@@ -306,7 +306,7 @@ def training_process(combined_df, task, kFold, scoring,
         for i_training in range(0, num_training):
             model_setting = [each_model, i_training]
             try: 
-                features, target = MLmodel.normalizeFeatures(combined_df, model_setting, model_name, training_features, target_feature)
+                features, target = ml_model.normalizeFeatures(combined_df, model_setting, model_name, training_features, target_feature)
             except:
                 logger.error("Error occurs in the normalizeFeatures(...) function in the analysis code!")
                 raise
@@ -332,7 +332,7 @@ def training_process(combined_df, task, kFold, scoring,
                 save_file = False
                 
             try:
-                result_list = MLmodel.writeOutput(kFold, model_name[each_model], results, result_list, training_features[each_model], target_feature[i_training], save_file)
+                result_list = ml_model.writeOutput(kFold, model_name[each_model], results, result_list, training_features[each_model], target_feature[i_training], save_file)
             except:
                 logger.error("Error occurs in the writeOutput(...) function in the analysis code!")
                 raise
@@ -417,7 +417,7 @@ def main():
 
     ### Main executions ###############
     ### 1. Check if features, evaluaton methods are valid ###
-    model_name, training_features, target_feature = check_model_inputs(task, scoring, combined_df, logger)
+    model_name, training_features, target_feature = check_model_inputs(MLmodel, task, scoring, combined_df, logger)
     logger.info("Pre-processing data took {runtime:.4f}s to run".format(runtime=(time.time() - start_time_step_0)))
 
     ### 2.Overview on combined data ###
@@ -429,7 +429,7 @@ def main():
 
     ### 3. Run the model ###
     start_time_step_2 = time.time()
-    training_process(combined_df, task, kFold, scoring, model_name, training_features, target_feature, logger)
+    training_process(MLmodel, combined_df, task, kFold, scoring, model_name, training_features, target_feature, logger)
 
     logger.info("In total, all models training took {runtime:.4f} to run. ".format(runtime=(time.time() - start_time_step_2)))
     logger.info("The whole analysis process took {runtime:.4f} to run. ".format(runtime=(time.time() - start_time_step_0)))
