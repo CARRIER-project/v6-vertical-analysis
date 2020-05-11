@@ -68,16 +68,15 @@ def main():
     for script in script_list:
         try:
             module = importlib.import_module("scripts." + script)
-            # modules.append(module)
-            module.main()
+            modules.append(module)
         except ModuleNotFoundError:
             logger.error("No script named '" + script + "' supplied by the " +
                          "container. Please consult the README.md for valid " +
                          "options.")
             raise
 
-    # for module in modules:
-    #     module.main()
+    for module in modules:
+        module.main()
 
 
 if __name__ == "__main__":

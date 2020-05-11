@@ -85,6 +85,7 @@ def read_write_encrypted_file(receiver_url, parties, keys_dict, modelNames, logg
                         write_model_file.write(contents)
         except FileNotFoundError:
             logger.error("Please provide the right file UUID number in your YAML Input file.")
+            raise
         
     else: 
 

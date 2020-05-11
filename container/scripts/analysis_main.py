@@ -20,7 +20,6 @@ import numpy as np
 import pandas as pd
 from collections import Counter
 from scripts import analysis_subfunctions
-from scripts import MLmodel
 from sklearn.model_selection import cross_validate
 import redacted_logging as rlog
 
@@ -354,6 +353,11 @@ def main():
     execute the functions from the analysis model file, then generate the fail results. 
     
     """
+
+    # We have to import MLmodel in the main function at runtime, because when
+    # this script is imported, MLmodel.py does not exist yet.
+    from scripts import MLmodel
+
     ### Read analysis yaml file ###
     logger = rlog.get_logger(__name__)
     input_analysis_yaml_file_name = r'/inputVolume/analysis_input.yaml'
