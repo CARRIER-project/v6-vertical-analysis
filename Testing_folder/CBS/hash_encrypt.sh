@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DATA_FILE="20200402_sample_cbs.csv"
+DATA_FILE="20200511_sample_cbs.csv"
 
 docker run \
   --rm \
