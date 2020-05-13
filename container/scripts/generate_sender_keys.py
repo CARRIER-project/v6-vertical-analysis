@@ -36,7 +36,10 @@ def main():
 
     # Sign-verify key generation
     keyset_sign_verify = cr.EdDSA.key_gen()
-    logger.info("Export EdDSA keys ... ...")
+    logger.info("For %s: exporting \"Signing Keys\" to folder "
+                "%s" % (party_name, KEY_OUTPUT_PATH))
+    logger.info("*** For %s: please input the password for the \"SECRET "
+                "Signing Key\" *** " % party_name)
     for key_object in keyset_sign_verify:
         start_key_export = time.time()
         key_object.export_key(KEY_OUTPUT_PATH, party_name,
@@ -46,7 +49,10 @@ def main():
 
     # Quantum vulnerable public-private key generation
     keyset_quantum_vulnerable_pub_priv = cr.DiffieHellman.key_gen()
-    logger.info("Export DiffieHellman keys ... ...")
+    logger.info("For %s: exporting \"Classic Encryption Keys\" to folder "
+                "%s" % (party_name, KEY_OUTPUT_PATH))
+    logger.info("*** For %s: please input the password for the \"SECRET "
+                "Classic Encryption Key\" *** " % party_name)
     for key_object in keyset_quantum_vulnerable_pub_priv:
         start_key_export = time.time()
         key_object.export_key(KEY_OUTPUT_PATH, party_name,

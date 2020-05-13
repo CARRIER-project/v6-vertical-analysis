@@ -59,23 +59,24 @@ def import_keys_from_yaml(inputYAML, logger):
 
     try:
         ### create and reading keys ###
-        # read values from yaml file 
+        # read values from yaml file
         signing_key_yaml = inputYAML['signing_key']
         quantum_safe_public_key_yaml = inputYAML['quantum_safe_public_key']
         classic_public_key_tse_yaml = inputYAML['classic_public_key_tse']
         classic_private_key_yaml = inputYAML['classic_private_key']
 
 
-        # symmetric_encryption_key 
+        # symmetric_encryption_key
         encryption_key = cr.Salsa20.key_gen()
         encryptionKeyBase64 = nacl.encoding.Base64Encoder.encode(bytes(encryption_key.key)).decode("utf-8")
 
         path = '/inputVolume/'
         # read signing key from itself
         key_export_time = 0
-        logger.info("*** Please input your password for Signing Key: ***")
+        logger.info("*** Please input your password for the \"SECRET "
+                    "Signing Key\": ***")
         start_key_export = time.time()
-        signing_key = cr.import_key(path + signing_key_yaml, silent=False) 
+        signing_key = cr.import_key(path + signing_key_yaml, silent=False)
         end_key_export = time.time()
         key_export_time += end_key_export - start_key_export
 
@@ -85,7 +86,8 @@ def import_keys_from_yaml(inputYAML, logger):
         classic_public_key_tse = cr.import_key(path + classic_public_key_tse_yaml, silent=False) 
 
         # read quantum vulnerable private key from itself
-        logger.info("*** Please input your password for Classic Secret Key: ***")
+        logger.info("*** Please input your password for the \"SECRET "
+                    "Classic Encryption Key\": ***")
         start_key_export = time.time()
         classic_secret_key = cr.import_key(path + classic_private_key_yaml, silent=False) 
         end_key_export = time.time()

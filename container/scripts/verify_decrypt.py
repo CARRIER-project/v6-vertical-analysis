@@ -200,12 +200,11 @@ def main():
     Then, symmetric key will be verified-decrypted-verified so that it can be used to verify-decrypt-verify
     the data files. Decrypted data files will be temporarily saved in the Docker container.
     Signed model files will be verified and saved in the Docker container temporarily.
-    
+
     """
     logger = rlog.get_logger(__name__)
     input_yaml_file_name = r'/inputVolume/security_input.yaml'
     inputYAML = load_yaml_file(input_yaml_file_name, logger)
-
 
     try:
         parties = inputYAML['parties']
@@ -227,29 +226,30 @@ def main():
 
     read_write_encrypted_file(receiver_url, parties, keys_dict, modelNames, logger)
 
-
     #run decryption and verification on data
     key_export_time = 0
     for each_party in parties:
-        logger.debug('Verifying %s' %each_party)
+        logger.debug('Verifying %s' % each_party)
 
         path = '/inputVolume/'
         try:
-            verifying_key = cr.import_key(path + keys_dict["%sverifying_key" %(each_party)], silent=False)
-            
-            logger.info("*** Please input your password for Quantum Safe Secret Key of %s: " %(each_party))
+            verifying_key = cr.import_key(path + keys_dict["%sverifying_key" % each_party], silent=False)
+
+            logger.info("*** For %s: please input your password for the "
+                        "\"SECRET Quantum-safe Encryption Key\"" % each_party)
             start_key_export = time.time()
             quantum_safe_secret_key = cr.import_key(path + keys_dict["%squantum_safe_secret_key" %(each_party)], silent=False)
             end_key_export = time.time()
             key_export_time += end_key_export - start_key_export
 
             start_key_export = time.time()
-            logger.info("*** Please input your password for Classic Secret Key of %s: " %(each_party))
-            classic_secret_key = cr.import_key(path + keys_dict["%sclassic_secret_key" %(each_party)], silent=False)
+            logger.info("*** For %s: please input your password for the "
+                        "\"SECRET Classic Encryption Key\"" % each_party)
+            classic_secret_key = cr.import_key(path + keys_dict["%sclassic_secret_key" % each_party], silent=False)
             end_key_export = time.time()
             key_export_time += end_key_export - start_key_export
-            
-            classic_public_key = cr.import_key(path + keys_dict["%sclassic_public_key" %(each_party)], silent=False)
+
+            classic_public_key = cr.import_key(path + keys_dict["%sclassic_public_key" % each_party], silent=False)
         except:
             logger.error("Failed to import verifying and public-priavte key. Please chekc if keys are in the input folder and give the correct names in the security_input.yaml file.")
             raise
