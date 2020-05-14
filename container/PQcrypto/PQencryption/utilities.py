@@ -11,6 +11,7 @@ import gc  # garbage collector
 import re
 import os
 from functools import wraps
+from nacl.exceptions import CryptoError
 
 def _check_password(password):
     """ Checks if the password meets the required criteria.
@@ -186,7 +187,7 @@ def repeat_import_export(function):
         while attempts <= max_number_of_attempts:
             try:
                 return function(*args, **kwargs)
-            except ValueError as error:
+            except (ValueError, CryptoError) as error:
                 attempts += 1
                 print()
                 print("Password input unsuccessful:")
@@ -199,7 +200,6 @@ def repeat_import_export(function):
                 print()
 
     return wrapper
-
 
 def sign_encrypt_sign_pubkey(signing_key, quantum_safe_public_key,
         classic_secret_key, classic_public_key, message):
