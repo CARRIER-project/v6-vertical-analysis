@@ -1,21 +1,27 @@
+### System files
 .DS_Store
 Icon[]
 .Rhistory
 Images
+
+### Python files
 __pycache__
 *.pyc
 
+### JupyterNotebooks
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+### Editor files
 *.swp
 *.sav
+
+### Files produced in use
 *.enc
 *.key
 *.log
 
+### Keep the output folder, but none of its contents
+### Git can only track files, not folders - so we use a placeholder
 Testing_folder/*/output/*
 !Testing_folder/*/output/.gitignore
-#!*/
-
-
-### JupyterNotebooks ###
-.ipynb_checkpoints
-*/.ipynb_checkpoints/*
