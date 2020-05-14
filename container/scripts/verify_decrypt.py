@@ -81,7 +81,7 @@ def read_write_encrypted_file(receiver_url, parties, keys_dict, modelNames, logg
                     with open("/inputVolume/%s_%s.enc" %(each_party, each_model), 'r') as read_model_file:
                         contents = read_model_file.read()
                     ### Write signed model files to the docker container ###
-                    with open("/%s_%s.enc" %(each_party, each_model), "w") as write_model_file:
+                    with open("/models/%s_%s.enc" %(each_party, each_model), "w") as write_model_file:
                         write_model_file.write(contents)
         except FileNotFoundError:
             logger.error("Please provide the right file UUID number in your YAML Input file.")
@@ -102,7 +102,7 @@ def read_write_encrypted_file(receiver_url, parties, keys_dict, modelNames, logg
             for each_model in modelNames:
                 url = receiver_url+"/file/%s_%s.enc" %(each_party, each_model)####
                 response = requests.get(url, stream=True)
-                with open("/%s_%s.enc" %(each_party, each_model), 'w') as out_file:
+                with open("/models/%s_%s.enc" %(each_party, each_model), 'w') as out_file:
                     shutil.copyfileobj(response.raw, out_file)
                 del response
 
@@ -169,7 +169,7 @@ def verify_model(verifying_key_list, modelFile_list, newFile, logger):
     for i in range(0, len(verifying_key_list)):
         try:
             #read signed model file
-            with open(modelFile_list[i], 'r') as m_file:
+            with open("/models/" + modelFile_list[i], 'r') as m_file:
                 myModel = m_file.read()
 
             #verify-model
@@ -284,7 +284,8 @@ def main():
 
     try:
         for key_item in modelKeys.keys():
-            verify_model(modelKeys[key_item], modelFileNames[key_item], "/scripts/MLmodel.py", logger)
+            verify_model(modelKeys[key_item], modelFileNames[key_item],
+                         "/models/MLmodel.py", logger)
         logger.info("Your model is verified successfully. ")
     except:
         logger.error("Model verification failed!")

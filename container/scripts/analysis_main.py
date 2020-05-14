@@ -199,6 +199,7 @@ def check_model_inputs(ml_model, task, scoring, combined_df, logger):
     """ Check if the model parameters are valid
 
     Args:
+        ml_model (module): model to use
         task (str): regression or classification.
         scoring (str/list): evaluation methods from Scikit Learn.
         combined_df (Pandas.DataFrame): the dataframe with selected features.
@@ -273,6 +274,7 @@ def training_process(ml_model, combined_df, task, kFold, scoring,
     """ Train and evaluate the analysis model 
 
     Args:
+        ml_model (module): model to use
         combined_df (Pandas.DataFrame): the dataframe with selected features.
         task (str): regression or classification.
         kFold (int/float): K-fold cross-validation or dataset slipting ratio
@@ -356,7 +358,7 @@ def main():
 
     # We have to import MLmodel in the main function at runtime, because when
     # this script is imported, MLmodel.py does not exist yet.
-    from scripts import MLmodel
+    from models import MLmodel
 
     ### Read analysis yaml file ###
     logger = rlog.get_logger(__name__)

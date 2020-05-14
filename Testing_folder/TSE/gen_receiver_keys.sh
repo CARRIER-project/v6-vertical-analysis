@@ -8,6 +8,7 @@ do
   docker run \
     --rm \
     -it \
+    --user $(id -u):$(id -g) \
     -e RUN="generate_receiver_keys" \
     -e PARTY_NAME="$PARTY_NAME" \
     -v "$(pwd)/input:/inputVolume" \

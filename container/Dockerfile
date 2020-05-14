@@ -2,13 +2,11 @@ FROM python:3.6.9-slim-stretch
 
 RUN apt-get update && apt-get install -y python-pip
 
-RUN mkdir /data
-
-RUN mkdir /models
-
-RUN mkdir /inputVolume
-
-RUN mkdir /output
+RUN mkdir /data && chmod a+rw /data
+RUN mkdir /models && chmod a+rw /models
+RUN mkdir /inputVolume && chmod a+rw /inputVolume
+RUN mkdir /output && chmod a+rw /output
+RUN mkdir /scripts && chmod a+rw /scripts
 
 RUN pip install \
   'mock==3.0.5' \
