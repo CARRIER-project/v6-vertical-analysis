@@ -9,10 +9,8 @@ or saved locally
 
 import time
 start_time = time.time()
-import base64
-import nacl.encoding
 import PQencryption as cr
-import requests, yaml, sys
+import requests, yaml
 import redacted_logging as rlog
 from PQencryption.eddsa import EdDSA
 

@@ -9,7 +9,6 @@ Then, sign-encrypt (symmetric key) -sign the data file and sign-encrypt (public-
 
 import time
 start_time = time.time()
-import base64
 import nacl.encoding
 import PQencryption as cr
 import requests, json, yaml, uuid

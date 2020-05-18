@@ -13,8 +13,7 @@ container for next steps (matching).
 import time
 start_time = time.time()
 
-import json, yaml, sys
-import base64
+import yaml, sys
 import shutil
 import requests
 import nacl.encoding

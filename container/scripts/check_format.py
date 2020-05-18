@@ -1,6 +1,5 @@
-import time, json
+import time
 start_time = time.time()
-import pandas as pd
 
 import redacted_logging as rlog
 logger = rlog.get_logger(__name__)
