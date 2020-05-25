@@ -34,11 +34,17 @@ def customize_features(input_dataframe):
         Please note there should not be any printing/writting out in this function
     Args:
         input_dataframe (Pandas.DataFrame): Dataframe of original data
-
     Returns:
         input_dataframe (Pandas.DataFrame): Dataframe of original + customized data.
+    Example:
+        If you need to add column_1 and column_2 as a new column:
+            --> input_dataframe['new_column'] = input_dataframe['column_1'] + input_dataframe['column_2']
+    Note:
+        1. You have to use the exact names of columns.
+        2. New columns (names) will be added to the dataframe.
     """
     ### input features which need to be operated ###
+    ### Column names have to be accurate ###
     operated_feature = [
                     ["ZVWKHUISARTS_2010", "ZVWKHUISARTS_2011", "ZVWKHUISARTS_2012", "ZVWKHUISARTS_2013", 
                         "ZVWKHUISARTS_2014", "ZVWKHUISARTS_2015", "ZVWKHUISARTS_2016"],
@@ -80,13 +86,15 @@ def customize_features(input_dataframe):
                     ["ZVWKMULTIDISC_2015", "ZVWKMULTIDISC_2016"]
                 ]
 
-    ### Give names to new features ###
+    ### Give names to new columns ###
+    ### New columns names will be used ###
     customized_feature_names = ["Ave_ZVWKHUISARTS","Ave_ZVWKFARMACIE","Ave_ZVWKZIEKENHUIS","Ave_ZVWKPARAMEDISCH","Ave_ZVWKHULPMIDDEL",
                                     "Ave_ZVWKZIEKENVERVOER", "Ave_ZVWKBUITENLAND", "Ave_ZVWKOVERIG", "Ave_ZVWKEERSTELIJNSPSYCHO",
                                     "Ave_ZVWKGGZ", "Ave_ZVWKGENBASGGZ", "Ave_ZVWKSPECGGZ", "Ave_ZVWKGERIATRISCH", \
                                     "Ave_ZVWKWYKVERPLEGING", "Ave_ZVWKMULTIDISC"]
 
-    ### Sum up features do average ###
+    ### Conduct operations on the exisitng columns  ###
+    ### e.g., input_dataframe['new_column'] = input_dataframe['column_1'] + input_dataframe['column_2'] ###
     for i in range(0,len(operated_feature)):
         if customized_feature_names[i] == 'Ave_ZVWKEERSTELIJNSPSYCHO': # this feature is only available for 4 years #
             input_dataframe[customized_feature_names[i]] = (input_dataframe[operated_feature[i]].sum(axis=1)) / 4
@@ -124,9 +132,13 @@ def defineFeatures():
             training_features (list): a list of features for training the model (each model has a list of training features)
             target_feature (list): a list of features as target (each model has one target feature)
     """
-
+    ### Give names to all models ###
+    ### Length of model_name is equal to the length of training features (and the length of target features) ###
     model_name = ['model_0', 'model_1', 'model_2', 'model_3', 'model_4', 'model_5', 'model_6', 'model_7', 'model_8', 'model_9', 'model_10']
 
+    ### training_features is a list of lists of features ###
+    ### Template: [[training features in model_0],[training features in model_1],[training features in model_2]...]
+    ### Please note the columns names (training features) you provide have to be correct ###
     training_features = [["N_Diabetes_WHO_2"],
                         ["SEX", "Age", "N_Education_3cat", "N_Diabetes_WHO_2"],
                         ["SEX", "Age", "height", "bmi", "N_Diabetes_WHO_2"],
@@ -160,9 +172,11 @@ def normalizeFeatures(combined_df, model_setting, model_name, training_features,
     """
     i_model = model_setting[0]
     i_training = model_setting[1]
-
-    ###### Remove missing values ######
     combined_df_selected = combined_df[training_features[i_model] + [target_feature[i_training]]]
+
+
+    ### Removing missing values ###
+    ### Normalization and model training will not work if missing values are not removed ###
 
     missing  = 0
     misVariables = []
@@ -184,7 +198,15 @@ def normalizeFeatures(combined_df, model_setting, model_name, training_features,
     combined_df_selected = combined_df_selected[np.invert(pd.isnull(combined_df_selected).any(axis=1))]
     logger.debug('After removing missings, {rows} rows left in training task of {model} {target}'.format(rows=len(combined_df_selected),model=model_name[i_model],target=target_feature[i_training]))
 
+    ### If you don't want to remove missing values, please comment the above function (line 178 - line 199) ###
+    ### Then, uncomment the following two lines.
+    # combined_df_selected = combined_df_selected
+    # logger.debug('You did not detect and remove missing values. The dataset might contain missing values which may cause errors in analysis.')
+
+
     ###### Normalization ######
+    ### Scalers from Scikit learn are supported including Normalizer, MinMaxScaler, RobustScaler ###
+    ### More scalers can be found here: https://scikit-learn.org/stable/modules/classes.html#module-sklearn.preprocessing ###
     logger.debug('Start Normalization ... ... ')
     scaler = RobustScaler(quantile_range=(15,85)) #MinMaxScaler(feature_range=(-1, 1)) RobustScaler
     scaled = scaler.fit_transform(combined_df_selected) # trans_features
@@ -215,10 +237,13 @@ def defineMLModels(model_name, kFold):
             model (list): a list of defined models
     """
 
-    ## Configure models when kFold is not False ###
+    ### Define_models is a dict which should indicate which model uses which analysis algorithms ###
+    ### when the goal of execution is prediciton, kFold will be a real number. ###
+    ### In this case, we recommend to use Skicit learn models e.g., linear regress, SVM regression, etc ###
+    ### More models can be found: https://scikit-learn.org/stable/supervised_learning.html ###
     if kFold:
         define_models = {
-            'model_0': LinearRegression(normalize=True),
+            'model_0': LinearRegression(normalize=True), ### Define models names and parameters ###
             'model_1': LinearRegression(normalize=True),
             'model_2': LinearRegression(normalize=True),
             'model_3': LinearRegression(normalize=True),
@@ -232,9 +257,10 @@ def defineMLModels(model_name, kFold):
         }
 
     else:
-        ### If you wanna use statmodels to learn associations (kFold is False)
+        ### when the goal of execution is learning association, kFold will be a False. ###
+        ### We support statsmodels to learn associations https://www.statsmodels.org/stable/index.html ###
         define_models = {
-            'model_0': ['OLS', 'add_constant'],
+            'model_0': ['OLS', 'add_constant'], ### Define models names and parameters ###
             'model_1': ['OLS', 'add_constant'],
             'model_2': ['OLS', 'add_constant'],
             'model_3': ['OLS', 'add_constant'],
@@ -282,6 +308,7 @@ def writeOutput(kFold, single_model_name, results, result_list, single_training_
             result_list (list): a list of results (each model generates one set of results)
     """
 
+    ### Output for Statsmodels ### 
     if not kFold:
         ### Write results out to a png file ###
         plt.rc('figure', figsize=(12, 7))
@@ -294,7 +321,7 @@ def writeOutput(kFold, single_model_name, results, result_list, single_training_
         plt.savefig(filename)
         logger.debug("%s - Statmodels result plot is done!" %single_model_name)
         plt.clf()
-    
+    ### Output for Scikit Learn ### 
     elif len(result_list) == 0:
         mean_scores = {}
         std_scores = {}
