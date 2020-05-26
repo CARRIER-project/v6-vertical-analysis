@@ -95,7 +95,7 @@ def select_features(data_frame, selected_variables, excluded_variables, logger):
         
 ### 1.Overview on combined data ###
 def overview_combined_data (combined_df, selected_columns, plotting_features, file_name, checkMissing, basicInfo, 
-                            CorrMatrix, dist_plot, pairplot_plot, pairplot_features, pairplot_hue, control_variable, logger):
+                            CorrMatrix, dist_plot, dist_table, category_threshold, pairplot_plot, pairplot_features, pairplot_hue, control_variable, logger):
     """ Generate basic information of the dataset including basic statistics, missing values,
         correlation matrix, distribution plot.
 
@@ -150,7 +150,7 @@ def overview_combined_data (combined_df, selected_columns, plotting_features, fi
             logger.warning("Failed to plot correlation matrix, but the execution will be continued!")
 
 
-    ### Function for distribution plot ###
+    ### Function for distribution plot and table ###
     if dist_plot:
         if not control_variable:
             for column_item in range(0,len(plotting_features)):
@@ -160,10 +160,10 @@ def overview_combined_data (combined_df, selected_columns, plotting_features, fi
                     logger.debug("%s - Calculated values for plotting contains errors!" %plotting_features[column_item])
             logger.debug('Distribution plot is done')
 
-        elif control_variable in plotting_features:
+        elif control_variable in selected_columns:
             list_value = list(Counter(combined_df[control_variable]).keys())
 
-            if len(list_value) < 8:
+            if len(list_value) < category_threshold:
                 for i_value in list_value:
                     ctrl_combined_df = combined_df[combined_df[control_variable]==i_value]
                     for column_item in range(0,len(plotting_features)):
@@ -176,11 +176,31 @@ def overview_combined_data (combined_df, selected_columns, plotting_features, fi
                 logger.debug('Distribution plot is done')
             else: 
                 logger.error("Sorry, control variable has too many different values! Please choose categorical variable as control")
-                sys.exit("Execution interrupted!")
             
         else:
             logger.error("Please give one valid variable name or False to 'control_var'.")
             sys.exit("Execution interrupted!")
+        
+    if dist_table:
+        ### Generate the data distribution parameters on the entire dataset ###
+        analysis_subfunctions.dist_table_function(combined_df, category_threshold, file_name, 'entire', 'dataset')
+
+        if control_variable:
+            if control_variable in selected_columns:
+                list_value = list(Counter(combined_df[control_variable]).keys())
+                if len(list_value) < category_threshold:
+                    for i_value in list_value:
+                        ctrl_combined_df = combined_df[combined_df[control_variable]==i_value]
+                        analysis_subfunctions.dist_table_function(ctrl_combined_df, category_threshold, file_name, control_variable, i_value)
+                else: 
+                    logger.error("Sorry, control variable has too many different values! Please choose categorical variable as control")
+            
+            else:
+                logger.error("Please give one valid variable name or False to 'control_var'.")
+                sys.exit("Execution interrupted!")
+                
+        logger.debug('Distribution table is done')
+
 
     ### Function for pairplot ###
     if pairplot_plot:
@@ -379,12 +399,14 @@ def main():
         categorical_to_numerical = inputYAML['variables_to_numeric']
         customize_feature = inputYAML['customize_features']
         file_name = inputYAML['taskName']
-        control_variable = inputYAML['control_var']
         checkMissing = inputYAML['check_missing']
         basicInfo = inputYAML['basic_Information']
         plotting_features = inputYAML['plotting_features']
         CorrMatrix = inputYAML['correlation_matrix']
         dist_plot = inputYAML["distribution_plot"]
+        dist_table = inputYAML["distribution_table"]
+        control_variable = inputYAML['control_var']
+        category_threshold = inputYAML['category_threshold']
         pairplot_plot = inputYAML["pairplot_plot"]
         pairplot_features = inputYAML["pairplot_features"]
         pairplot_hue = inputYAML["pairplot_hue"]
@@ -425,7 +447,7 @@ def main():
     ### 2.Overview on combined data ###
     start_time_step_1 = time.time()
     overview_combined_data (combined_df, selected_columns, plotting_features, file_name, checkMissing, basicInfo, 
-                            CorrMatrix, dist_plot, pairplot_plot, pairplot_features, pairplot_hue, control_variable, logger)
+                            CorrMatrix, dist_plot, dist_table, category_threshold, pairplot_plot, pairplot_features, pairplot_hue, control_variable, logger)
     logger.info("Basic info took {runtime:.4f}s to run".format(runtime=(time.time() - start_time_step_1)))
 
 

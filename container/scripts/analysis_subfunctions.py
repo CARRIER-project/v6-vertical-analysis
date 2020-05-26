@@ -207,6 +207,32 @@ def dist_Plot (data_frame,featureName,ctrl_value):
     # return df_dist
     # ##################### END  ########################
 
+###########################################
+# Function for variable distribution table#
+###########################################
+def dist_table_function(ctrl_combined_df, category_threshold, file_name, control_variable, i_value):
+    cat_variables = {}
+    num_variables = []
+    try:
+        for each_col in ctrl_combined_df.columns:
+            if len(ctrl_combined_df[each_col].value_counts())<category_threshold:
+                cat_variables.update({each_col:ctrl_combined_df[each_col].value_counts(dropna=False)})
+            else:
+                num_variables.append(each_col)
+
+        outputFile_categorical = "output/Dist/%s_%s_%s_categorical.csv" %(file_name, control_variable, i_value)
+        outputFile_numerical = "output/Dist/%s_%s_%s_numerical.csv" %(file_name, control_variable, i_value)
+        
+        os.makedirs(os.path.dirname(outputFile_categorical), exist_ok=True)
+        pd.DataFrame(cat_variables).to_csv(outputFile_categorical)
+
+        os.makedirs(os.path.dirname(outputFile_numerical), exist_ok=True)
+        ctrl_combined_df[num_variables].describe().to_csv(outputFile_numerical)
+    except KeyError:
+        logger.debug("Check the control variable name!")
+    except ValueError:
+        logger.debug("Distribution parameters cannot be calculated successfully.")
+
 
 ############################################################
 #### Train on the Splited training and testing dataset  ####
