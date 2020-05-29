@@ -2,8 +2,8 @@ receiver_url: false
 
 ### What variables are selected ###
 variables: all
+
 exclude_variables: 
-    - VISIT1_DATE
     - SF36_Q7
     - SF36_Q10
 
@@ -20,32 +20,77 @@ check_missing: true
 basic_Information: true
 
 ### Which features will be plotted ###
-plotting_features: all
+plotting_features: 
+    - N_DM_DUR_2
+    - N_Diabetes_WHO_2
+    - N_T2DM_new_diagn
+    - SEX
+    - Age
+    - waist
+    - hip
+    - height
+    - weight
+    - bmi
+    - N_Education_3cat
+    - Income_equivalent
+    - Employment_status
+    - Occupational_category
+    - n_smokingcat4
+    - N_ALCOHOL_CAT
+    - NIT_kcal
+    - medGRscore_TR
+    - TOTALPA
+    - MVPA
+    - N_CVD
+    - N_HT
+    - Mobility_lim
+    - med_depression
+    - MINIdep_adjusted
+    - MEAN_VALID_MIN_SLEEP_T
+    - MEAN_SED_MIN_WAKE_T
+    - MEAN_STAND_MIN_WAKE_T
+    - MEAN_STEP_MIN_WAKE_T
+    - ZVWKHUISARTS_modify
+    - ZVWKFARMACIE_modify
+    - ZVWKZIEKENHUIS_modify
+    - ZVWKPARAMEDISCH_modify
+    - ZVWKHULPMIDDEL_modify
+    - ZVWKZIEKENVERVOER_modify
+    - ZVWKBUITENLAND_modify
+    - ZVWKOVERIG_modify
+    - ZVWKEERSTELIJNSPSYCHO_modify
+    - ZVWKGGZ_modify
+    - ZVWKWYKVERPLEGING_modify
+    - ZVWKMULTIDISC_modify
 
 ### Plot correlation matrix figure (true or false) ###
 correlation_matrix: true
 
 ### Plot distribution figure (true or false) ###
-distribution_plot: true 
-# If set up controlled variables when you plot distribution figure #
-control_var: false
+distribution_plot: false
+### Calculate distribution parameter values into a table (true or false) ###
+distribution_table: true
+### If set up controlled variables when you plot distribution figure #
+control_var: N_Diabetes_WHO_2
+### A threshold to distinguish numerical and categorial variables (int, def=8) ###
+category_threshold: 8 
 
 ### Plot pairplot (true or false) ###
 pairplot_plot: true 
 # If set up controlled variables when you plot distribution figure #
 pairplot_features: 
     - N_Diabetes_WHO_2
-    - Ave_ZVWKEERSTELIJNSPSYCHO
-    - Ave_ZVWKGGZ
-    - Ave_ZVWKWYKVERPLEGING
-    - Ave_ZVWKMULTIDISC
+    - ZVWKHUISARTS_modify
+    - ZVWKFARMACIE_modify
+    - ZVWKZIEKENHUIS_modify
+    - ZVWKPARAMEDISCH_modify
 pairplot_hue: N_Diabetes_WHO_2
 
 ### what task you wanna do (classification or regression) ###
 task: regression
 
 ### Give a name of this task ###
-taskName: Training_2020421
+taskName: Training_20200527
 
 ### Give the evalaution methods (the same as sklearn names)
 evaluation_methods: 
@@ -57,6 +102,5 @@ evaluation_methods:
 # If k_fold/split_ratio >=2, it will do cross-validation (K-fold) #
 # If 0 < k_fold/split_ratio < 1, it will do one-time split (test:the whole set)#
 # e.g., k_fold/split_ratio = 0.2, then the dataset will be split to train:test = 0.8:0.2 #
-# If k_fold/split_ratio = 1, the whole dataset will be trained by Scikit Learning models #
-# If k_fold = False, the dataset will be trained by Statmodel pkg for only learning the associations (no prediction) #
+# If k_fold/split_ratio = False, the whole dataset will be trained by statsmodels - linear regression model #
 k_fold/split_ratio: False

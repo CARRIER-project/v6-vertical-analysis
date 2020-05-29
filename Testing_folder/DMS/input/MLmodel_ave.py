@@ -44,6 +44,22 @@ def customize_features(input_dataframe):
         2. New columns (names) will be added to the dataframe.
     """
     ### input features which need to be operated ###
+    ### Customize the depression variables ###
+    MINIdep_adj = []
+    for i in range(0, len(input_dataframe)):
+        if input_dataframe['MINIlifedepr'][i] == 1:
+            MINIdep_adj.append(1)
+        elif input_dataframe['MINIlifedepr'][i] == 0:
+            MINIdep_adj.append(0)
+        else:
+            if input_dataframe['MINIcurrdepr'][i] == 1:
+                MINIdep_adj.append(2)
+            elif input_dataframe['MINIcurrdepr'][i] == 0:
+                MINIdep_adj.append(0)
+            else:
+                MINIdep_adj.append(None)
+    input_dataframe['MINIdep_adjusted']=MINIdep_adj
+
     ### Column names have to be accurate ###
     operated_feature = [
                     ["ZVWKHUISARTS_2010", "ZVWKHUISARTS_2011", "ZVWKHUISARTS_2012", "ZVWKHUISARTS_2013", 
@@ -88,30 +104,31 @@ def customize_features(input_dataframe):
 
     ### Give names to new columns ###
     ### New columns names will be used ###
-    customized_feature_names = ["Ave_ZVWKHUISARTS","Ave_ZVWKFARMACIE","Ave_ZVWKZIEKENHUIS","Ave_ZVWKPARAMEDISCH","Ave_ZVWKHULPMIDDEL",
-                                    "Ave_ZVWKZIEKENVERVOER", "Ave_ZVWKBUITENLAND", "Ave_ZVWKOVERIG", "Ave_ZVWKEERSTELIJNSPSYCHO",
-                                    "Ave_ZVWKGGZ", "Ave_ZVWKGENBASGGZ", "Ave_ZVWKSPECGGZ", "Ave_ZVWKGERIATRISCH", \
-                                    "Ave_ZVWKWYKVERPLEGING", "Ave_ZVWKMULTIDISC"]
+    customized_feature_names = ["ZVWKHUISARTS_modify","ZVWKFARMACIE_modify","ZVWKZIEKENHUIS_modify","ZVWKPARAMEDISCH_modify","ZVWKHULPMIDDEL_modify",
+                                "ZVWKZIEKENVERVOER_modify", "ZVWKBUITENLAND_modify", "ZVWKOVERIG_modify", "ZVWKEERSTELIJNSPSYCHO_modify",
+                                "ZVWKGGZ_modify", "ZVWKGENBASGGZ_modify", "ZVWKSPECGGZ_modify", "ZVWKGERIATRISCH_modify", \
+                                "ZVWKWYKVERPLEGING_modify", "ZVWKMULTIDISC_modify"]
 
     ### Conduct operations on the exisitng columns  ###
     ### e.g., input_dataframe['new_column'] = input_dataframe['column_1'] + input_dataframe['column_2'] ###
     for i in range(0,len(operated_feature)):
-        if customized_feature_names[i] == 'Ave_ZVWKEERSTELIJNSPSYCHO': # this feature is only available for 4 years #
+        if customized_feature_names[i] == 'ZVWKEERSTELIJNSPSYCHO_modify': # this feature is only available for 4 years #
             input_dataframe[customized_feature_names[i]] = (input_dataframe[operated_feature[i]].sum(axis=1)) / 4
-        elif customized_feature_names[i] == 'Ave_ZVWKGGZ': # this feature is only available for 4 years #
+        elif customized_feature_names[i] == 'ZVWKGGZ_modify': # this feature is only available for 4 years #
             input_dataframe[customized_feature_names[i]] = (input_dataframe[operated_feature[i]].sum(axis=1)) / 4
-        elif customized_feature_names[i] == 'Ave_ZVWKGENBASGGZ': # this feature is only available for 3 years #
+        elif customized_feature_names[i] == 'ZVWKGENBASGGZ_modify': # this feature is only available for 3 years #
             input_dataframe[customized_feature_names[i]] = (input_dataframe[operated_feature[i]].sum(axis=1)) / 3
-        elif customized_feature_names[i] == 'Ave_ZVWKSPECGGZ': # this feature is only available for 3 years #
+        elif customized_feature_names[i] == 'ZVWKSPECGGZ_modify': # this feature is only available for 3 years #
             input_dataframe[customized_feature_names[i]] = (input_dataframe[operated_feature[i]].sum(axis=1)) / 3
-        elif customized_feature_names[i] == 'Ave_ZVWKGERIATRISCH': # this feature is only available for 4 years #
+        elif customized_feature_names[i] == 'ZVWKGERIATRISCH_modify': # this feature is only available for 4 years #
             input_dataframe[customized_feature_names[i]] = (input_dataframe[operated_feature[i]].sum(axis=1)) / 4
-        elif customized_feature_names[i] == 'Ave_ZVWKWYKVERPLEGING': # this feature is only available for 3 years #
+        elif customized_feature_names[i] == 'ZVWKWYKVERPLEGING_modify': # this feature is only available for 3 years #
             input_dataframe[customized_feature_names[i]] = (input_dataframe[operated_feature[i]].sum(axis=1)) / 3
-        elif customized_feature_names[i] == 'Ave_ZVWKMULTIDISC': # this feature is only available for 2 years #
+        elif customized_feature_names[i] == 'ZVWKMULTIDISC_modify': # this feature is only available for 2 years #
             input_dataframe[customized_feature_names[i]] = (input_dataframe[operated_feature[i]].sum(axis=1)) / 2
         else:
             input_dataframe[customized_feature_names[i]] = (input_dataframe[operated_feature[i]].sum(axis=1)) / 7 
+
 
     return input_dataframe
 
@@ -132,28 +149,38 @@ def defineFeatures():
             training_features (list): a list of features for training the model (each model has a list of training features)
             target_feature (list): a list of features as target (each model has one target feature)
     """
+
     ### Give names to all models ###
     ### Length of model_name is equal to the length of training features (and the length of target features) ###
-    model_name = ['model_0', 'model_1', 'model_2', 'model_3', 'model_4', 'model_5', 'model_6', 'model_7', 'model_8', 'model_9', 'model_10']
+    model_name = ['0_model', '0_modelBasic', '1_modelDemo', '2_modelLife', '3_modelCompli', '4_modelDailyAct', \
+                    '5_modelSocioEco', '6_modelDemoLife', '7_modelDemoCompli', '8_modelDemoDA', \
+                        '9_modelDemoSE', '10_modelDemoLifeDA', '11_modelDemoLifeCompli', \
+                            '12_modelDemoLifeSE', '13_modelDemoLifeDASE', '14_modelDemoLifeDACompli']
 
     ### training_features is a list of lists of features ###
     ### Template: [[training features in model_0],[training features in model_1],[training features in model_2]...]
     ### Please note the columns names (training features) you provide have to be correct ###
-    training_features = [["N_Diabetes_WHO_2"],
-                        ["SEX", "Age", "N_Education_3cat", "N_Diabetes_WHO_2"],
-                        ["SEX", "Age", "height", "bmi", "N_Diabetes_WHO_2"],
-                        ["SEX", "Age", "height", "waist", "hip", "N_Diabetes_WHO_2"],
-                        ["SEX", "Age", "height", "bmi", "n_smokingcat4","N_ALCOHOL_CAT", "NIT_kcal", "medGRscore_TR", "N_Diabetes_WHO_2"],
-                        ["SEX", "Age", "N_CVD", "N_HT",  "med_depression", "MINIlifedepr", "Mobility_lim", "N_Diabetes_WHO_2"],
-                        ["SEX", "Age", "N_Education_3cat", "height", "bmi", "n_smokingcat4","N_ALCOHOL_CAT", "NIT_kcal", "medGRscore_TR", "N_Diabetes_WHO_2"],
-                        ["SEX", "Age", "N_Education_3cat", "height", "bmi", "n_smokingcat4","N_ALCOHOL_CAT", "NIT_kcal", "medGRscore_TR", "N_Diabetes_WHO_2", 'MEAN_VALID_MIN_SLEEP_T', 'MEAN_SED_MIN_WAKE_T', 'MEAN_STAND_MIN_WAKE_T','MEAN_STEP_MIN_WAKE_T'],
-                        ["SEX", "Age", "N_Education_3cat", "N_CVD", "N_HT",  "med_depression", "MINIlifedepr", "Mobility_lim", "N_Diabetes_WHO_2"],
-                        ["SEX", "Age", "height", "bmi", "n_smokingcat4", "N_ALCOHOL_CAT", "NIT_kcal", "medGRscore_TR", "N_CVD", "N_HT",  "med_depression", "MINIlifedepr", "Mobility_lim", "N_Diabetes_WHO_2"],
-                        ["SEX", "Age", "N_Education_3cat", "height", "bmi", "n_smokingcat4", "N_ALCOHOL_CAT", "NIT_kcal", "medGRscore_TR", "N_CVD", "N_HT",  "med_depression", "MINIlifedepr", "Mobility_lim", "N_Diabetes_WHO_2"]]
-
-    target_feature = ["Ave_ZVWKHUISARTS","Ave_ZVWKFARMACIE","Ave_ZVWKZIEKENHUIS","Ave_ZVWKPARAMEDISCH","Ave_ZVWKHULPMIDDEL",
-                    "Ave_ZVWKZIEKENVERVOER", "Ave_ZVWKBUITENLAND", "Ave_ZVWKOVERIG", "Ave_ZVWKEERSTELIJNSPSYCHO",
-                    "Ave_ZVWKGGZ", "Ave_ZVWKWYKVERPLEGING", "Ave_ZVWKMULTIDISC"]
+    training_features = [["N_Diabetes_WHO_2"], # 0_model
+                        ["N_Diabetes_WHO_2", "SEX", "Age"], # 0_modelBasic
+                        ["N_Diabetes_WHO_2", "SEX", "Age", "height", "bmi"], # 1_modelDemo, "waist"
+                        ["N_Diabetes_WHO_2", "SEX", "Age", "n_smokingcat4", "N_ALCOHOL_CAT", "medGRscore_TR", "NIT_kcal", "TOTALPA"], # 2_modelLife, "MVPA"
+                        ["N_Diabetes_WHO_2", "SEX", "Age", "N_CVD", "N_HT", "Mobility_lim", "MINIdep_adjusted"], # 3_modelCompli, "med_depression"
+                        ["N_Diabetes_WHO_2", "SEX", "Age", "MEAN_VALID_MIN_SLEEP_T", "MEAN_SED_MIN_WAKE_T"], # 4_modelDailyAct, "MEAN_STAND_MIN_WAKE_T", "MEAN_STEP_MIN_WAKE_T"
+                        ["N_Diabetes_WHO_2", "SEX", "Age", "N_Education_3cat", "Income_equivalent"], # 5_modelSocioEco, "Employment_status"
+                        ["N_Diabetes_WHO_2", "SEX", "Age", "height", "bmi", "n_smokingcat4", "N_ALCOHOL_CAT", "medGRscore_TR", "NIT_kcal", "TOTALPA"], # 6_modelDemoLife
+                        ["N_Diabetes_WHO_2", "SEX", "Age", "height", "bmi", "N_CVD", "N_HT", "Mobility_lim", "MINIdep_adjusted"], # 7_modelDemoCompli
+                        ["N_Diabetes_WHO_2", "SEX", "Age", "height", "bmi", "MEAN_VALID_MIN_SLEEP_T", "MEAN_SED_MIN_WAKE_T"], # 8_modelDemoDA
+                        ["N_Diabetes_WHO_2", "SEX", "Age", "height", "bmi", "N_Education_3cat", "Income_equivalent"], # 9_modelDemoSE
+                        ["N_Diabetes_WHO_2", "SEX", "Age", "height", "bmi", "n_smokingcat4", "N_ALCOHOL_CAT", "medGRscore_TR", "NIT_kcal", "TOTALPA", "MEAN_VALID_MIN_SLEEP_T", "MEAN_SED_MIN_WAKE_T"],# 10_modelDemoLifeDA
+                        ["N_Diabetes_WHO_2", "SEX", "Age", "height", "bmi", "n_smokingcat4", "N_ALCOHOL_CAT", "medGRscore_TR", "NIT_kcal", "TOTALPA", "N_CVD", "N_HT", "Mobility_lim", "MINIdep_adjusted"], # 11_modelDemoLifeCompli
+                        ["N_Diabetes_WHO_2", "SEX", "Age", "height", "bmi", "n_smokingcat4", "N_ALCOHOL_CAT", "medGRscore_TR", "NIT_kcal", "TOTALPA", "N_Education_3cat", "Income_equivalent"], # 12_modelDemoLifeSE
+                        ["N_Diabetes_WHO_2", "SEX", "Age", "height", "bmi", "n_smokingcat4", "N_ALCOHOL_CAT", "medGRscore_TR", "NIT_kcal", "TOTALPA", "MEAN_VALID_MIN_SLEEP_T", "MEAN_SED_MIN_WAKE_T", "N_Education_3cat", "Income_equivalent"], # 13_modelDemoLifeDASE
+                        ["N_Diabetes_WHO_2", "SEX", "Age", "height", "bmi", "n_smokingcat4", "N_ALCOHOL_CAT", "medGRscore_TR", "NIT_kcal", "TOTALPA", "MEAN_VALID_MIN_SLEEP_T", "MEAN_SED_MIN_WAKE_T", "N_CVD", "N_HT", "Mobility_lim", "MINIdep_adjusted"]] # 14_modelDemoLifeDACompli
+                
+    target_feature = ["ZVWKHUISARTS_modify","ZVWKFARMACIE_modify","ZVWKZIEKENHUIS_modify","ZVWKPARAMEDISCH_modify","ZVWKHULPMIDDEL_modify",
+                        "ZVWKZIEKENVERVOER_modify", "ZVWKBUITENLAND_modify", "ZVWKOVERIG_modify", "ZVWKEERSTELIJNSPSYCHO_modify",
+                        "ZVWKGGZ_modify", "ZVWKGENBASGGZ_modify", "ZVWKSPECGGZ_modify", "ZVWKGERIATRISCH_modify", \
+                        "ZVWKWYKVERPLEGING_modify", "ZVWKMULTIDISC_modify"]
 
     return model_name, training_features, target_feature
 
@@ -184,16 +211,16 @@ def normalizeFeatures(combined_df, model_setting, model_name, training_features,
     column_names = list(CheckNull.keys())
     for var in range(0, len(CheckNull)):
         if CheckNull[var] != 0:
-            misVariables.append([column_names[var], CheckNull[var], round(CheckNull[var]/len(combined_df_selected ),3)])
+            misVariables.append(['%s_%s_%s' %(model_name[i_model], target_feature[i_training], column_names[var]), CheckNull[var], round(CheckNull[var]/len(combined_df_selected ),3)])
             missing = missing + 1
     if missing != 0:
         df_misVariables = pd.DataFrame.from_records(misVariables)
         df_misVariables.columns = ['Variable', 'Missing', 'Percentage (%)']
         sort_table = df_misVariables.sort_values(by=['Percentage (%)'], ascending=False)
         
-        outputFile = 'output/missings_in_models/%s_%s_summary.csv' %(model_name[i_model], target_feature[i_training])
+        outputFile = 'output/missings_in_models.csv'
         os.makedirs(os.path.dirname(outputFile), exist_ok=True)
-        sort_table.to_csv(outputFile)
+        sort_table.to_csv(outputFile, mode='a', index=False)
 
     combined_df_selected = combined_df_selected[np.invert(pd.isnull(combined_df_selected).any(axis=1))]
     logger.debug('After removing missings, {rows} rows left in training task of {model} {target}'.format(rows=len(combined_df_selected),model=model_name[i_model],target=target_feature[i_training]))
@@ -220,6 +247,7 @@ def normalizeFeatures(combined_df, model_setting, model_name, training_features,
 
     return features, target
 
+
 ######################################
 ### Define Machine learning Models ###
 ######################################
@@ -243,7 +271,7 @@ def defineMLModels(model_name, kFold):
     ### More models can be found: https://scikit-learn.org/stable/supervised_learning.html ###
     if kFold:
         define_models = {
-            'model_0': LinearRegression(normalize=True), ### Define models names and parameters ###
+            'model_0': LinearRegression(normalize=True),### Define models names and parameters ###
             'model_1': LinearRegression(normalize=True),
             'model_2': LinearRegression(normalize=True),
             'model_3': LinearRegression(normalize=True),
@@ -260,7 +288,7 @@ def defineMLModels(model_name, kFold):
         ### when the goal of execution is learning association, kFold will be a False. ###
         ### We support statsmodels to learn associations https://www.statsmodels.org/stable/index.html ###
         define_models = {
-            'model_0': ['OLS', 'add_constant'], ### Define models names and parameters ###
+            'model_0': ['OLS', 'add_constant'],### Define models names and parameters ###
             'model_1': ['OLS', 'add_constant'],
             'model_2': ['OLS', 'add_constant'],
             'model_3': ['OLS', 'add_constant'],
@@ -307,7 +335,7 @@ def writeOutput(kFold, single_model_name, results, result_list, single_training_
         Returns:
             result_list (list): a list of results (each model generates one set of results)
     """
-
+    
     ### Output for Statsmodels ### 
     if not kFold:
         ### Write results out to a png file ###
@@ -321,6 +349,7 @@ def writeOutput(kFold, single_model_name, results, result_list, single_training_
         plt.savefig(filename)
         logger.debug("%s - Statmodels result plot is done!" %single_model_name)
         plt.clf()
+
     ### Output for Scikit Learn ### 
     elif len(result_list) == 0:
         mean_scores = {}
