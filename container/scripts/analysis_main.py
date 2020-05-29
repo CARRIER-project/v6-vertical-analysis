@@ -116,10 +116,10 @@ def overview_combined_data (combined_df, selected_columns, plotting_features, fi
 
     ### For checking missings ###
     if checkMissing:
-        # try: 
-        analysis_subfunctions.check_missing(combined_df, selected_columns, file_name)
-        # except:
-        #     logger.warning("Failed to check missing values, but the execution will be continued!")
+        try: 
+            analysis_subfunctions.check_missing(combined_df, selected_columns, file_name)
+        except:
+            logger.warning("Failed to check missing values, but the execution will be continued!")
 
     ### For getting some basic info ###
     if basicInfo:
