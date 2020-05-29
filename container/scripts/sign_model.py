@@ -125,7 +125,7 @@ def main():
         try:
             path = '/inputVolume/'
 
-            logger.info("*** Please input your password for Signing Key: ***")
+            logger.info("*** Please input your password for Signing Key to sign model - %s: ***" %(model))
             start_key_export = time.time()
             signing_key = cr.import_key(path + signing_key_yaml, silent=False)
             end_key_export = time.time()
