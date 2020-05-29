@@ -271,34 +271,45 @@ def defineMLModels(model_name, kFold):
     ### More models can be found: https://scikit-learn.org/stable/supervised_learning.html ###
     if kFold:
         define_models = {
-            'model_0': LinearRegression(normalize=True),### Define models names and parameters ###
-            'model_1': LinearRegression(normalize=True),
-            'model_2': LinearRegression(normalize=True),
-            'model_3': LinearRegression(normalize=True),
-            'model_4': LinearRegression(normalize=True),
-            'model_5': LinearRegression(normalize=True),
-            'model_6': LinearRegression(normalize=True),
-            'model_7': LinearRegression(normalize=True),
-            'model_8': LinearRegression(normalize=True),
-            'model_9': LinearRegression(normalize=True),
-            'model_10': LinearRegression(normalize=True)
+            '0_model': LinearRegression(normalize=True),
+            '0_modelBasic': LinearRegression(normalize=True),
+            '1_modelDemo': LinearRegression(normalize=True),
+            '2_modelLife': LinearRegression(normalize=True),
+            '3_modelCompli': LinearRegression(normalize=True),
+            '4_modelDailyAct': LinearRegression(normalize=True),
+            '5_modelSocioEco': LinearRegression(normalize=True),
+            '6_modelDemoLife': LinearRegression(normalize=True),
+            '7_modelDemoCompli': LinearRegression(normalize=True),
+            '8_modelDemoDA': LinearRegression(normalize=True),
+            '9_modelDemoSE': LinearRegression(normalize=True),
+            '10_modelDemoLifeDA': LinearRegression(normalize=True),
+            '11_modelDemoLifeCompli': LinearRegression(normalize=True),
+            '12_modelDemoLifeSE': LinearRegression(normalize=True),
+            '13_modelDemoLifeDASE': LinearRegression(normalize=True),
+            '14_modelDemoLifeDACompli': LinearRegression(normalize=True)
         }
 
     else:
         ### when the goal of execution is learning association, kFold will be a False. ###
         ### We support statsmodels to learn associations https://www.statsmodels.org/stable/index.html ###
+       
         define_models = {
-            'model_0': ['OLS', 'add_constant'],### Define models names and parameters ###
-            'model_1': ['OLS', 'add_constant'],
-            'model_2': ['OLS', 'add_constant'],
-            'model_3': ['OLS', 'add_constant'],
-            'model_4': ['OLS', 'add_constant'],
-            'model_5': ['OLS', 'add_constant'],
-            'model_6': ['OLS', 'add_constant'],
-            'model_7': ['OLS', 'add_constant'],
-            'model_8': ['OLS', 'add_constant'],
-            'model_9': ['OLS', 'add_constant'],
-            'model_10': ['OLS', 'add_constant']
+            '0_model': ['OLS', 'add_constant'],
+            '0_modelBasic': ['OLS', 'add_constant'],
+            '1_modelDemo': ['OLS', 'add_constant'],
+            '2_modelLife': ['OLS', 'add_constant'],
+            '3_modelCompli': ['OLS', 'add_constant'],
+            '4_modelDailyAct': ['OLS', 'add_constant'],
+            '5_modelSocioEco': ['OLS', 'add_constant'],
+            '6_modelDemoLife': ['OLS', 'add_constant'],
+            '7_modelDemoCompli': ['OLS', 'add_constant'],
+            '8_modelDemoDA': ['OLS', 'add_constant'],
+            '9_modelDemoSE': ['OLS', 'add_constant'],
+            '10_modelDemoLifeDA': ['OLS', 'add_constant'],
+            '11_modelDemoLifeCompli': ['OLS', 'add_constant'],
+            '12_modelDemoLifeSE': ['OLS', 'add_constant'],
+            '13_modelDemoLifeDASE': ['OLS', 'add_constant'],
+            '14_modelDemoLifeDACompli': ['OLS', 'add_constant']
         }
 
     model = define_models[model_name]
@@ -308,6 +319,7 @@ def defineMLModels(model_name, kFold):
         logger.debug('Model parameters (Statmodel): %s' %model[0])
 
     return model
+
 
 
 ####################################
