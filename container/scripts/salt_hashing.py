@@ -14,6 +14,7 @@ import pyreadstat
 import pandas as pd
 import PQencryption as cr
 import redacted_logging as rlog
+import check_format
 
 
 
@@ -127,7 +128,7 @@ def main():
 
     ### Check formats of linking features###
     if check_format:
-        checkFormat.checking(data_frame, linking_features)
+        check_format.checking(data_frame, linking_features)
     else:
         logger.warning("You did not check format of linking features which might cause mis-matchings!")
 
@@ -167,7 +168,7 @@ def main():
     ### Write the new data file out ###
     hashedData_df.to_csv("/data/encrypted_%s.csv" %(party_name), index=None, sep=',', encoding='utf-8') #2.4 Output file name
 
-    logger.info("My program took {runtime:.4f}s to run".format(runtime=time.time() - start_time)) 
+    logger.info("Hashing identifiers took {runtime:.4f}s to run".format(runtime=time.time() - start_time)) 
 
 if __name__ == "__main__":
     main()
