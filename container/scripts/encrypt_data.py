@@ -208,7 +208,6 @@ def main():
 
     end_time = time.time()
     run_time = end_time - start_time - key_export_time
-
     logger.info("Data encryption program took {runtime:.4f}s to run (excluding key exports)".format(runtime=run_time))
 
 if __name__ == "__main__":

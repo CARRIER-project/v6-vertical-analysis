@@ -14,7 +14,7 @@ import pyreadstat
 import pandas as pd
 import PQencryption as cr
 import redacted_logging as rlog
-import check_format
+from scripts import check_format
 
 
 
