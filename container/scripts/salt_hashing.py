@@ -9,7 +9,6 @@ in the Docker container. The new file will be used for encrypt.py.
 """
 
 import time, sys, yaml
-start_time = time.time()
 import pyreadstat
 import pandas as pd
 import PQencryption as cr
@@ -99,6 +98,8 @@ def main():
     The main function will extract linking features, combine multiple values into one string, and salt hash the string. 
     Then, hashed linking features combining with actual data will be written into a data file stored in the Docker container.
     """
+    start_time = time.time()
+    
     logger = rlog.get_logger(__name__)
     input_yaml_file_name = r'/inputVolume/encrypt_input.yaml'
     inputYAML = load_yaml_file(input_yaml_file_name, logger)

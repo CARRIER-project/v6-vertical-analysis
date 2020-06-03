@@ -8,7 +8,6 @@ Then, sign-encrypt (symmetric key) -sign the data file and sign-encrypt (public-
 """
 
 import time
-start_time = time.time()
 import nacl.encoding
 import PQencryption as cr
 import requests, json, yaml, uuid
@@ -158,6 +157,7 @@ def main():
     sign-(public-priavte key)encrypt-sign for the key file. Then signed-encrypted-signed data and
     key files will be sent to TSE or saved locally.
     """
+    start_time = time.time()
 
     logger = rlog.get_logger(__name__)
     input_yaml_file_name = r'/inputVolume/encrypt_input.yaml'
@@ -208,6 +208,7 @@ def main():
 
     end_time = time.time()
     run_time = end_time - start_time - key_export_time
+
     logger.info("Data encryption program took {runtime:.4f}s to run (excluding key exports)".format(runtime=run_time))
 
 if __name__ == "__main__":

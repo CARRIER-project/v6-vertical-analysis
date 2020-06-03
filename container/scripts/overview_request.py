@@ -14,7 +14,6 @@ Until 25-03-2020, the following functions has been implemented in this script:
 
 """
 import time
-start_time = time.time()
 import ntpath
 from collections import Counter
 import yaml
@@ -84,6 +83,8 @@ def main():
     After reading the data file, the varilables will be selected by users input.
     Execute the functions of generating basic description of data, checking cokpleteness, plotting correlation metrix, distribution plots.
     """
+    start_time = time.time()
+    
     logger = rlog.get_logger(__name__)
     input_yaml_file_name = "/inputVolume/request.yaml"
     input_yaml = load_yaml_file(input_yaml_file_name, logger)

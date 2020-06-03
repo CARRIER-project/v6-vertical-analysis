@@ -14,7 +14,6 @@ Until 25-03-2020, the analysis process includes:
 ########## Simple Linear Regression ##########
 import os
 import time
-start_time_step_0 = time.time()
 import sys, yaml
 import numpy as np
 import pandas as pd
@@ -378,6 +377,7 @@ def main():
 
     # We have to import MLmodel in the main function at runtime, because when
     # this script is imported, MLmodel.py does not exist yet.
+    start_time_step_0 = time.time()
     from models import MLmodel
 
     ### Read analysis yaml file ###

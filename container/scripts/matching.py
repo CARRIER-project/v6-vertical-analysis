@@ -8,8 +8,6 @@ the actually analysis.
 """
 
 import time
-start_time = time.time()
-
 import yaml, sys
 import pandas as pd
 import numpy as np
@@ -102,7 +100,8 @@ def main():
     If the number of exact matched records is less than 100, execution will be interrupted
     to protect individual's privacy.
     """
-
+    start_time = time.time()
+    
     logger = rlog.get_logger(__name__)
     input_yaml_file_name = r'/inputVolume/security_input.yaml'
     inputYAML = load_yaml_file(input_yaml_file_name, logger)

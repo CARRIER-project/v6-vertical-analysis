@@ -11,8 +11,6 @@ container for next steps (matching).
 
 
 import time
-start_time = time.time()
-
 import yaml, sys
 import shutil
 import requests
@@ -201,6 +199,8 @@ def main():
     Signed model files will be verified and saved in the Docker container temporarily.
 
     """
+    start_time = time.time()
+    
     logger = rlog.get_logger(__name__)
     input_yaml_file_name = r'/inputVolume/security_input.yaml'
     inputYAML = load_yaml_file(input_yaml_file_name, logger)

@@ -8,7 +8,6 @@ or saved locally
 """
 
 import time
-start_time = time.time()
 import PQencryption as cr
 import requests, yaml
 import redacted_logging as rlog
@@ -92,7 +91,8 @@ def main():
     """main function
     The main function will import all model files and sign them by using signing key
     """
-
+    start_time = time.time()
+    
     logger = rlog.get_logger(__name__)
     input_yaml_file_name = r'/inputVolume/sign_model_input.yaml'
     inputYAML = load_yaml_file(input_yaml_file_name, logger)
